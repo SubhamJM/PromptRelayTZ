@@ -1,11 +1,11 @@
 # 🕵️ Prompt Relay: The Hot-Seat Sprint (Murder Mystery Edition)
 
-**Prompt Relay** is a sequential, high-stakes prompt-engineering party game designed for live crowds, meetups, hackathons, and conferences. Teams of 3 take turns at a single laptop ("hot seat" style), with each player acting as a human manager for a step in a chained AI pipeline solving a murder mystery.
+**Prompt Relay** is a sequential prompt-engineering challenge where teams of 3 take turns at a single laptop station. Each player acts as the prompt engineer for one link in a chained AI pipeline to solve a murder mystery:
 
-* **Player 1 (The Extractor):** Filters facts from a noisy case file.
-* **Player 2 (The Reconstructor):** Builds a chronological timeline from Player 1's facts (without leaking the killer).
-* **Player 3 (The Formatter):** Deduces the culprit and outputs strict JSON.
-* **The Roastmaster:** A final judge AI evaluates the pipeline, checks against ground truth, and roasts the teammate who broke the chain.
+* **Player 1 (The Extractor):** Filters critical facts from a noisy case file without prematurely solving the case.
+* **Player 2 (The Reconstructor):** Builds a chronological timeline based strictly on Player 1's extracted facts.
+* **Player 3 (The Detective & Formatter):** Deduces the culprit, method, and key clue based on Player 2's timeline, outputting strict JSON.
+* **Objective Evaluator:** Compares the final verdict against expected ground truth and scores the team on an objective 0–100 rubric.
 
 ---
 
@@ -38,6 +38,6 @@ Interactive API docs will be available at `http://localhost:8000/docs`.
 ---
 
 ## 📚 Documentation & Roadmap
-* [event_vision_complete_flow.md](file:///home/ricing/Documents/code/PromptRelay/event_vision_complete_flow.md): Minute-by-minute spectator flow, stage vs. Jumbotron view, and event mechanics.
-* [project_phases.md](file:///home/ricing/Documents/code/PromptRelay/project_phases.md): Phased implementation roadmap from setup to production.
+* [event_vision_complete_flow.md](file:///home/ricing/Documents/code/PromptRelay/event_vision_complete_flow.md): Single-laptop station workflow, handoff mechanics, and scoring rubric.
+* [project_phases.md](file:///home/ricing/Documents/code/PromptRelay/project_phases.md): Phased implementation roadmap from setup to tournament leaderboard.
 * [prompt_relay_readme.md](file:///home/ricing/Documents/code/PromptRelay/prompt_relay_readme.md): Core LangGraph state schema and node specifications.

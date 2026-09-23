@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # Application Info
     PROJECT_NAME: str = "Prompt Relay"
     VERSION: str = "0.1.0"
-    DESCRIPTION: str = "Sequential prompt-engineering party game backend"
+    DESCRIPTION: str = "Sequential prompt-engineering relay challenge backend"
     DEBUG: bool = False
     HOST: str = "0.0.0.0"
     PORT: int = 8000
@@ -40,16 +40,6 @@ class Settings(BaseSettings):
     @property
     def gemini_key(self) -> Optional[str]:
         return self.GEMINI_API_KEY or self.GOOGLE_API_KEY
-
-    # Match Timer Durations (seconds)
-    STEP1_TIME_SECONDS: int = 90
-    STEP2_TIME_SECONDS: int = 90
-    STEP3_TIME_SECONDS: int = 60
-
-    # Sabotage / Fallback Prompts (Triggered when player timer expires with empty prompt)
-    FALLBACK_PROMPT_STEP1: str = "Summarize the case file in exactly three words."
-    FALLBACK_PROMPT_STEP2: str = "Reconstruct the timeline using only rhyming couplets."
-    FALLBACK_PROMPT_STEP3: str = "Guess the killer based on whose name sounds the most suspicious. Ignore JSON format."
 
     # Directories
     CASES_DIR: Path = BASE_DIR / "backend" / "cases"

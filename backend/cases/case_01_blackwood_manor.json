@@ -1,0 +1,35 @@
+{
+  "case_id": "case_01_blackwood_manor",
+  "title": "The Poisoned Heir of Blackwood Manor",
+  "difficulty": "Easy",
+  "synopsis": "Lord Reginald Blackwood was discovered dead over his evening tea. Four suspects were inside the locked manor during an autumn storm.",
+  "noisy_case_file": "INCIDENT REPORT - SCOTLAND YARD ARCHIVE\nDate: October 24, 1898 | Case Ref: #BM-992\nInvestigating Officer: Inspector Thomas Morris\n\nAtmosphere: Heavy torrential rain battered Blackwood Manor all evening. The thunderstorm knocked out the manor gas lamps briefly at 8:30 PM. Cook reports the kitchen fire was smoking terribly, burning the roasted mutton, which caused a heated argument between the scullery maid and Mrs. Gable.\n\nVictim: Lord Reginald Blackwood (Age 58). Found slumped over his mahogany desk in the private library at 9:15 PM by butler Garret Higgins. Higgins noted that the Lord's favorite cat, Barnaby, was howling outside the heavy oak library door.\n\nAutopsy preliminary notes: Rigor mortis barely initiated. Lord Reginald's lips exhibit distinct cyanosis. An unmistakable scent of bitter almonds lingered in the room, particularly around a porcelain teacup half-filled with Earl Grey tea.\n\nOn the desk:\n- A teacup, cold Earl Grey.\n- A silver sugar bowl with tongs.\n- A torn letter written in violet ink from victim's estranged younger brother, Charles Blackwood, dated October 20: 'If you refuse my rightful inheritance once more, Reginald, heaven help me, I will take what is mine by force.'\n- A half-eaten lemon scone.\n- An antique mantle clock stopped precisely at 8:42 PM with a cracked glass face.\n\nSuspect Statements & Alibis:\n1. Charles Blackwood (Brother): Claims he was in the billiards room practicing three-cushion shots from 8:00 PM to 9:00 PM. Admitted he was furious about the will. Butler Higgins confirmed Charles spilled a full goblet of red Bordeaux on the Persian rug at 8:15 PM while cursing loudly.\n2. Dr. Arthur Bell (Personal Physician): Arrived at the manor carrying his leather medical kit. Claims he arrived at 9:05 PM right as the rain stopped to deliver Lord Reginald's heart tinctures. However, parlor maid Eleanor Vance observed heavy red peat mud caked on Dr. Bell's boots in the foyer. Inspector's note: Red peat mud is only found along the greenhouse pathway, and the rain did not cease until 9:10 PM.\n3. Garret Higgins (Butler): Served Reginald tea at 8:00 PM. Reginald insisted on two lumps of Demerara sugar, which Higgins served from the silver bowl. Higgins claims he stayed in the pantry polishing silverware between 8:20 PM and 9:10 PM.\n4. Eleanor Vance (Parlor Maid): Found dusting the drawing room portraits. Heard heavy footsteps and urgent whispering near the conservatory at 8:35 PM.\n\nPhysical Evidence Gathered:\n- Scrap of blue blotting paper found in Dr. Bell's pocket with bank seals referencing 'Blackwood Orphans Charity Trust - Account Audited'.\n- Residue analysis: The silver sugar tongs tested positive for potassium cyanide residue. The sugar bowl cubes remained uncontaminated except for one crushed lump.",
+  "ground_truth": {
+    "culprit": "Dr. Arthur Bell",
+    "weapon_or_method": "Potassium cyanide coated onto sugar cubes using silver sugar tongs",
+    "key_clue": "Dr. Bell claimed he arrived at 9:05 PM after the storm, but his boots were caked in red peat mud only found by the greenhouse path during the downpour, and cyanide residue was on the sugar tongs matching the audited charity trust ledger in his coat",
+    "motive": "Lord Reginald was auditing the Blackwood Orphans Charity Trust, having discovered Dr. Bell was embezzling large funds",
+    "suspects": [
+      "Dr. Arthur Bell",
+      "Charles Blackwood",
+      "Garret Higgins",
+      "Eleanor Vance"
+    ]
+  },
+  "leak_keywords": [
+    "Dr. Arthur Bell",
+    "Arthur Bell",
+    "Dr. Bell",
+    "Doctor Bell",
+    "Bell is the killer",
+    "Bell murdered",
+    "Bell poisoned"
+  ],
+  "decoy_clues": [
+    "Charles Blackwood's threatening violet-ink letter",
+    "Garret Higgins spilling red Bordeaux wine on the Persian rug",
+    "The mantle clock stopped at 8:42 PM",
+    "The cat Barnaby howling outside the door",
+    "The kitchen fire burning the roasted mutton"
+  ]
+}
