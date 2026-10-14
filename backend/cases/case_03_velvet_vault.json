@@ -1,0 +1,34 @@
+{
+  "case_id": "case_03_velvet_vault",
+  "title": "Murder at the Vernissage Gallery",
+  "difficulty": "Hard",
+  "synopsis": "During the black-tie charity gala at the Vernissage Art Gallery, billionaire collector Maximillian Cross collapsed as the lights briefly failed. The centerpiece ruby vanished in the dark.",
+  "noisy_case_file": "PREFECTURE DE POLICE - METROPOLITAN INVESTIGATION UNIT\nCase Reference: #VG-771 'Operation Crimson Velvet'\nScene: Vernissage Gallery of Fine Arts, Grand Rotunda | Date: November 14, 2025\nLead Investigator: Commissaire Laurent Moreau\n\nEvening Environment:\nOver 150 guests in black-tie attire attended the annual Beaux-Arts Gala. The gallery was filled with vintage crystal chandeliers, ice sculptures shaped like swans, and a six-piece live jazz ensemble playing aggressively loud bebop. Catering staff circulated with canapés of beluga caviar and glasses of vintage 2012 Dom Pérignon.\n\nVictim & Discovery:\nMaximillian Cross (Age 62), billionaire financier and trustee of the gallery. At exactly 10:15 PM, Cross approached the central pedestal to pull the velvet cord unveiling the centerpiece: 'The Eye of Florence' (a 45-carat Burmese pigeon-blood ruby valued at $18M). As he gripped the ornate bronze handle of the display vitrine, the gallery's circuit breaker tripped, plunging the room into total darkness for 45 seconds. Shouts and shattering glassware echoed across the hall. When auxiliary emergency lights activated at 10:16 PM, Cross was lying lifeless on the marble floor, gasping through paralyzed vocal cords. The vitrine glass was intact, but the pedestal was empty—the ruby was gone.\n\nForensic Medical Examiner Report:\nDeath caused by fast-acting neurotoxin (tetrodotoxin / pufferfish derivative) absorbed transdermally through micro-abrasions on the victim's right palm. Time from skin contact to cardiovascular collapse: approximately 60 seconds.\n\nKey Persons of Interest & Alibis:\n1. Helena Rostova (Chief Curator): Stood 3 meters from the pedestal during the countdown. Wore elbow-length black velvet opera gloves throughout the evening, explaining to guests that she suffered from contact dermatitis. Forensic UV sweep of the gallery revealed microscopic luminescent chemical binder on the bronze handle of the vitrine, matching residue found inside the lining of Helena's left glove. When detectives searched her office locker, the genuine 'Eye of Florence' ruby was discovered concealed inside the hollow core of a dismantled Leica vintage camera lens, while the display pedestal had contained a zirconium decoy prior to the gala.\n2. Julian Thorne (Rival Art Dealer): Owed Cross $4.2M from a disputed Renaissance auction. Security saw Thorne pacing near the breaker room at 10:05 PM smoking a Turkish cigarette. Thorne admitted he wanted to confront Cross, but claims he fled when the lights cut out.\n3. Chloe Vane (Socialite & Gem Collector): Seen wearing an emerald necklace. Security found an unauthorized laser-diffraction measuring pen in her evening clutch, which she claimed was for evaluating jewelry authenticity.\n4. Antoine Dubois (Head Banquet Server): Dropped an entire tray of twenty crystal champagne flutes near the south corridor at 10:14 PM, creating a loud diversion immediately before the lights failed. Dubois tested negative for chemical residue; he claimed a guest in a hurry violently bumped his elbow.",
+  "ground_truth": {
+    "culprit": "Helena Rostova",
+    "weapon_or_method": "Transdermal tetrodotoxin neurotoxin applied to the bronze handle of the vitrine display case",
+    "key_clue": "Helena wore opera gloves to conceal poison application, UV inspection revealed chemical binder on her glove lining matching the vitrine handle, and the genuine ruby was found hidden inside her vintage Leica camera lens",
+    "motive": "Helena had already replaced the original ruby with a fake zirconium replica months earlier and engineered the blackout and poisoning to prevent Cross from discovering the forgery and to cover the theft",
+    "suspects": [
+      "Helena Rostova",
+      "Julian Thorne",
+      "Chloe Vane",
+      "Antoine Dubois"
+    ]
+  },
+  "leak_keywords": [
+    "Helena Rostova",
+    "Helena",
+    "Rostova is the killer",
+    "Helena poisoned",
+    "Rostova murdered",
+    "Curator Rostova"
+  ],
+  "decoy_clues": [
+    "Julian Thorne's unpaid $4.2M debt and Turkish cigarette near breaker room",
+    "Antoine Dubois dropping twenty crystal champagne flutes at 10:14 PM",
+    "Chloe Vane carrying an unauthorized laser-diffraction measuring pen",
+    "Ice sculptures shaped like swans melting into the punch bowl",
+    "Loud bebop jazz quartet drowning out ambient noise"
+  ]
+}

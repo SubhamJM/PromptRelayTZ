@@ -1,0 +1,34 @@
+{
+  "case_id": "case_02_neon_nexus",
+  "title": "The Fatal Deployment at SynthAI",
+  "difficulty": "Medium",
+  "synopsis": "Viktor Kane, founder of hot unicorn SynthAI, collapsed dead in the server bunker during a midnight release. An insulin overdose triggered by remote tampering was masked by the datacenter freeze.",
+  "noisy_case_file": "INCIDENT DOSSIER - SAN FRANCISCO POLICE DEPT\nIncident: Suspicious Death / Cyber-Homicide\nLocation: SynthAI HQ, 4th Floor Server Bunker, SOMA, San Francisco\nTime of Discovery: 12:20 AM, Friday | Lead Investigator: Det. Sarah Chen\n\nBackground & Scene Details:\nSynthAI was preparing for its Series C funding announcement and v2 model weights release at 1:00 AM. Catering had delivered 12 boxes of cold pepperoni pizza and brown sugar boba milk teas at 10:30 PM. The office was bustling with tired engineers playing ping-pong in the lounge and arguing over git merge conflicts in #release-war-room.\n\nVictim: Viktor Kane (Age 34), CEO & Chief AI Architect. Diagnosed with Type 1 Diabetes; wore a continuous glucose monitor (CGM) and an automated Bluetooth-connected OmniDose insulin pump. Found unresponsive on the grating floor of Server Pod C, where temperatures are kept at a frigid 15°C (59°F). Paramedics pronounced him dead at 12:28 AM from acute severe hypoglycemia induced by a massive 50-unit insulin bolus.\n\nServer Room Access & Tech Logs:\n- 11:15 PM: Viktor logged into workstation Alpha-1, drinking a zero-sugar sparkling water.\n- 11:40 PM: Viktor entered Server Pod C with his biometric badge to manually check GPU cluster temperatures.\n- 11:48 PM: Datacenter Bluetooth gateway logged an unauthorized pairing attempt with device 'OmniDose-VK99' from MAC address F4:D4:88:9A:12:FE (hostname 'ML-Air-M3'). Bolus override executed, injecting 50 units of fast-acting Lispro.\n- 11:55 PM: Fire alarm in Sector B briefly tripped due to an overworked cooling manifold valve blowing dry nitrogen gas.\n\nSuspect Profiles & Interrogations:\n1. Maya Lin (Co-Founder & VP of Product): Claims she was locked inside Conference Room Echo hosting a live pitch to London venture capitalists on Zoom between 11:30 PM and 12:15 AM. London partners verified the call, but noted Maya muted her camera and mic between 11:45 PM and 11:52 PM claiming poor Wi-Fi. Forensic extraction: Hardware MAC address F4:D4:88:9A:12:FE matches Maya Lin's gold MacBook Air. In her designer handbag, detectives found an encrypted SanDisk Extreme SSD containing the complete proprietary neural weights of SynthAI v2 labeled 'Buyer: Apex Venture Beijing'.\n2. Devon Park (Lead Infrastructure Engineer): Seen shouting at Viktor at 10:45 PM regarding equity clawback clauses. Sent a message in Slack at 11:10 PM: 'If Kane doesn't fix our vesting schedules, this entire cluster can burn down.' Devon was spotted in the snack kitchen brewing third-wave pour-over coffee continuously from 11:35 PM to 12:05 AM, corroborated by security camera #3.\n3. Samira Khan (Head of Security): Was investigating a phishing incident reported by an intern at 11:20 PM. Left her badge on the reception desk between 11:40 PM and 11:50 PM while using the restroom.\n4. Garrison Cole (Lead Angel Investor): Present at the office celebrating early. Spilled a glass of champagne over the demo terminal at 11:30 PM, causing a brief breaker switch trip.",
+  "ground_truth": {
+    "culprit": "Maya Lin",
+    "weapon_or_method": "Remote Bluetooth firmware injection overriding Viktor's OmniDose smart insulin pump with a lethal 50-unit bolus",
+    "key_clue": "Maya's gold MacBook Air MAC address matched the unauthorized Bluetooth pairing logged at 11:48 PM during the exact 7-minute window she turned off her camera on the London Zoom call, and she possessed an SSD ready to sell SynthAI weights to a competitor",
+    "motive": "Maya was secretly orchestrating an illegal IP transfer of SynthAI's proprietary model weights to an offshore buyer, which Viktor had uncovered earlier that evening",
+    "suspects": [
+      "Maya Lin",
+      "Devon Park",
+      "Samira Khan",
+      "Garrison Cole"
+    ]
+  },
+  "leak_keywords": [
+    "Maya Lin",
+    "Maya",
+    "Lin is the killer",
+    "Maya killed",
+    "Maya murdered",
+    "Maya Lin did it"
+  ],
+  "decoy_clues": [
+    "Devon Park's angry Slack message in #release-war-room",
+    "The fire alarm tripped by the dry nitrogen valve in Sector B",
+    "Garrison Cole spilling champagne over demo terminal",
+    "Samira Khan leaving her badge on the reception desk",
+    "Catering boxes of cold pepperoni pizza and brown sugar boba"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "scenario_04_velvet_vault",
+  "type": "text",
+  "title": "Murder at the Vernissage Gallery",
+  "difficulty": "Hard",
+  "synopsis": "During the VIP opening gala of the Vernissage Gallery in Paris, gallery owner Henri Delacroix was found dead beside an empty pedestal where a priceless Roman intaglio gem was stolen.",
+  "dossier_text": "DOSSIER CRIMINEL: GALERIE DU VERNISSAGE\nDate: 08 November 2024 | Location: 4th Arrondissement, Paris\nInvestigating Desk: Brigade Criminelle\n\nNARRATIVE BRIEFING:\nHenri Delacroix, 59, prominent antiquities dealer, was discovered lifeless in the private vault display room at 21:40 during a VIP champagne preview. The vault door was open, and the centerpiece artifact—the Caesarean Emerald Intaglio—was missing from its reinforced vitrine.\n\nFORENSIC EVIDENCE & INTERROGATION LOGS:\n1. Toxicology: Cause of death was acute transdermal absorption of tetrodotoxin (pufferfish neurotoxin). Onset of paralysis occurred within 10 minutes of contact.\n2. Crime Scene Analysis: The toxin was meticulously coated onto the brass interior latch of the display vitrine. Whoever opened the display case without protective nitrile gloves would absorb the lethal dose immediately.\n3. Suspect Movements during Gala (20:30 - 21:30):\n   - Julian Thorne (Renowned restorer & gemologist): Stated he was on the garden terrace smoking and discussing Provençal wines with patrons from 20:45 to 21:15.\n   - Cecile Moreau (Gallery curator): Stated she was managing the catering staff in the main salon from 20:30 to 21:20.\n   - Baroness Monique De Valois (Wealthy collector): Stated she was in the main showroom admiring paintings until the alarm sounded at 21:35.\n4. Physical Evidence Recovered:\n   - In the restroom trash bin, detectives recovered a pair of discarded black nitrile gloves inside a champagne flute box.\n   - Forensic swab of the glove exterior tested positive for tetrodotoxin residue.\n   - Interior swab of the left glove yielded epithelial DNA matching Julian Thorne, along with trace powder residue from Thorne's bespoke lavender talc.\n5. Hidden Compartment: Julian Thorne's leather briefcase in the coat check contained an antique velvet jeweler's pouch containing the Caesarean Emerald Intaglio.",
+  "evidence_items": [
+    {
+      "id": "doc_01",
+      "title": "Toxicology & Vitrine Latch Chemical Swab",
+      "category": "Forensic Toxicology",
+      "badge": "Laboratoire Central",
+      "timestamp": "22:15",
+      "src": null,
+      "prompt_hint": "Extract the specific chemical agent, how it was delivered, and what surface was coated.",
+      "description": "Tetrodotoxin neurotoxin applied to brass vitrine latch; transdermal absorption.",
+      "ocr_ledger": "LAB RESULTS: Tetrodotoxin identified on brass vitrine latch #V-02. Lethal transdermal dose. Victim opened vitrine barehanded at approx 21:15 and collapsed within minutes."
+    },
+    {
+      "id": "doc_02",
+      "title": "Restroom Bin Glove Swab & DNA Match",
+      "category": "Physical Forensic",
+      "badge": "DNA & Trace Report",
+      "timestamp": "22:45",
+      "src": null,
+      "prompt_hint": "Extract the glove type, exterior toxin findings, and interior DNA match.",
+      "description": "Nitrile gloves with tetrodotoxin on exterior and Julian Thorne's DNA on interior.",
+      "ocr_ledger": "TRACE REPORT: Black nitrile gloves recovered in bin. Exterior: positive for tetrodotoxin. Interior: positive for Julian Thorne DNA (STR match probability 1 in 40 billion) and lavender talc."
+    }
+  ],
+  "operational_rules": [
+    "Biological Trace Principle §201: Epithelial DNA recovered inside crime paraphernalia establishes direct physical operation of the weapon.",
+    "Property Recovery Presumption: Unexplained possession of stolen goods immediately following homicide establishes culpability."
+  ],
+  "ground_truth": {
+    "target_action_or_culprit": "Julian Thorne",
+    "target_rules_or_method": "Tetrodotoxin neurotoxin coated onto the brass latch of the display vitrine, worn with nitrile gloves",
+    "target_proof_or_clue": "Recovered nitrile gloves tested positive for tetrodotoxin on exterior and Julian Thorne's DNA inside, with the stolen Caesarean Emerald in his briefcase",
+    "explanation": "Julian Thorne coated the vitrine latch with tetrodotoxin using nitrile gloves so that Delacroix would be poisoned upon opening it. He then stole the Caesarean Emerald, discarded the gloves in the restroom, and hid the gem in his coat-check briefcase. His DNA was found inside the gloves and the gem was in his bag.",
+    "suspects_or_entities": [
+      "Julian Thorne",
+      "Cecile Moreau",
+      "Baroness Monique De Valois"
+    ],
+    "motive_or_hazard": "Delacroix had discovered that Thorne had substituted fake replicas for three museum gems in Julian's restoration workshop"
+  },
+  "spoiler_keywords": [
+    "Julian Thorne",
+    "Julian",
+    "Thorne",
+    "tetrodotoxin",
+    "Caesarean Emerald"
+  ],
+  "decoy_items": [
+    "Baroness Monique's broken champagne flute",
+    "Main salon catering argument",
+    "Garden terrace cigar ashes"
+  ]
+}

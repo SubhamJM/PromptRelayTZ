@@ -1,0 +1,59 @@
+{
+  "id": "scenario_03_neon_nexus",
+  "type": "text",
+  "title": "The Fatal Deployment at SynthAI",
+  "difficulty": "Medium",
+  "synopsis": "Dr. Elena Rostova, chief AI safety officer at autonomous robotics company SynthAI, was found dead in the server cleanroom. What appeared to be a diabetic coma was actually a precision cyber-assassination via an exploited medical pump.",
+  "dossier_text": "INCIDENT DOSSIER: SYNTHAI RESEARCH CAMPUS\nDate: September 14, 2026 | Location: Cleanroom 03, SynthAI HQ, Palo Alto\nInvestigating Desk: High-Tech Crimes Bureau\n\nNARRATIVE BRIEFING:\nDr. Elena Rostova, 42, was discovered collapsed inside the Class-10 server cleanroom at 23:45. Paramedics declared death at 00:05. Preliminary findings indicated acute hypoglycemic shock. Rostova was a type-1 diabetic utilizing an automated continuous glucose monitor (CGM) and an Omnipod Bluetooth insulin pump.\n\nTECHNICAL EVIDENCE & LOGS:\n1. Server Cleanroom Badge Logs: Only three people accessed the sub-level cleanroom between 22:00 and 23:30:\n   - 22:15: Dr. Elena Rostova (Badge #004)\n   - 22:30: Marcus Vance (Lead ML Architect, Badge #019) checked in to monitor production model deployment; checked out 22:50.\n   - 23:05: Chloe Lin (VP of Infrastructure, Badge #007) entered to verify cooling manifold alarms; checked out 23:25.\n2. Medical Device Telemetry Extraction:\n   - Rostova's insulin pump received a remote override command at 22:42:15 instructing a maximum bolus delivery of 25.0 units of rapid-acting insulin.\n   - Normal basal dose was 0.8 units/hour.\n3. Network Packet Capture & Bluetooth Sniffing:\n   - Packet capture log from cleanroom wireless monitor captures an encrypted Bluetooth Low Energy (BLE) payload broadcast at 22:42:14 matching MAC address D4:8A:3F:11:C9:82.\n   - The MAC address matches a custom Raspberry Pi Zero dongle concealed inside an external USB battery pack recovered from Marcus Vance's desk drawer.\n4. Alibi Statements:\n   - Marcus Vance claimed he was in his cubicle writing Python deployment scripts from 22:35 to 23:15.\n   - Git commits: A commit was pushed under Marcus's name at 22:41, but system terminal history reveals it was executed by an automated cron shell script.\n   - Chloe Lin was on a video call with AWS customer support from 22:35 to 23:00 from the 3rd floor lounge.",
+  "evidence_items": [
+    {
+      "id": "doc_01",
+      "title": "Medical Telemetry Dump",
+      "category": "Medical IoT Log",
+      "badge": "Omnipod Device Audit",
+      "timestamp": "22:42:15",
+      "src": null,
+      "prompt_hint": "Extract the exact injection time, delivered bolus dosage, and communication protocol from the insulin pump telemetry.",
+      "description": "Insulin pump records unauthorized 25-unit lethal bolus injection over Bluetooth.",
+      "ocr_ledger": "DEVICE LOG: Omnipod Serial #OP-9941. At 22:42:15, pump received external BLE override command 'FORCE_BOLUS_MAX(25.0U)'. Delivered 25.0 units causing fatal hypoglycemia."
+    },
+    {
+      "id": "doc_02",
+      "title": "Cleanroom BLE Wireless Sniffer Capture",
+      "category": "Network Forensics",
+      "badge": "Packet Capture",
+      "timestamp": "22:42:14",
+      "src": null,
+      "prompt_hint": "Extract the transmitting hardware MAC address and identify which suspect device it corresponds to.",
+      "description": "BLE payload broadcast by MAC D4:8A:3F:11:C9:82 matching Marcus Vance's concealed Pi Zero.",
+      "ocr_ledger": "RADIO CAPTURE: Packet #48921. BLE transmission directed to Omnipod MAC. Originator hardware: D4:8A:3F:11:C9:82. Hardware cross-referenced to Raspberry Pi Zero recovered in Marcus Vance's drawer."
+    }
+  ],
+  "operational_rules": [
+    "Cyber-Physical Forensics Standard §404: Hardware-address cryptographic packet origin takes precedence over automated software commit timestamps.",
+    "Alibi Integrity Rule: Automated scheduled tasks pushing code cannot establish physical human presence."
+  ],
+  "ground_truth": {
+    "target_action_or_culprit": "Marcus Vance",
+    "target_rules_or_method": "Remote Bluetooth Low Energy (BLE) override payload delivering a fatal 25-unit insulin bolus via concealed Raspberry Pi dongle",
+    "target_proof_or_clue": "BLE sniffer matched MAC address D4:8A:3F:11:C9:82 on the concealed Pi Zero in Marcus Vance's drawer, and his commit was scheduled via automated cron",
+    "explanation": "Marcus Vance used a custom Raspberry Pi BLE transmitter concealed in a power bank to broadcast an unauthorized max-bolus command (25.0 units) to Dr. Rostova's insulin pump at 22:42:15 while she was in the cleanroom. His alibi of writing code was proven fraudulent because the git commit was launched by a scheduled cron script.",
+    "suspects_or_entities": [
+      "Marcus Vance",
+      "Chloe Lin",
+      "Dr. Elena Rostova"
+    ],
+    "motive_or_hazard": "Dr. Rostova had discovered Marcus faked critical safety audit benchmark scores on the commercial AI model"
+  },
+  "spoiler_keywords": [
+    "Marcus Vance",
+    "Marcus",
+    "insulin bolus",
+    "Raspberry Pi"
+  ],
+  "decoy_items": [
+    "Cleanroom cooling manifold temperature alert",
+    "AWS support call ticket",
+    "Automated CI/CD build failure notification"
+  ]
+}

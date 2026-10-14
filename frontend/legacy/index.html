@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Relay - Murder Mystery Station</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/assets/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-200">
+
+  <!-- Top Header Navigation -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg font-serif">
+        🕵️
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-100 font-serif tracking-wide leading-tight">PROMPT RELAY</h1>
+        <p class="text-xs text-slate-400">Sequential AI Murder Mystery Challenge</p>
+      </div>
+    </div>
+
+    <!-- Top Header Right Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Active Match Indicator -->
+      <div id="header-match-info" class="hidden flex items-center gap-3 text-xs font-mono">
+        <div class="bg-slate-800/70 border border-slate-700/60 px-3 py-1.5 rounded-full flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-400">Team:</span>
+          <span id="active-team-name" class="text-amber-300 font-bold"></span>
+        </div>
+        <div class="bg-slate-800/70 border border-slate-700/60 px-3 py-1.5 rounded-full text-slate-400">
+          <span id="active-case-title" class="text-slate-200 font-medium"></span>
+        </div>
+      </div>
+
+      <!-- Leaderboard Modal Trigger -->
+      <button 
+        onclick="openLeaderboard()" 
+        class="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-mono font-semibold text-amber-400 flex items-center gap-1.5 transition active:scale-95"
+      >
+        <span>🏆</span>
+        <span>Leaderboard</span>
+      </button>
+
+      <!-- Organizer Modal Trigger -->
+      <button 
+        onclick="openAdminModal()" 
+        class="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-mono font-semibold text-slate-300 hover:text-slate-100 flex items-center gap-1.5 transition active:scale-95"
+      >
+        <span>⚙️</span>
+        <span>Organizer</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Wizard Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-start">
+
+    <!-- Global Error Banner -->
+    <div id="error-banner" class="hidden mb-6 p-4 rounded-xl bg-red-950/80 border border-red-500/40 text-red-200 text-sm flex items-start justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-red-400 font-bold text-base">⚠️</span>
+        <span id="error-message">An error occurred</span>
+      </div>
+      <button onclick="dismissError()" class="text-red-400 hover:text-red-200 text-xs font-bold font-mono">DISMISS</button>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 1: WELCOME & REGISTRATION                         -->
+    <!-- ======================================================== -->
+    <section id="screen-welcome" class="space-y-8 animate-fade-in">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold tracking-wider uppercase mb-2">
+          3-Agent Prompt Engineering Relay Competition
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-100 font-serif tracking-tight">
+          Orchestrate 3 Specialized AI Agents in a Prompt Relay
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+          Teams of 3 prompt engineers craft generalized instructions for specialized AI agents. The output of Agent 1 feeds Agent 2, whose output feeds Agent 3. Score is evaluated on prompt engineering quality (60 pts) and final solution accuracy (40 pts).
+        </p>
+      </div>
+
+      <!-- Rules Preview Card -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 font-mono text-sm font-bold">1</div>
+            <span class="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-[10px] font-mono text-blue-300 font-semibold">👁️ OCR / Vision Tool</span>
+          </div>
+          <h3 class="font-bold text-slate-200 text-sm mb-1">Player 1: Evidence Extractor</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Crafts a generalized prompt directing Agent 1 to extract facts, times, locations, and movements while distinguishing confirmed from uncertain information without premature inferences.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-mono text-sm font-bold">2</div>
+            <span class="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-[10px] font-mono text-purple-300 font-semibold">🕸️ NetworkX Graph</span>
+          </div>
+          <h3 class="font-bold text-slate-200 text-sm mb-1">Player 2: Timeline Reconstructor</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Sees <strong>only</strong> Agent 1's facts and prompts Agent 2 to reconstruct chronological sequences and causal graph dependencies, keeping uncertainties separate.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-sm font-bold">3</div>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 font-semibold">⚙️ Z3 Constraint Solver</span>
+          </div>
+          <h3 class="font-bold text-slate-200 text-sm mb-1">Player 3: Final Detective</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Sees <strong>only</strong> Agent 2's timeline and prompts Agent 3 to evaluate operational rules and deduce valid actions, supporting rules, and blocking conditions in strict JSON.
+          </p>
+        </div>
+      </div>
+
+      <!-- Registration & Scenario Mode Selection Form -->
+      <div class="max-w-3xl mx-auto bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div>
+          <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2" for="team-name-input">
+            Team Name (3-Person Prompt Engineering Squad)
+          </label>
+          <input 
+            type="text" 
+            id="team-name-input" 
+            placeholder="e.g. Flight 472 Response Unit" 
+            class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition text-sm"
+          />
+        </div>
+
+        <!-- Divided Story Selection: Image-Based vs Text-Based -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider">
+              Select Challenge Scenario Category
+            </label>
+            <span class="text-[11px] font-mono text-blue-400 font-semibold" id="mode-selected-label">Active: 🖼️ Image-Based Stories</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Mode Card 1: Image-Based Stories -->
+            <div 
+              id="mode-card-image" 
+              onclick="selectStoryMode('image')" 
+              class="cursor-pointer rounded-2xl border-2 border-blue-500 bg-blue-950/30 p-4 sm:p-5 transition hover:bg-blue-950/50 flex flex-col justify-between space-y-3 shadow-lg shadow-blue-500/15 ring-1 ring-blue-500/30"
+            >
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 font-mono text-[10px] font-bold border border-blue-500/30 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    🖼️ IMAGE-BASED STORIES
+                  </span>
+                  <span id="badge-mode-image" class="w-3.5 h-3.5 rounded-full bg-blue-400 ring-4 ring-blue-500/30"></span>
+                </div>
+                <h4 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                  <span>✈️</span> Airport Crisis: Flight 472 Emergency
+                </h4>
+                <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                  Investigate with <strong>actual surveillance photos, CCTV feeds, boarding monitors, passenger WhatsApp chats, and physical bag tags</strong>. Visual evidence is rendered for all 3 players with step-by-step prompt hints!
+                </p>
+              </div>
+
+              <!-- Live Image Thumbnails Preview -->
+              <div class="pt-2.5 border-t border-blue-500/20">
+                <span class="block text-[10px] font-mono text-slate-400 uppercase mb-1.5">Evidence Photo Previews (10 Files):</span>
+                <div class="flex items-center gap-2 overflow-hidden">
+                  <img src="/image_data/01_cctv_checkin.png" onerror="this.onerror=null; this.src='../image_data/01_cctv_checkin.png';" class="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0" title="CCTV Check-in" alt="CCTV Check-in">
+                  <img src="/image_data/04_flight_display.png" onerror="this.onerror=null; this.src='../image_data/04_flight_display.png';" class="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0" title="Flight Display" alt="Flight Display">
+                  <img src="/image_data/05_passenger_messages.png" onerror="this.onerror=null; this.src='../image_data/05_passenger_messages.png';" class="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0" title="WhatsApp Alert" alt="WhatsApp Alert">
+                  <img src="/image_data/09_baggage_tag.png" onerror="this.onerror=null; this.src='../image_data/09_baggage_tag.png';" class="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0" title="SkyWays Bag Tag" alt="SkyWays Bag Tag">
+                  <span class="text-[10px] font-mono text-blue-300 font-bold ml-1">+6 more</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mode Card 2: Text-Based Stories -->
+            <div 
+              id="mode-card-text" 
+              onclick="selectStoryMode('text')" 
+              class="cursor-pointer rounded-2xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5 transition hover:bg-slate-800/40 flex flex-col justify-between space-y-3"
+            >
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] font-bold border border-slate-700">
+                    📝 TEXT-BASED STORIES
+                  </span>
+                  <span id="badge-mode-text" class="w-3.5 h-3.5 rounded-full bg-slate-700"></span>
+                </div>
+                <h4 class="font-bold text-slate-200 text-base flex items-center gap-2">
+                  <span>🕵️</span> Murder Mystery Investigations
+                </h4>
+                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                  Classic textual detective dossiers, witness interrogation statements, autopsy reports, and alibi statements solved through 3 text reasoning agents.
+                </p>
+              </div>
+
+              <!-- Murder Mystery Case Dropdown -->
+              <div id="text-stories-selector" class="pt-2.5 border-t border-slate-800/80">
+                <label class="block text-[10px] font-mono text-slate-400 uppercase mb-1.5" for="mystery-select">Select Mystery Dossier:</label>
+                <select 
+                  id="mystery-select" 
+                  onchange="syncMysteryCase(this.value)" 
+                  class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-400"
+                >
+                  <option value="case_01_blackwood_manor">The Poisoned Heir of Blackwood Manor (Easy)</option>
+                  <option value="case_02_neon_nexus">The Fatal Deployment at SynthAI (Medium)</option>
+                  <option value="case_03_velvet_vault">Murder at the Vernissage Gallery (Hard)</option>
+                  <option value="">🎲 Random Mystery Scenario</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Synced Case Select Input (supports all existing backend APIs & automated tests) -->
+          <select id="case-select" class="hidden">
+            <option value="case_04_airport_crisis" selected>Airport Crisis: Flight 472 Emergency</option>
+            <option value="case_01_blackwood_manor">The Poisoned Heir of Blackwood Manor</option>
+            <option value="case_02_neon_nexus">The Fatal Deployment at SynthAI</option>
+            <option value="case_03_velvet_vault">Murder at the Vernissage Gallery</option>
+          </select>
+        </div>
+
+        <button 
+          id="btn-start-game" 
+          onclick="handleStartGame()" 
+          class="w-full py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-extrabold text-sm transition transform active:scale-[0.98] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+        >
+          <span id="btn-start-text">Launch Flight 472 Emergency Operation (Image-Based)</span>
+          <span>➔</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 2: STEP 1 - EVIDENCE EXTRACTION (PLAYER 1)        -->
+    <!-- ======================================================== -->
+    <section id="screen-step1" class="hidden space-y-6 animate-fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono font-bold uppercase">
+              Turn 1 of 3
+            </span>
+            <span class="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-[10px] font-mono text-blue-300 font-semibold">
+              Specialized Tool: 👁️ Vision & OCR Tool
+            </span>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-100 font-serif mt-2">Player 1: Evidence Extractor</h2>
+        </div>
+        <div class="text-xs text-slate-400 font-mono sm:text-right">
+          <p>🎯 Goal: Extract entities, times, locations & movements</p>
+          <p class="text-amber-400/90">⚠️ Rule: DO NOT infer causes or accuse</p>
+        </div>
+      </div>
+
+      <!-- Split-Screen Workspace: Evidence Dossier & Prominent Image on Left, Prompt Workspace on Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT PANEL: Active Flight Evidence Image, Non-Spoiler Hint & Thumbnails (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- AIRPORT CRISIS THEME: Active Visual Evidence Dossier -->
+          <div id="step1-airport-board" class="space-y-4">
+            
+            <!-- Active Image Card -->
+            <!-- Active Image Card -->
+            <div class="rounded-2xl border border-blue-500/40 bg-slate-900/90 shadow-2xl overflow-hidden">
+              
+              <!-- Active Image Header Bar -->
+              <div class="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-wrap min-w-0">
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">
+                    Feed <span id="p1-active-num">1</span> of <span id="p1-total-num">10</span>
+                  </span>
+                  <span id="p1-active-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 truncate">
+                    CAM 03 • Check-in A
+                  </span>
+                  <h3 id="p1-active-title" class="text-xs sm:text-sm font-bold text-slate-100 font-mono truncate">
+                    CCTV: Check-in Area A
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" id="p1-btn-prev" onclick="prevP1Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Previous Evidence Feed (Left Arrow)">
+                    <span>◀</span><span class="hidden sm:inline">Prev</span>
+                  </button>
+                  <button type="button" id="p1-btn-next" onclick="nextP1Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Next Evidence Feed (Right Arrow)">
+                    <span class="hidden sm:inline">Next</span><span>▶</span>
+                  </button>
+                  <button type="button" id="p1-btn-zoom" onclick="openActiveImageViewer(1)" class="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-xs font-mono font-bold transition cursor-pointer" title="Inspect Fullscreen (Click Image)">
+                    🔍
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Jump Pills Row -->
+              <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between gap-2 overflow-x-auto text-[11px] font-mono">
+                <span class="text-slate-400 font-bold shrink-0">Feed Quick Jump:</span>
+                <div class="flex items-center gap-1 shrink-0" id="p1-quick-pills">
+                  <button type="button" onclick="setP1ActiveImage(0)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-blue-500 text-slate-950 font-bold font-mono text-[11px] shadow-sm cursor-pointer" data-index="0" title="1. CCTV Check-in Area A">1</button>
+                  <button type="button" onclick="setP1ActiveImage(1)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="1" title="2. CCTV Gate B07 Corridor">2</button>
+                  <button type="button" onclick="setP1ActiveImage(2)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="2" title="3. CCTV Baggage Bay">3</button>
+                  <button type="button" onclick="setP1ActiveImage(3)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="3" title="4. Flight Information Display">4</button>
+                  <button type="button" onclick="setP1ActiveImage(4)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="4" title="5. Passenger Messages (Chat)">5</button>
+                  <button type="button" onclick="setP1ActiveImage(5)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="5" title="6. Security Observation Report">6</button>
+                  <button type="button" onclick="setP1ActiveImage(6)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="6" title="7. Terminal 1 Map">7</button>
+                  <button type="button" onclick="setP1ActiveImage(7)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="7" title="8. Handwritten Note">8</button>
+                  <button type="button" onclick="setP1ActiveImage(8)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="8" title="9. Baggage Tag">9</button>
+                  <button type="button" onclick="setP1ActiveImage(9)" class="p1-quick-jump-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] transition cursor-pointer" data-index="9" title="10. Newspaper Clipping">10</button>
+                </div>
+              </div>
+
+              <!-- Main High-Res Image Display Container (Click to Zoom with Floating Nav Arrows) -->
+              <div id="p1-img-container" class="relative w-full aspect-[2/1] overflow-hidden bg-slate-950 flex items-center justify-center p-1 group cursor-pointer" onclick="openActiveImageViewer(1)" title="Click image to inspect fullscreen">
+                <button type="button" id="p1-img-arrow-prev" onclick="event.stopPropagation(); prevP1Image()" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-blue-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Previous Evidence Feed (Left Arrow)">◀</button>
+                <img id="p1-active-img" src="/image_data/01_cctv_checkin.png" alt="Active flight story evidence" class="w-full h-full object-contain rounded transition duration-200" onerror="this.onerror=null; if(!this.src.includes('..')) this.src='../image_data/' + this.src.split('/').pop();">
+                <button type="button" id="p1-img-arrow-next" onclick="event.stopPropagation(); nextP1Image()" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-blue-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Next Evidence Feed (Right Arrow)">▶</button>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono text-slate-300 border border-slate-700/60 pointer-events-none opacity-80 group-hover:opacity-100 transition flex items-center gap-1">🔍 Click to zoom</div>
+              </div>
+
+              <!-- Investigative Prompting Hint Box (NO Spoilers - tells user what to prompt the AI to extract) -->
+              <div class="p-4 bg-gradient-to-br from-blue-950/60 to-slate-900 border-t border-blue-500/30 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-amber-400">💡</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-blue-300">
+                      Investigative Prompting Hint (Extract from Image)
+                    </span>
+                  </div>
+                  <span id="p1-active-filename" class="text-[10px] font-mono text-slate-500">01_cctv_checkin.png</span>
+                </div>
+                <p id="p1-active-hint" class="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
+                  Inspect the airline counter transaction. Prompt Agent 1 to read the visible camera timestamp, identify the passenger checking in, describe the luggage item and color, and extract any counter details.
+                </p>
+                <div class="text-[11px] font-mono text-amber-300/80 border-t border-blue-500/20 pt-2 flex items-center gap-1.5">
+                  <span>⚠️</span>
+                  <span>Look closely at the image above: Instruct Agent 1 to read exact timestamps, names, and objects visible in this capture.</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Filter Tabs for Evidence Feeds -->
+            <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+              <button type="button" id="p1-filter-all" onclick="filterAirportEvidence('all')" class="airport-filter-btn px-2.5 py-1 rounded-lg bg-blue-500 text-slate-950 font-bold transition shadow-sm cursor-pointer" data-filter="all">All (10)</button>
+              <button type="button" id="p1-filter-cctv" onclick="filterAirportEvidence('CCTV Surveillance')" class="airport-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition cursor-pointer" data-filter="CCTV Surveillance">📷 CCTV (3)</button>
+              <button type="button" id="p1-filter-flight" onclick="filterAirportEvidence('Flight & Chat')" class="airport-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition cursor-pointer" data-filter="Flight & Chat">📱 FIDS/Chat (2)</button>
+              <button type="button" id="p1-filter-security" onclick="filterAirportEvidence('Security & Report')" class="airport-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition cursor-pointer" data-filter="Security & Report">📋 Security (1)</button>
+              <button type="button" id="p1-filter-physical" onclick="filterAirportEvidence('Physical & Layout')" class="airport-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition cursor-pointer" data-filter="Physical & Layout">🏷️ Physical (4)</button>
+            </div>
+
+            <!-- Thumbnail Selection Strip (Pre-rendered and dynamically updated) -->
+            <div id="p1-thumbnail-strip" class="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-5 gap-2 max-h-56 overflow-y-auto pr-1">
+              <button type="button" data-index="0" onclick="setP1ActiveImage(0)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border-2 border-blue-400 ring-2 ring-blue-500/40 bg-slate-900 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/01_cctv_checkin.png" alt="CCTV Check-in" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/01_cctv_checkin.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">1. CAM 03 • Check-in A</div>
+              </button>
+              <button type="button" data-index="1" onclick="setP1ActiveImage(1)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/02_cctv_gate_b07.png" alt="CCTV Gate B07" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/02_cctv_gate_b07.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">2. CAM 12 • Gate B07</div>
+              </button>
+              <button type="button" data-index="2" onclick="setP1ActiveImage(2)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/03_cctv_baggage_bay.png" alt="CCTV Baggage" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/03_cctv_baggage_bay.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">3. CAM 21 • Apron Bay</div>
+              </button>
+              <button type="button" data-index="3" onclick="setP1ActiveImage(3)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/04_flight_display.png" alt="Flight Display" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/04_flight_display.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">4. Terminal 1 FIDS</div>
+              </button>
+              <button type="button" data-index="4" onclick="setP1ActiveImage(4)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/05_passenger_messages.png" alt="WhatsApp Chat" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/05_passenger_messages.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">5. Passenger WhatsApp</div>
+              </button>
+              <button type="button" data-index="5" onclick="setP1ActiveImage(5)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/06_security_report.png" alt="Security Report" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/06_security_report.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">6. Officer Nair Log</div>
+              </button>
+              <button type="button" data-index="6" onclick="setP1ActiveImage(6)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/07_airport_map.png" alt="Airport Map" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/07_airport_map.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">7. Terminal 1 Map</div>
+              </button>
+              <button type="button" data-index="7" onclick="setP1ActiveImage(7)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/08_handwritten_note.png" alt="Handwritten Note" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/08_handwritten_note.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">8. Paper Scrap Note</div>
+              </button>
+              <button type="button" data-index="8" onclick="setP1ActiveImage(8)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/09_baggage_tag.png" alt="Luggage Tag" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/09_baggage_tag.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">9. Recovered Bag Tag</div>
+              </button>
+              <button type="button" data-index="9" onclick="setP1ActiveImage(9)" class="p1-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                  <img src="/image_data/10_witness_statement.png" alt="Newspaper Decoy" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/10_witness_statement.png';">
+                </div>
+                <div class="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">10. Daily Chronicle</div>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- MURDER MYSTERY THEME: Classic Text-Based Investigative Dossier -->
+          <div id="step1-mystery-board" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+              <span>RAW CASE FILE (INVESTIGATIVE REPORT)</span>
+              <span class="text-slate-500">Scroll to read all details</span>
+            </div>
+            <div id="step1-case-file" class="h-96 overflow-y-auto p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-amber-500/30">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT PANEL: Prompt Composition Workspace (5 Cols, Sticky) -->
+        <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+          
+          <!-- Tactical Strategy Tip Box -->
+          <div id="step1-guidance-box" class="p-4 rounded-2xl bg-blue-950/30 border border-blue-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">💡</span>
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-blue-300">
+                  Tactical Strategy Tip: Evidence Filtering
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onclick="insertExamplePrompt(1)" 
+                class="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-[11px] font-mono text-blue-300 hover:text-blue-100 transition flex items-center gap-1.5 font-semibold"
+              >
+                <span>⚡ Use Template</span>
+              </button>
+            </div>
+            <p id="step1-hints-text" class="text-xs text-slate-300 font-sans leading-relaxed">
+              Examine the evidence photos and prompting hints on the left. Craft a generalized prompt commanding Agent 1 to perform OCR & fact extraction: identify persons, timestamps, locations, and movements from the visual evidence without prematurely inferring guilt or final decisions.
+            </p>
+          </div>
+
+          <!-- Player 1 Prompt Input -->
+          <div class="space-y-2">
+            <label for="step1-prompt-input" class="block text-xs font-mono text-slate-300 uppercase tracking-wider">
+              Your Prompt for Agent 1 (Evidence Extractor)
+            </label>
+            <textarea 
+              id="step1-prompt-input" 
+              rows="7" 
+              placeholder="e.g. Extract verified facts from the provided visual evidence for Flight SW 472. Identify key people, objects, times, locations, and movements. Distinguish confirmed facts from uncertain information and ignore irrelevant marathon news. Do not infer causes or final actions." 
+              class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition text-sm font-mono"
+            ></textarea>
+            <p class="text-[11px] text-slate-400 font-mono">💡 Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">Ctrl+Enter</kbd> to submit.</p>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            id="btn-submit-step1" 
+            onclick="handleSubmitStep1()" 
+            class="w-full py-3.5 px-6 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+          >
+            <span>Run Agent 1 (Extractor)</span>
+            <span>➔</span>
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ======================================================== -->
+    <!-- INTERSTITIAL MODAL 1: HANDOFF TO PLAYER 2                -->
+    <!-- ======================================================== -->
+    <div id="modal-handoff1" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="max-w-md w-full bg-slate-900 border border-purple-500/30 rounded-2xl p-8 text-center space-y-6 shadow-2xl">
+        <div class="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/40 mx-auto flex items-center justify-center text-3xl">
+          🔄
+        </div>
+        <div class="space-y-2">
+          <span class="px-2.5 py-1 rounded bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold uppercase">
+            Step 1 Complete
+          </span>
+          <h3 class="text-2xl font-bold text-slate-100 font-serif">Hand Laptop to Player 2</h3>
+          <p class="text-xs sm:text-sm text-slate-400">
+            Player 1, please step away from the keyboard. Player 2, take the seat. You will see <strong>only</strong> the evidence extracted by Player 1's agent.
+          </p>
+        </div>
+        <button 
+          onclick="handleAcknowledgeHandoff1()" 
+          class="w-full py-3.5 px-6 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-purple-500/20"
+        >
+          I am Player 2 — Ready to Prompt
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 3: STEP 2 - TIMELINE RECONSTRUCTION (PLAYER 2)    -->
+    <!-- ======================================================== -->
+    <section id="screen-step2" class="hidden space-y-6 animate-fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold uppercase">
+              Turn 2 of 3
+            </span>
+            <span class="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-[10px] font-mono text-purple-300 font-semibold">
+              Specialized Tool: 🕸️ NetworkX Graph Tool
+            </span>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-100 font-serif mt-2">Player 2: Timeline Reconstructor</h2>
+        </div>
+        <div class="text-xs text-slate-400 font-mono sm:text-right">
+          <p>🎯 Goal: Chronological sequencing & causal links</p>
+          <p class="text-purple-400">🛡️ Guardrail: Objectively map events; do NOT name final action</p>
+        </div>
+      </div>
+
+      <!-- Split-Screen Workspace: Sequence Dossier on Left, Prompt Workspace on Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT PANEL: Chronological Sequence Photos, Upstream Facts & Sequence Thumbnails (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- AIRPORT CRISIS THEME: Active Chronological Sequence Viewer -->
+          <div id="step2-airport-board" class="space-y-4">
+            
+            <!-- Active Sequence Photo Card -->
+            <div class="rounded-2xl border border-purple-500/40 bg-slate-900/90 shadow-2xl overflow-hidden">
+              
+              <!-- Header Bar -->
+              <div class="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-wrap min-w-0">
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-xs font-bold border border-purple-500/30">
+                    Step <span id="p2-active-num">1</span> of 6
+                  </span>
+                  <span id="p2-active-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 truncate">
+                    Seq Feed 1 • Check-in A
+                  </span>
+                  <h3 id="p2-active-title" class="text-xs sm:text-sm font-bold text-slate-100 font-mono truncate">
+                    Check-in Conveyor Dispatch
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" id="p2-btn-prev" onclick="prevP2Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Previous Sequence Step (Left Arrow)">
+                    <span>◀</span><span class="hidden sm:inline">Prev</span>
+                  </button>
+                  <button type="button" id="p2-btn-next" onclick="nextP2Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Next Sequence Step (Right Arrow)">
+                    <span class="hidden sm:inline">Next</span><span>▶</span>
+                  </button>
+                  <button type="button" id="p2-btn-zoom" onclick="openActiveImageViewer(2)" class="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-mono font-bold transition cursor-pointer" title="Inspect Fullscreen (Click Image)">
+                    🔍
+                  </button>
+                </div>
+              </div>
+
+              <!-- Main High-Res Image Display Container (Click to Zoom with Floating Nav Arrows) -->
+              <div id="p2-img-container" class="relative w-full aspect-[2/1] overflow-hidden bg-slate-950 flex items-center justify-center p-1 group cursor-pointer" onclick="openActiveImageViewer(2)" title="Click image to inspect fullscreen">
+                <button type="button" id="p2-img-arrow-prev" onclick="event.stopPropagation(); prevP2Image()" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-purple-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Previous Sequence Step (Left Arrow)">◀</button>
+                <img id="p2-active-img" src="/image_data/01_cctv_checkin.png" alt="Active flight story timeline photo" class="w-full h-full object-contain rounded transition duration-200" onerror="this.onerror=null; if(!this.src.includes('..')) this.src='../image_data/' + this.src.split('/').pop();">
+                <button type="button" id="p2-img-arrow-next" onclick="event.stopPropagation(); nextP2Image()" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-purple-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Next Sequence Step (Right Arrow)">▶</button>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono text-slate-300 border border-slate-700/60 pointer-events-none opacity-80 group-hover:opacity-100 transition flex items-center gap-1">🔍 Click to zoom</div>
+              </div>
+
+              <!-- Chronological Connection Hint Box (No Spoilers) -->
+              <div class="p-4 bg-gradient-to-br from-purple-950/60 to-slate-900 border-t border-purple-500/30 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-purple-400">💡</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-purple-300">
+                      Chronological Reconstruction Hint
+                    </span>
+                  </div>
+                  <span id="p2-active-time" class="text-[11px] font-mono text-purple-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">Read Feed Timestamp</span>
+                </div>
+                <p id="p2-active-hint" class="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
+                  Examine the camera timestamp and initial luggage handling. Direct Agent 2 to place this transaction as the start of the custody timeline.
+                </p>
+                <div class="text-[11px] font-mono text-purple-300/80 border-t border-purple-500/20 pt-2 flex items-center gap-1.5">
+                  <span>⚠️</span>
+                  <span>Connect timeline events: Direct Agent 2 to order events chronologically without declaring final clearance actions.</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Sequence Steps Strip (6 Chronological Feeds - Pre-rendered & dynamically updated) -->
+            <div>
+              <span class="block text-[10px] font-mono text-slate-400 uppercase mb-1.5 font-bold">Chronological Sequence Steps (Click to Inspect):</span>
+              <div id="p2-thumbnail-strip" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <button type="button" data-index="0" onclick="setP2ActiveImage(0)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border-2 border-purple-400 ring-2 ring-purple-500/40 bg-slate-900 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/01_cctv_checkin.png" alt="Check-in Dispatch" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/01_cctv_checkin.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 1</div>
+                </button>
+                <button type="button" data-index="1" onclick="setP2ActiveImage(1)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-purple-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/04_flight_display.png" alt="Boarding Call" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/04_flight_display.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 2</div>
+                </button>
+                <button type="button" data-index="2" onclick="setP2ActiveImage(2)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-purple-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/05_passenger_messages.png" alt="Bag Discovery" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/05_passenger_messages.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 3</div>
+                </button>
+                <button type="button" data-index="3" onclick="setP2ActiveImage(3)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-purple-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/02_cctv_gate_b07.png" alt="Corridor Movement" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/02_cctv_gate_b07.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 4</div>
+                </button>
+                <button type="button" data-index="4" onclick="setP2ActiveImage(4)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-purple-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/06_security_report.png" alt="Security Response" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/06_security_report.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 5</div>
+                </button>
+                <button type="button" data-index="5" onclick="setP2ActiveImage(5)" class="p2-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-purple-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/09_baggage_tag.png" alt="Bag Tag Ownership" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/09_baggage_tag.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-purple-300 font-bold">Step 6</div>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Agent 1 Extracted Evidence Box -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+              <span class="text-purple-300 font-bold">EVIDENCE EXTRACTED BY AGENT 1</span>
+              <span class="text-slate-500">Your upstream facts from Agent 1</span>
+            </div>
+            <div id="step2-agent1-output" class="h-44 sm:h-52 overflow-y-auto p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-purple-500/30">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT PANEL: Prompt Composition Workspace (5 Cols, Sticky) -->
+        <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+          
+          <!-- Tactical Strategy Tip Box -->
+          <div id="step2-guidance-box" class="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">💡</span>
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-purple-300">
+                  Tactical Strategy Tip: Timeline Reconstruction
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onclick="insertExamplePrompt(2)" 
+                class="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[11px] font-mono text-purple-300 hover:text-purple-100 transition flex items-center gap-1.5 font-semibold"
+              >
+                <span>⚡ Use Template</span>
+              </button>
+            </div>
+            <p id="step2-hints-text" class="text-xs text-slate-300 font-sans leading-relaxed">
+              Using Agent 1's extracted facts and the chronological sequence photos on the left, prompt Agent 2 to construct a minute-by-minute timeline connecting passenger movements, gate calls, and the bag discovery, while keeping uncertain relationships separate.
+            </p>
+          </div>
+
+          <!-- Player 2 Prompt Input -->
+          <div class="space-y-2">
+            <label for="step2-prompt-input" class="block text-xs font-mono text-slate-300 uppercase tracking-wider">
+              Your Prompt for Agent 2 (Timeline Reconstructor)
+            </label>
+            <textarea 
+              id="step2-prompt-input" 
+              rows="7" 
+              placeholder="e.g. Using the extracted evidence, reconstruct the Flight SW 472 incident timeline minute-by-minute. Connect passenger movements, gate announcements, and the unattended baggage discovery while separating confirmed dependencies from uncertain ones. Do not declare final operational actions." 
+              class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400 transition text-sm font-mono"
+            ></textarea>
+            <p class="text-[11px] text-slate-400 font-mono">💡 Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">Ctrl+Enter</kbd> to submit.</p>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            id="btn-submit-step2" 
+            onclick="handleSubmitStep2()" 
+            class="w-full py-3.5 px-6 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
+          >
+            <span>Run Agent 2 (Reconstructor)</span>
+            <span>➔</span>
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ======================================================== -->
+    <!-- INTERSTITIAL MODAL 2: HANDOFF TO PLAYER 3                -->
+    <!-- ======================================================== -->
+    <div id="modal-handoff2" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 text-center space-y-6 shadow-2xl">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/40 mx-auto flex items-center justify-center text-3xl">
+          🔍
+        </div>
+        <div class="space-y-2">
+          <span class="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase">
+            Step 2 Complete
+          </span>
+          <h3 class="text-2xl font-bold text-slate-100 font-serif">Hand Laptop to Player 3</h3>
+          <p class="text-xs sm:text-sm text-slate-400">
+            Player 2, please step away. Player 3, take the seat. You will see the reconstructed timeline and operational rules to deduce the final decision and clearance conditions.
+          </p>
+        </div>
+        <button 
+          onclick="handleAcknowledgeHandoff2()" 
+          class="w-full py-3.5 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-emerald-500/20"
+        >
+          I am Player 3 — Ready to Deduce
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 4: STEP 3 - VERDICT & FORMATTING (PLAYER 3)       -->
+    <!-- ======================================================== -->
+    <section id="screen-step3" class="hidden space-y-6 animate-fade-in">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase">
+              Turn 3 of 3 (Final)
+            </span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 font-semibold">
+              Specialized Tool: ⚙️ Z3 Constraint Solver
+            </span>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-100 font-serif mt-2">Player 3: Final Detective / Operations Commander</h2>
+        </div>
+        <div class="text-xs text-slate-400 font-mono sm:text-right">
+          <p>🎯 Goal: Deduce valid operational action, rules & blocking condition</p>
+          <p class="text-emerald-400">📋 Format: Strict JSON output schema</p>
+        </div>
+      </div>
+
+      <!-- Split-Screen Workspace: Clues & Rules on Left, Prompt Workspace on Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT PANEL: Decisive Incident Clues, Operational Rules & Upstream Timeline (7 Cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- AIRPORT CRISIS THEME: Active Decisive Clues Viewer -->
+          <div id="step3-airport-board" class="space-y-4">
+            
+            <!-- Active Clue Card -->
+            <div class="rounded-2xl border border-emerald-500/40 bg-slate-900/90 shadow-2xl overflow-hidden">
+              
+              <!-- Header Bar -->
+              <div class="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-wrap min-w-0">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
+                    Clue <span id="p3-active-num">1</span> of 4
+                  </span>
+                  <span id="p3-active-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 truncate">
+                    🚨 Blocking Condition
+                  </span>
+                  <h3 id="p3-active-title" class="text-xs sm:text-sm font-bold text-slate-100 font-mono truncate">
+                    Security Officer Incident Report
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" id="p3-btn-prev" onclick="prevP3Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Previous Clue (Left Arrow)">
+                    <span>◀</span><span class="hidden sm:inline">Prev</span>
+                  </button>
+                  <button type="button" id="p3-btn-next" onclick="nextP3Image()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold transition flex items-center gap-1 cursor-pointer" title="Next Clue (Right Arrow)">
+                    <span class="hidden sm:inline">Next</span><span>▶</span>
+                  </button>
+                  <button type="button" id="p3-btn-zoom" onclick="openActiveImageViewer(3)" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold transition cursor-pointer" title="Inspect Fullscreen (Click Image)">
+                    🔍
+                  </button>
+                </div>
+              </div>
+
+              <!-- Main High-Res Image Display Container (Click to Zoom with Floating Nav Arrows) -->
+              <div id="p3-img-container" class="relative w-full aspect-[2/1] overflow-hidden bg-slate-950 flex items-center justify-center p-1 group cursor-pointer" onclick="openActiveImageViewer(3)" title="Click image to inspect fullscreen">
+                <button type="button" id="p3-img-arrow-prev" onclick="event.stopPropagation(); prevP3Image()" class="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-emerald-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Previous Clue (Left Arrow)">◀</button>
+                <img id="p3-active-img" src="/image_data/06_security_report.png" alt="Active flight story decisive clue" class="w-full h-full object-contain rounded transition duration-200" onerror="this.onerror=null; if(!this.src.includes('..')) this.src='../image_data/' + this.src.split('/').pop();">
+                <button type="button" id="p3-img-arrow-next" onclick="event.stopPropagation(); nextP3Image()" class="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-slate-900/85 hover:bg-emerald-600 text-white border border-slate-700 flex items-center justify-center transition shadow-xl font-bold cursor-pointer hover:scale-105 active:scale-95" title="Next Clue (Right Arrow)">▶</button>
+                <div class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono text-slate-300 border border-slate-700/60 pointer-events-none opacity-80 group-hover:opacity-100 transition flex items-center gap-1">🔍 Click to zoom</div>
+              </div>
+
+              <!-- Operational Decision Hint Box (No Spoilers) -->
+              <div class="p-4 bg-gradient-to-br from-emerald-950/60 to-slate-900 border-t border-emerald-500/30 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-emerald-400">💡</span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-300">
+                      Operational Logic & Rule Hint
+                    </span>
+                  </div>
+                  <span id="p3-active-tag" class="text-[11px] font-mono text-emerald-300 font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">Rule SEC-101</span>
+                </div>
+                <p id="p3-active-hint" class="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
+                  Review the officer's logged action and pending requirement. Prompt Agent 3 to evaluate what specific safety unit must clear the bag before operations resume.
+                </p>
+                <div class="text-[11px] font-mono text-emerald-300/80 border-t border-emerald-500/20 pt-2 flex items-center gap-1.5">
+                  <span>⚠️</span>
+                  <span>Cross-reference with operational protocols: Determine the valid action, governing rules, and blocking condition.</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Decisive Clues Strip (4 Clues - Pre-rendered & dynamically updated) -->
+            <div>
+              <span class="block text-[10px] font-mono text-slate-400 uppercase mb-1.5 font-bold">Decisive Incident Clues (Click to Inspect):</span>
+              <div id="p3-thumbnail-strip" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" data-index="0" onclick="setP3ActiveImage(0)" class="p3-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border-2 border-emerald-400 ring-2 ring-emerald-500/40 bg-slate-900 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/06_security_report.png" alt="Security Report" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/06_security_report.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-emerald-300 font-bold">Clue 1 • Blocking Condition</div>
+                </button>
+                <button type="button" data-index="1" onclick="setP3ActiveImage(1)" class="p3-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-emerald-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/09_baggage_tag.png" alt="Baggage Tag" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/09_baggage_tag.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-emerald-300 font-bold">Clue 2 • Owner Match</div>
+                </button>
+                <button type="button" data-index="2" onclick="setP3ActiveImage(2)" class="p3-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-emerald-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/04_flight_display.png" alt="Flight Display" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/04_flight_display.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-emerald-300 font-bold">Clue 3 • Boarding Status</div>
+                </button>
+                <button type="button" data-index="3" onclick="setP3ActiveImage(3)" class="p3-thumb-btn group relative cursor-pointer overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 hover:border-emerald-500/50 opacity-75 hover:opacity-100 transition shadow text-left p-1.5 space-y-1">
+                  <div class="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                    <img src="/image_data/07_airport_map.png" alt="Terminal Map" class="h-full w-full object-cover group-hover:scale-105 transition" onerror="this.onerror=null; this.src='../image_data/07_airport_map.png';">
+                  </div>
+                  <div class="truncate text-[10px] font-mono text-emerald-300 font-bold">Clue 4 • Concourse Map</div>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Operational Rules Card -->
+          <div id="step3-rules-container" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-emerald-400">
+              <span class="flex items-center gap-2 font-bold">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                AIRPORT OPERATIONAL RULES & SECURITY PROTOCOLS
+              </span>
+              <span class="text-slate-400">Governing Constraints</span>
+            </div>
+            <div id="step3-rules-list" class="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-xs font-mono text-emerald-200/90 space-y-2">
+              <!-- Dynamically populated rules -->
+            </div>
+          </div>
+
+          <!-- Agent 2 Reconstructed Timeline Box -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+              <span class="text-emerald-300 font-bold">RECONSTRUCTED TIMELINE (FROM AGENT 2)</span>
+              <span class="text-slate-500">Analyze this sequence to solve the case</span>
+            </div>
+            <div id="step3-agent2-output" class="h-44 sm:h-52 overflow-y-auto p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-emerald-500/30">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT PANEL: Prompt Composition Workspace (5 Cols, Sticky) -->
+        <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+          
+          <!-- Tactical Strategy Tip Box -->
+          <div id="step3-guidance-box" class="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-base">💡</span>
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-300">
+                  Tactical Strategy Tip: Final Detective
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onclick="insertExamplePrompt(3)" 
+                class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-[11px] font-mono text-emerald-300 hover:text-emerald-100 transition flex items-center gap-1.5 font-semibold"
+              >
+                <span>⚡ Use Template</span>
+              </button>
+            </div>
+            <p id="step3-hints-text" class="text-xs text-slate-300 font-sans leading-relaxed">
+              Using Agent 2's reconstructed incident timeline, the decisive evidence clues on the left, and governing operational safety rules (SEC-101, OPS-204, CLR-305), prompt Agent 3 to deduce the valid operational action, cite supporting rules, specify the current blocking condition, and output strict JSON.
+            </p>
+          </div>
+
+          <!-- JSON Format Helper Card -->
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 text-xs font-mono text-slate-300 flex items-center justify-between">
+            <span class="text-slate-400">Required Schema:</span>
+            <code class="text-emerald-400 font-bold">{"culprit": "Action", "method": "Rules", "clue": "Blocker"}</code>
+          </div>
+
+          <!-- Player 3 Prompt Input -->
+          <div class="space-y-2">
+            <label for="step3-prompt-input" class="block text-xs font-mono text-slate-300 uppercase tracking-wider">
+              Your Prompt for Agent 3 (Final Detective)
+            </label>
+            <textarea 
+              id="step3-prompt-input" 
+              rows="7" 
+              placeholder="e.g. Using the reconstructed incident sequence and airport operational rules (SEC-101, OPS-204, CLR-305), determine the valid operational action for Flight SW 472. Identify supporting rules, the current blocking condition, and requirements before operations can resume. Output strictly valid JSON with culprit, method, clue." 
+              class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition text-sm font-mono"
+            ></textarea>
+            <p class="text-[11px] text-slate-400 font-mono">💡 Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">Ctrl+Enter</kbd> to submit.</p>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            id="btn-submit-step3" 
+            onclick="handleSubmitStep3()" 
+            class="w-full py-3.5 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+          >
+            <span>Submit Final Verdict & Score</span>
+            <span>➔</span>
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 5: STEP 4 - EVALUATION & RESULTS REVEAL           -->
+    <!-- ======================================================== -->
+    <section id="screen-results" class="hidden space-y-8 animate-fade-in pb-12">
+      <!-- Top Score Hero Banner -->
+      <div class="text-center space-y-4 border-b border-slate-800 pb-8">
+        <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold uppercase">
+          Match Evaluation Complete
+        </div>
+
+        <div class="flex items-center justify-center gap-6">
+          <div class="text-6xl sm:text-7xl font-extrabold font-serif text-slate-100 tracking-tight" id="result-total-score">
+            --
+          </div>
+          <div class="text-left">
+            <span class="text-xs font-mono text-slate-400 block uppercase">Total Score / 100</span>
+            <span id="result-grade-badge" class="inline-block mt-1 px-3 py-1 rounded-lg text-sm font-bold font-mono">
+              --
+            </span>
+          </div>
+        </div>
+
+        <p id="result-summary-text" class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+          <!-- Summary sentence -->
+        </p>
+      </div>
+
+      <!-- 3-Teammate Prompt Engineering Scorecard (60 pts max) -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold font-serif text-slate-200">Teammate Prompt Engineering & Tool Execution (60 pts)</h3>
+          <span class="text-xs font-mono text-amber-400 font-semibold">20 pts per teammate</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Player 1 Scorecard -->
+          <div class="p-5 rounded-2xl bg-slate-900/90 border border-blue-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-mono font-bold text-blue-400 uppercase tracking-wider">Player 1 (Extractor)</span>
+              <span id="score-p1-total" class="text-sm font-bold font-mono text-slate-100">-- / 20</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 space-y-1">
+              <div class="flex justify-between">
+                <span>Prompt Quality:</span>
+                <span id="score-p1-prompt" class="text-blue-300 font-semibold">-- / 12</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Vision OCR Execution:</span>
+                <span id="score-p1-agent" class="text-slate-200">-- / 8</span>
+              </div>
+            </div>
+            <p id="score-p1-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+          </div>
+
+          <!-- Player 2 Scorecard -->
+          <div class="p-5 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">Player 2 (Reconstructor)</span>
+              <span id="score-p2-total" class="text-sm font-bold font-mono text-slate-100">-- / 20</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 space-y-1">
+              <div class="flex justify-between">
+                <span>Prompt Quality:</span>
+                <span id="score-p2-prompt" class="text-purple-300 font-semibold">-- / 12</span>
+              </div>
+              <div class="flex justify-between">
+                <span>NetworkX Graph Execution:</span>
+                <span id="score-p2-agent" class="text-slate-200">-- / 8</span>
+              </div>
+            </div>
+            <p id="score-p2-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+          </div>
+
+          <!-- Player 3 Scorecard -->
+          <div class="p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Player 3 (Detective)</span>
+              <span id="score-p3-total" class="text-sm font-bold font-mono text-slate-100">-- / 20</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-400 space-y-1">
+              <div class="flex justify-between">
+                <span>Prompt Quality:</span>
+                <span id="score-p3-prompt" class="text-emerald-300 font-semibold">-- / 12</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Z3 Solver Execution:</span>
+                <span id="score-p3-agent" class="text-slate-200">-- / 8</span>
+              </div>
+            </div>
+            <p id="score-p3-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side-by-Side Comparison: Pipeline Output vs Expected Ground Truth -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-bold font-serif text-slate-200">Analytical Deduction Breakdown (40 pts)</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Pipeline Verdict Card -->
+          <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">Your Pipeline's Deduction</span>
+              <span class="text-[11px] text-slate-500 font-mono">Agent 3 Verdict</span>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm font-mono">
+              <div>
+                <span class="text-slate-500 block text-[11px]">CULPRIT:</span>
+                <span id="res-actual-culprit" class="text-slate-200 font-semibold">--</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">METHOD:</span>
+                <span id="res-actual-method" class="text-slate-300">--</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">KEY CLUE:</span>
+                <span id="res-actual-clue" class="text-slate-300">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expected Solution Card -->
+          <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Expected Target Solution</span>
+              <span class="text-[11px] text-slate-500 font-mono">Ground Truth</span>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm font-mono">
+              <div>
+                <span class="text-slate-500 block text-[11px]">TRUE CULPRIT:</span>
+                <span id="res-expected-culprit" class="text-slate-200 font-semibold">--</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">TRUE METHOD:</span>
+                <span id="res-expected-method" class="text-slate-300">--</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">SMOKING GUN CLUE:</span>
+                <span id="res-expected-clue" class="text-slate-300">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rubric Score Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Culprit Card -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Action / Culprit</span>
+            <span id="score-culprit-pts" class="text-sm font-bold font-mono text-slate-200">--</span>
+          </div>
+          <p id="score-culprit-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+        </div>
+
+        <!-- Method Card -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Rules / Method</span>
+            <span id="score-method-pts" class="text-sm font-bold font-mono text-slate-200">--</span>
+          </div>
+          <p id="score-method-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+        </div>
+
+        <!-- Clue Card -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Key Clue / Blocking</span>
+            <span id="score-clue-pts" class="text-sm font-bold font-mono text-slate-200">--</span>
+          </div>
+          <p id="score-clue-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+        </div>
+
+        <!-- Format Card -->
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">JSON Format</span>
+            <span id="score-format-pts" class="text-sm font-bold font-mono text-slate-200">--</span>
+          </div>
+          <p id="score-format-feedback" class="text-xs text-slate-400 leading-snug">--</p>
+        </div>
+      </div>
+
+      <!-- Leak Penalty Notice (If applicable) -->
+      <div id="leak-penalty-notice" class="hidden p-4 rounded-xl bg-red-950/60 border border-red-500/30 text-xs font-mono text-red-300 flex items-center justify-between">
+        <span class="font-bold">⚠️ Premature Leak Penalty Applied: -20 Points</span>
+        <span id="leak-penalty-feedback">Player 2 leaked the culprit prematurely in the timeline.</span>
+      </div>
+
+      <!-- Interactive Team Relay Chain Review (The "Telephone Game" Post-Mortem) -->
+      <div class="mt-8 border border-slate-800 rounded-2xl bg-slate-900/80 p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🔍</span>
+            <div>
+              <h4 class="text-sm font-bold text-slate-100 font-serif">Relay Chain Breakdown</h4>
+              <p class="text-xs text-slate-400">Review what each player prompted and what their agent produced</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onclick="toggleRelayChainReview()" 
+            id="btn-toggle-relay-review"
+            class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-amber-400 font-semibold border border-slate-700 transition"
+          >
+            Show Full Relay Chain ▼
+          </button>
+        </div>
+
+        <div id="relay-chain-container" class="hidden pt-4 border-t border-slate-800 space-y-4 text-xs font-mono">
+          <!-- Step 1 Extractor Box -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-amber-400 font-bold">
+              <span>👤 Player 1: Evidence Extractor</span>
+              <span class="text-slate-500 font-normal">Input: Case File</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Prompt Sent:</span>
+              <p id="review-user1-prompt" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-200 whitespace-pre-wrap"></p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Agent 1 Extracted Facts:</span>
+              <div id="review-agent1-output" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-300 max-h-40 overflow-y-auto whitespace-pre-wrap"></div>
+            </div>
+          </div>
+
+          <!-- Step 2 Reconstructor Box -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-amber-400 font-bold">
+              <span>👤 Player 2: Timeline Reconstructor</span>
+              <span class="text-slate-500 font-normal">Input: Agent 1 Facts Only</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Prompt Sent:</span>
+              <p id="review-user2-prompt" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-200 whitespace-pre-wrap"></p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Agent 2 Reconstructed Timeline:</span>
+              <div id="review-agent2-output" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-300 max-h-40 overflow-y-auto whitespace-pre-wrap"></div>
+            </div>
+          </div>
+
+          <!-- Step 3 Detective Box -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-amber-400 font-bold">
+              <span>👤 Player 3: Final Detective</span>
+              <span class="text-slate-500 font-normal">Input: Agent 2 Timeline Only</span>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Prompt Sent:</span>
+              <p id="review-user3-prompt" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-200 whitespace-pre-wrap"></p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-slate-400 text-[11px] uppercase tracking-wider">Agent 3 Final Output:</span>
+              <pre id="review-agent3-output" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80 text-slate-300 overflow-x-auto"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-6">
+        <button 
+          onclick="openLeaderboard()" 
+          class="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-400 font-bold text-sm transition transform active:scale-[0.98] flex items-center gap-2"
+        >
+          <span>🏆</span>
+          <span>View Leaderboard</span>
+        </button>
+        <button 
+          onclick="handleResetForNewTeam()" 
+          class="px-8 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition transform active:scale-[0.98] shadow-lg shadow-amber-500/20"
+        >
+          Start New Team Match
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: TOURNAMENT LEADERBOARD                            -->
+    <!-- ======================================================== -->
+    <div id="modal-leaderboard" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="max-w-3xl w-full bg-slate-900 border border-amber-500/30 rounded-2xl p-6 sm:p-8 flex flex-col max-h-[85vh] shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🏆</span>
+            <div>
+              <h3 class="text-xl font-bold font-serif text-slate-100">Tournament Leaderboard</h3>
+              <p class="text-xs text-slate-400 font-mono">Ranked by total score • Ties broken by speed</p>
+            </div>
+          </div>
+          <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-slate-200 text-lg font-bold font-mono px-2 py-1">✕</button>
+        </div>
+
+        <!-- Table Container -->
+        <div class="flex-1 overflow-y-auto pr-1">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="text-slate-400 border-b border-slate-800 sticky top-0 bg-slate-900">
+              <tr>
+                <th class="py-2.5 px-3">#</th>
+                <th class="py-2.5 px-3">Team</th>
+                <th class="py-2.5 px-3">Case</th>
+                <th class="py-2.5 px-3">Score</th>
+                <th class="py-2.5 px-3">Grade</th>
+                <th class="py-2.5 px-3">Completed</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/60 text-slate-200">
+              <!-- Populated dynamically by JS -->
+            </tbody>
+          </table>
+          <div id="leaderboard-empty" class="hidden py-12 text-center text-slate-500 font-mono text-xs">
+            No completed matches recorded yet. Play a match to set the high score!
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
+          <button onclick="fetchLeaderboard()" class="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-1">
+            <span>🔄</span> Refresh
+          </button>
+          <button onclick="closeLeaderboard()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-bold transition">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: ORGANIZER CONTROL CENTER                          -->
+    <!-- ======================================================== -->
+    <div id="modal-admin" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+      <div class="max-w-4xl w-full bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 flex flex-col max-h-[90vh] shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">⚙️</span>
+            <div>
+              <h3 class="text-xl font-bold font-serif text-slate-100">Organizer Control Center</h3>
+              <p class="text-xs text-slate-400 font-mono">Tournament monitoring, match inspection & data export</p>
+            </div>
+          </div>
+          <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-200 text-lg font-bold font-mono px-2 py-1">✕</button>
+        </div>
+
+        <!-- Admin Navigation Tabs -->
+        <div class="flex border-b border-slate-800 gap-4 text-xs font-mono">
+          <button id="admin-tab-btn-matches" onclick="switchAdminTab('matches')" class="pb-2 border-b-2 border-amber-400 text-amber-400 font-bold transition">
+            📊 Standings & Matches
+          </button>
+          <button id="admin-tab-btn-llm" onclick="switchAdminTab('llm')" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+            ⚡ LLM Engine & Connectivity
+          </button>
+          <button id="admin-tab-btn-cases" onclick="switchAdminTab('cases')" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+            📂 Mystery Cases & Authoring
+          </button>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- TAB 1: STANDINGS & MATCHES                             -->
+        <!-- ====================================================== -->
+        <div id="admin-view-matches" class="space-y-4 flex-1 flex flex-col min-h-0">
+          <!-- Quick Stats Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div id="admin-stat-matches" class="text-xl font-bold text-amber-400">0</div>
+              <div class="text-[11px] text-slate-400">Total Matches</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div id="admin-stat-avg" class="text-xl font-bold text-slate-100">0.0</div>
+              <div class="text-[11px] text-slate-400">Average Score</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div id="admin-stat-high" class="text-xl font-bold text-emerald-400">0</div>
+              <div class="text-[11px] text-slate-400">Highest Score</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div id="admin-stat-solve-rate" class="text-xl font-bold text-cyan-400">0%</div>
+              <div class="text-[11px] text-slate-400">Culprit Solve Rate</div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <button onclick="exportCSV()" class="px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold flex items-center gap-1.5 transition">
+                <span>📥</span> Export CSV
+              </button>
+              <button onclick="exportJSON()" class="px-3 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 font-semibold flex items-center gap-1.5 transition">
+                <span>📦</span> Export JSON
+              </button>
+              <button onclick="fetchAdminData()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1 transition">
+                <span>🔄</span> Refresh
+              </button>
+            </div>
+            <button onclick="handleAdminResetTournament()" class="px-3 py-1.5 rounded-lg bg-red-950/50 hover:bg-red-900/50 border border-red-500/40 text-red-300 font-semibold flex items-center gap-1.5 transition">
+              <span>⚠️</span> Reset Tournament
+            </button>
+          </div>
+
+          <!-- Matches Table -->
+          <div class="flex-1 overflow-y-auto pr-1 border border-slate-800 rounded-xl bg-slate-950 max-h-56">
+            <table class="w-full text-left text-xs font-mono">
+              <thead class="text-slate-400 border-b border-slate-800 sticky top-0 bg-slate-950">
+                <tr>
+                  <th class="py-2.5 px-3">Team</th>
+                  <th class="py-2.5 px-3">Case</th>
+                  <th class="py-2.5 px-3">Score</th>
+                  <th class="py-2.5 px-3">Grade</th>
+                  <th class="py-2.5 px-3">Completed</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-matches-tbody" class="divide-y divide-slate-800/60 text-slate-200">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+            <div id="admin-matches-empty" class="hidden py-8 text-center text-slate-500 font-mono text-xs">
+              No matches recorded yet.
+            </div>
+          </div>
+
+          <!-- Match Detail Inspector Container -->
+          <div id="admin-inspector-container" class="hidden p-4 rounded-xl bg-slate-950 border border-amber-500/40 space-y-3 font-mono text-xs max-h-56 overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h4 class="font-bold text-amber-400">Match Transcript: <span id="inspector-team-name">--</span></h4>
+              <button onclick="closeInspector()" class="text-slate-400 hover:text-slate-200">✕</button>
+            </div>
+            <div class="space-y-2">
+              <div>
+                <span class="text-slate-400 font-semibold">Player 1 Prompt:</span>
+                <p id="inspector-p1" class="text-slate-300 bg-slate-900 p-2 rounded whitespace-pre-wrap"></p>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Agent 1 Extracted Facts:</span>
+                <p id="inspector-a1" class="text-slate-300 bg-slate-900 p-2 rounded whitespace-pre-wrap"></p>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Player 2 Prompt:</span>
+                <p id="inspector-p2" class="text-slate-300 bg-slate-900 p-2 rounded whitespace-pre-wrap"></p>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Agent 2 Timeline:</span>
+                <p id="inspector-a2" class="text-slate-300 bg-slate-900 p-2 rounded whitespace-pre-wrap"></p>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Player 3 Prompt:</span>
+                <p id="inspector-p3" class="text-slate-300 bg-slate-900 p-2 rounded whitespace-pre-wrap"></p>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Final Verdict:</span>
+                <pre id="inspector-verdict" class="text-slate-300 bg-slate-900 p-2 rounded overflow-x-auto"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- TAB 2: LLM ENGINE & VENUE CONNECTIVITY                 -->
+        <!-- ====================================================== -->
+        <div id="admin-view-llm" class="hidden space-y-4 font-mono text-xs">
+          <!-- Connection Status Card -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span id="llm-status-dot" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+              <div>
+                <div class="font-bold text-slate-100 flex items-center gap-2">
+                  <span>Provider:</span>
+                  <span id="llm-current-provider" class="text-amber-400 uppercase">gemini</span>
+                  <span class="text-slate-500">|</span>
+                  <span id="llm-current-model" class="text-slate-300">gemini-3.5-flash-lite</span>
+                </div>
+                <div id="llm-status-message" class="text-[11px] text-slate-400">Connection active</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="llm-latency-badge" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 text-slate-300 font-bold">-- ms</span>
+              <button onclick="handleTestLLMConnection()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold transition">
+                ⚡ Test Ping
+              </button>
+            </div>
+          </div>
+
+          <!-- Configuration Form -->
+          <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-4">
+            <h4 class="font-bold text-slate-200">Configure Active Model & Provider</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-slate-400 uppercase tracking-wider text-[11px] mb-1">Provider</label>
+                <select id="llm-config-provider" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-amber-400">
+                  <option value="gemini">Google Gemini (Default)</option>
+                  <option value="ollama">Ollama Local (qwen3:4b)</option>
+                  <option value="openai">OpenAI</option>
+                  <option value="anthropic">Anthropic Claude</option>
+                  <option value="offline">Offline Simulator (Zero Internet Mode)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-400 uppercase tracking-wider text-[11px] mb-1">Model Identifier</label>
+                <input id="llm-config-model" type="text" placeholder="e.g. gemini-3.5-flash-lite or gpt-4o-mini" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-amber-400">
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+              <input type="checkbox" id="llm-config-fallback" class="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-amber-500">
+              <label for="llm-config-fallback" class="text-slate-300 text-xs">
+                Auto-fallback to Offline Simulator if internet drops or API errors occur during game
+              </label>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button onclick="handleSaveLLMConfig()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+                Apply Model Settings
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- TAB 3: MYSTERY CASES & AUTHORING                       -->
+        <!-- ====================================================== -->
+        <div id="admin-view-cases" class="hidden space-y-4 font-mono text-xs flex-1 flex flex-col min-h-0">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Installed Scenarios</span>
+            <button onclick="toggleCaseCreatorForm()" id="btn-toggle-case-creator" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-semibold transition">
+              ➕ Author New Mystery
+            </button>
+          </div>
+
+          <!-- Cases List -->
+          <div id="admin-cases-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Create Case Collapsible Form -->
+          <div id="admin-case-creator-form" class="hidden p-4 rounded-xl bg-slate-950 border border-amber-500/40 space-y-3 overflow-y-auto max-h-72">
+            <h4 class="font-bold text-amber-400">Author Custom Mystery Scenario</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Case ID (Slug)</label>
+                <input id="create-case-id" type="text" placeholder="case_04_cyber_heist" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Title</label>
+                <input id="create-case-title" type="text" placeholder="The Cyber Heist" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Difficulty</label>
+                <select id="create-case-difficulty" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+                  <option value="Easy">Easy</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Synopsis</label>
+              <input id="create-case-synopsis" type="text" placeholder="Brief 1-2 sentence overview" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+            </div>
+
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Noisy Case File (Unformatted Story, Clues & Red Herrings)</label>
+              <textarea id="create-case-story" rows="4" placeholder="Full investigative report narrative..." class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">True Culprit Name</label>
+                <input id="create-case-culprit" type="text" placeholder="Dr. Arthur Bell" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Murder Weapon / Method</label>
+                <input id="create-case-method" type="text" placeholder="Cyanide in sugar cubes" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Decisive Key Clue</label>
+                <input id="create-case-clue" type="text" placeholder="Muddy boots from conservatory" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[11px] mb-1">Motive</label>
+                <input id="create-case-motive" type="text" placeholder="Financial debt & blackmail" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Suspects (comma-separated)</label>
+              <input id="create-case-suspects" type="text" placeholder="Dr. Bell, Lady Beatrice, Colonel Vance" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+            </div>
+
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Leak Keywords (comma-separated)</label>
+              <input id="create-case-keywords" type="text" placeholder="Bell, cyanide, poison" class="w-full px-2.5 py-1.5 rounded bg-slate-900 border border-slate-700 text-slate-100">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+              <button onclick="toggleCaseCreatorForm()" class="px-4 py-2 rounded bg-slate-800 text-slate-300">Cancel</button>
+              <button onclick="handleCreateCustomCase()" class="px-5 py-2 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold">
+                Deploy Case to Station
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-2 flex justify-end">
+          <button onclick="closeAdminModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-bold transition">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: High-Res Visual Evidence Viewer with Navigation & Minimal Context -->
+    <div id="modal-image-viewer" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in" onclick="closeImageViewer()">
+      <div class="max-w-4xl w-full max-h-[95vh] bg-slate-900 border border-blue-500/40 rounded-2xl p-4 sm:p-6 flex flex-col space-y-3 shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="modal-image-badge" class="px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-blue-300 text-[11px] font-mono font-bold">CCTV</span>
+            <span id="modal-image-time" class="px-2 py-0.5 rounded bg-slate-800 text-blue-300 text-[11px] font-mono font-semibold">Feed</span>
+            <h3 id="modal-image-title" class="text-sm sm:text-base font-bold text-slate-100 font-mono">Visual Evidence</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="modal-image-counter" class="text-xs font-mono text-slate-500 hidden sm:inline">1 of 10</span>
+            <button id="modal-btn-close" onclick="closeImageViewer()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs font-mono font-bold">
+              ✕ Close (Esc)
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Image with Prev / Next Navigation -->
+        <div class="relative flex-1 overflow-hidden flex items-center justify-center bg-slate-950/90 rounded-xl p-2 border border-slate-800 min-h-[260px] max-h-[58vh]">
+          <button id="modal-btn-prev" onclick="prevImage()" class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-900/80 hover:bg-blue-600 text-white border border-slate-700 transition transform active:scale-95 shadow-lg z-10 font-bold" title="Previous Image (Left Arrow)">
+            ◀
+          </button>
+          <img id="modal-image-src" src="" alt="Evidence feed" class="max-h-[54vh] w-auto max-w-full object-contain rounded-lg shadow-lg transition duration-200">
+          <button id="modal-btn-next" onclick="nextImage()" class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-900/80 hover:bg-blue-600 text-white border border-slate-700 transition transform active:scale-95 shadow-lg z-10 font-bold" title="Next Image (Right Arrow)">
+            ▶
+          </button>
+        </div>
+
+        <!-- Minimal Text Context & Metadata Box -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+          <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <span class="text-blue-400 font-bold">MINIMAL CONTEXT NOTE</span>
+            <span id="modal-image-meta" class="text-slate-500">File: 01_cctv_checkin.png</span>
+          </div>
+          <p id="modal-image-desc" class="text-xs sm:text-sm font-sans text-slate-200 leading-relaxed"></p>
+        </div>
+
+        <!-- Bottom Thumbnails Strip for Quick Switching -->
+        <div id="modal-thumbnail-strip" class="flex items-center gap-2 overflow-x-auto pb-1 pt-1 border-t border-slate-800/80">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Global Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4">
+      <div class="w-12 h-12 border-4 border-amber-400/20 border-t-amber-400 rounded-full animate-spin mb-4"></div>
+      <p id="loading-text" class="text-sm font-mono text-slate-300 animate-pulse">Running Agent...</p>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800/80 py-3 text-center text-xs text-slate-400 font-mono">
+    Prompt Relay • Powered by Google Gemini
+  </footer>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    if (typeof window.setP2ActiveImage === "undefined") {
+      var s = document.createElement("script");
+      s.src = "app.js";
+      document.body.appendChild(s);
+    }
+  </script>
+</body>
+</html>

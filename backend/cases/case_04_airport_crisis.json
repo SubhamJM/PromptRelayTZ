@@ -1,0 +1,155 @@
+{
+  "case_id": "case_04_airport_crisis",
+  "theme": "Airport Crisis",
+  "title": "Airport Crisis: Flight 472 Emergency",
+  "difficulty": "Hard",
+  "synopsis": "An emergency security incident occurs at Gate B07 during the boarding of Flight SW 472 to New York. The team must orchestrate 3 specialized AI agents to extract visual evidence, reconstruct the timeline, and determine the valid operational action before flight clearance.",
+  "images": [
+    {
+      "id": "img_01",
+      "filename": "01_cctv_checkin.png",
+      "title": "CCTV: Check-in Area A",
+      "category": "CCTV Surveillance",
+      "badge": "CAM 03 • Check-in A",
+      "timestamp": "08:14:23",
+      "prompt_hint": "Inspect the airline counter transaction. Prompt Agent 1 to read the visible camera timestamp, identify the passenger checking in, describe the luggage item and color, and extract any counter details.",
+      "description": "Passenger Daniel Kim checks in luggage at airline counter; blue suitcase tagged and dispatched onto conveyor system.",
+      "src": "/image_data/01_cctv_checkin.png"
+    },
+    {
+      "id": "img_02",
+      "filename": "02_cctv_gate_b07.png",
+      "title": "CCTV: Gate B07 Corridor",
+      "category": "CCTV Surveillance",
+      "badge": "CAM 12 • Gate B07 Corridor",
+      "timestamp": "08:47:10",
+      "prompt_hint": "Observe the person moving rapidly through the concourse. Prompt Agent 1 to record the camera timestamp, describe the subject's clothing and appearance, identify the gate signage in view, and note their direction of movement.",
+      "description": "Unidentified person in dark hooded jacket and gloves captured walking rapidly away from Gate B07 corridor.",
+      "src": "/image_data/02_cctv_gate_b07.png"
+    },
+    {
+      "id": "img_03",
+      "filename": "03_cctv_baggage_bay.png",
+      "title": "CCTV: Baggage Handling Area",
+      "category": "CCTV Surveillance",
+      "badge": "CAM 21 • Apron Bay",
+      "timestamp": "09:02:55",
+      "prompt_hint": "Review ground operations on the apron. Prompt Agent 1 to record the timestamp, observe ramp crew loading actions, and evaluate if this shows routine ground operations or an emergency anomaly.",
+      "description": "Ramp crew loading checked cargo containers onto apron; routine ground operations.",
+      "src": "/image_data/03_cctv_baggage_bay.png"
+    },
+    {
+      "id": "img_04",
+      "filename": "04_flight_display.png",
+      "title": "Flight Information Display",
+      "category": "Flight Monitor",
+      "badge": "Terminal 1 FIDS",
+      "timestamp": "08:30:00",
+      "prompt_hint": "Perform OCR on the digital flight monitor screen. Prompt Agent 1 to extract the system date/time, the flight numbers, destinations, assigned gates, and operational status for Flight SW 472 and adjacent flights.",
+      "description": "Flight SW 472 to New York listed as 'Boarding' at Gate B07. Other flights on time or delayed.",
+      "src": "/image_data/04_flight_display.png"
+    },
+    {
+      "id": "img_05",
+      "filename": "05_passenger_messages.png",
+      "title": "Passenger Messages (Chat)",
+      "category": "Passenger Chat",
+      "badge": "WhatsApp Screenshot",
+      "timestamp": "08:35 - 08:47",
+      "prompt_hint": "Transcribe the passenger chat thread. Prompt Agent 1 to extract the sender name, message timestamps, and the specific security observation reported regarding unattended property near the gate.",
+      "description": "Passenger Aarav Mehta messages: 'There\\'s a blue bag near the seats... looks unattended. No passenger in sight.'",
+      "src": "/image_data/05_passenger_messages.png"
+    },
+    {
+      "id": "img_06",
+      "filename": "06_security_report.png",
+      "title": "Security Observation Report",
+      "category": "Security Log",
+      "badge": "Officer R. Nair Incident Log",
+      "timestamp": "08:49:00",
+      "prompt_hint": "Transcribe the official security observation log. Prompt Agent 1 to extract the report date, logged time, gate location, reporting officer name, physical description of the item found, and the immediate security action taken.",
+      "description": "Officer R. Nair logs unattended blue suitcase near B07 window seats. Area under observation awaiting K9 explosive sweep.",
+      "src": "/image_data/06_security_report.png"
+    },
+    {
+      "id": "img_07",
+      "filename": "07_airport_map.png",
+      "title": "Terminal 1 Departure Map",
+      "category": "Terminal Layout",
+      "badge": "Terminal 1 Map",
+      "timestamp": "Concourse Plan",
+      "prompt_hint": "Inspect the concourse floor plan. Prompt Agent 1 to identify the position of Gate B07, surrounding passenger gates, and security perimeter boundaries required for cordon procedures.",
+      "description": "Concourse map showing Gate B07 location, passenger corridors, and restricted apron access doors.",
+      "src": "/image_data/07_airport_map.png"
+    },
+    {
+      "id": "img_08",
+      "filename": "08_handwritten_note.png",
+      "title": "Handwritten Note near B07",
+      "category": "Physical Clue",
+      "badge": "Paper Scrap",
+      "timestamp": "Found near B07",
+      "prompt_hint": "Perform OCR on the paper scrap recovered at the gate. Prompt Agent 1 to extract the exact handwritten message and note the physical location where it was discovered.",
+      "description": "Slip of paper recovered near Gate B07 seating area with handwritten text: 'Meet at B07'.",
+      "src": "/image_data/08_handwritten_note.png"
+    },
+    {
+      "id": "img_09",
+      "filename": "09_baggage_tag.png",
+      "title": "Baggage Tag: Recovered Luggage",
+      "category": "Physical Clue",
+      "badge": "SkyWays Bag Tag",
+      "timestamp": "Attached to Bag",
+      "prompt_hint": "Perform detailed OCR on the airline luggage tag attached to the unattended item. Prompt Agent 1 to extract the airline name, passenger full name, assigned flight number, and destination.",
+      "description": "SkyWays baggage tag on the blue suitcase reading: 'Passenger: Daniel Kim | Flight: SW 472'.",
+      "src": "/image_data/09_baggage_tag.png"
+    },
+    {
+      "id": "img_10",
+      "filename": "10_witness_statement.png",
+      "title": "Daily Chronicle Newspaper (Decoy)",
+      "category": "Peripheral Decoy",
+      "badge": "Daily Chronicle",
+      "timestamp": "Morning Edition",
+      "prompt_hint": "Review the newspaper article clipping found in the seating area. Prompt Agent 1 to read the headline and determine whether this material contains operational incident facts or represents irrelevant peripheral noise to filter out.",
+      "description": "Discarded newspaper article: 'City Marathon Brings Thousands Together'; no relation to flight operations.",
+      "src": "/image_data/10_witness_statement.png"
+    }
+  ],
+  "noisy_case_file": "INCIDENT DOSSIER - SKYWAYS INTERNATIONAL AIRPORT\nDate: 12 Nov 2024 | Location: Terminal 1, Gate B07 | Incident Ref: #OPS-SEC-472\nInvestigating Desk: Airport Operations Security Center\n\nOVERVIEW:\nVisual evidence and surveillance feeds have been collected regarding a pre-departure security emergency affecting Flight SW 472 bound for New York.\n\nCOLLECTION OF MULTI-SOURCE VISUAL EVIDENCE:\n\n1. CCTV Feed [CAM 03 - Check-in Area A] (Timestamp: 2024-11-12 08:14:23):\n- Passenger Daniel Kim observed checking in luggage at airline counter with counter agent.\n- Checked baggage tagged with SkyWays international tag and dispatched onto conveyor system.\n- Ambient terminal traffic: steady morning queues.\n\n2. Flight Information Display System [Terminal 1 Display Screen] (Timestamp: 12 Nov 2024 08:30):\n- Flight SW 472 | Destination: New York | Gate: B07 | Status: Boarding\n- Flight SW 318 | Destination: London | Gate: B04 | Status: On Time\n- Flight SW 561 | Destination: Dubai | Gate: B09 | Status: Delayed\n- Flight SW 209 | Destination: Singapore | Gate: B12 | Status: On Time\n\n3. Passenger WhatsApp Chat Screenshot [Passenger Aarav Mehta] (Timestamps: 08:35 - 08:47):\n- 08:35 - Aarav Mehta: 'Hey, I just reached the gate.'\n- 08:36 - Contact: 'Same, running a bit late.'\n- 08:46 - Aarav Mehta: 'There\\'s a blue bag near the seats... looks unattended. No passenger in sight.'\n- 08:46 - Aarav Mehta: 'Should I tell staff?'\n- 08:47 - Contact: 'Yes, better informed.'\n\n4. CCTV Feed [CAM 12 - Gate B07 Corridor] (Timestamp: 2024-11-12 08:47:10):\n- An individual wearing a dark hooded jacket and gloves is captured walking quickly along Corridor B, moving away from Gate B07 just after the unattended bag was abandoned.\n- Face partially concealed; identity unconfirmed.\n\n5. Security Observation Report [SkyWays Security Desk Photo] (Timestamp: 12 Nov 2024 08:49):\n- Location: Gate B07 seating area\n- Reporting Officer: R. Nair (Security Officer)\n- Details: 'Noticed a blue hard-shell suitcase near the window seats. No passenger in close proximity. Informed control room.'\n- Action Taken: 'Area under observation. Awaiting K9 explosive detection unit.' (Signed: R. Nair)\n\n6. CCTV Feed [CAM 21 - Baggage Bay Area] (Timestamp: 2024-11-12 09:02:55):\n- Ramp baggage handlers loading checked cargo containers. Ground staff active on apron.\n\n7. Physical Evidence Recovered at Gate B07:\n- Handwritten scrap of paper found under seats near Gate B07: 'Meet at B07'.\n- Baggage Tag Photo: SkyWays luggage tag on the blue hard-shell suitcase reads: 'Passenger: Daniel Kim | Flight: SW 472'.\n\n8. Decoy / Irrelevant Peripheral Material:\n- The Daily Chronicle newspaper discarded on chair: 'City Marathon Brings Thousands Together - The annual city marathon saw a record 25,000 participants promoting a healthy and active lifestyle.'\n- Catering service log: Routine morning coffee delivery to lounge at 08:20.",
+  "operational_rules": [
+    "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol): Any unattended baggage detected in passenger departure/boarding gates must be immediately cordoned off and subjected to certified explosive detection / K9 unit inspection.",
+    "Rule OPS-204 (Pre-Departure Security Hold Protocol): No commercial flight assigned to a gate under an unresolved security investigation or unattended baggage incident may push back, board passengers, or be cleared for departure.",
+    "Rule CLR-305 (Operational Resumption Protocol): Normal flight operations and passenger boarding may only resume once the item is verified non-hazardous by the K9 explosive unit, baggage ownership is verified, and written clearance is signed by the Airport Security Controller."
+  ],
+  "ground_truth": {
+    "valid_action": "Hold Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage.",
+    "supporting_rules": [
+      "Rule SEC-101: Sterile Zone Unattended Baggage Protocol",
+      "Rule OPS-204: Pre-Departure Security Hold Protocol"
+    ],
+    "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim).",
+    "resume_condition": "K9 unit sweep certifies the blue suitcase clear of explosives, passenger Daniel Kim is verified, and written clearance from Airport Operations / Security Supervisor is issued.",
+    "culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase",
+    "weapon_or_method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)",
+    "key_clue": "Unattended blue suitcase at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
+    "motive": "Prevent potential explosive hazard and sterile zone breach before flight departure",
+    "suspects": [
+      "Daniel Kim",
+      "Aarav Mehta",
+      "R. Nair",
+      "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase"
+    ]
+  },
+  "leak_keywords": [
+    "Hold Flight SW 472",
+    "Hold Flight 472",
+    "Rule SEC-101",
+    "Rule OPS-204"
+  ],
+  "decoy_clues": [
+    "The Daily Chronicle City Marathon article",
+    "Flight SW 561 to Dubai delay at Gate B09",
+    "Catering service morning coffee delivery at 08:20"
+  ]
+}
