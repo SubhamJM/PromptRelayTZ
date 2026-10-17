@@ -23,6 +23,7 @@ class StartGameResponse(BaseModel):
     theme: Optional[str] = None
     images: List[Any] = Field(default_factory=list)
     operational_rules: List[str] = Field(default_factory=list)
+    prompt_limits: Dict[str, Any] = Field(default_factory=dict)
 
 
 class Step1Request(BaseModel):

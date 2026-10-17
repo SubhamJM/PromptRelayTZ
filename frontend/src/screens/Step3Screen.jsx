@@ -22,31 +22,35 @@ export function Step3Screen() {
 
   if (!scenario) return null;
 
-  const defaultTemplate = `You are a chief logic solver and senior security prosecutor.
-Analyze the reconstructed timeline provided by Agent 2 alongside the official operational rules.
-Perform step-by-step deductive reasoning to solve the crisis:
-1. Identify the primary culprit or perpetrator who breached regulations.
-2. Determine their exact method and sequence of execution (e.g., luggage swaps, unauthorized transfers, digital bypasses).
-3. Identify the true motive or objective behind the incident.
-4. Pinpoint the specific operational rule/policy violated (e.g. SEC-101, OPS-204, CLR-305).
-5. List the key evidence items and timestamps confirming their culpability.
+  const MAX_WORDS = 120;
+  const MAX_CHARS = 900;
 
-CRITICAL INSTRUCTION: You MUST return your final verdict as a clean, strictly valid JSON object without markdown fences, with these exact keys:
+  const defaultTemplate = `Role: Logic Decision Solver.
+Analyze the reconstructed timeline and operational rules to determine the final operational action:
+- Identify the true culprit or entity responsible
+- Deduce the exact breach method and mechanism
+- Cite the governing operational rule broken
+- Identify the decisive physical clue or blocking condition
+Output strictly valid JSON with keys:
 {
-  "culprit": "<name or identifier>",
-  "method": "<detailed explanation of method>",
-  "motive": "<underlying objective/motive>",
-  "rule_broken": "<exact code or rule violated>",
-  "evidence_keys": ["<evidence 1>", "<evidence 2>", "<evidence 3>"]
+  "culprit": "<name or action>",
+  "method": "<method or rules>",
+  "motive": "<objective>",
+  "rule_broken": "<rule code>",
+  "evidence_keys": ["<key clues>"]
 }`;
+
+  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
+  const charCount = prompt.length;
+  const isOverWordLimit = wordCount > MAX_WORDS;
+  const isOverCharLimit = charCount > MAX_CHARS;
+  const isOverLimit = isOverWordLimit || isOverCharLimit;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!prompt.trim() || isLoading) return;
+    if (!prompt.trim() || isOverLimit || isLoading) return;
     submitStep3(prompt.trim());
   };
-
-  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
   const rules = scenario.rules || [];
 
   return (
@@ -202,6 +206,7 @@ CRITICAL INSTRUCTION: You MUST return your final verdict as a clean, strictly va
                 <li><strong className="text-slate-100">Pinpoint Accuracy:</strong> Name the exact culprit, method, and motive.</li>
                 <li><strong className="text-slate-100">Strict JSON Output:</strong> Enforce the JSON schema keys to avoid parsing penalties.</li>
                 <li><strong className="text-slate-100">Final Verdict:</strong> This turn completes the relay match and scores your entire team!</li>
+                <li><strong className="text-amber-400">Hard Length Cap:</strong> Max {MAX_WORDS} words / {MAX_CHARS} characters. Concise JSON schema & rule directives.</li>
               </ul>
             </div>
           )}
@@ -243,21 +248,37 @@ CRITICAL INSTRUCTION: You MUST return your final verdict as a clean, strictly va
                 rows={12}
                 disabled={isLoading}
                 placeholder="Write your prompt to instruct Agent 3 to deduce the culprit, method, motive, and violated rule, and format the verdict in JSON..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition resize-y leading-relaxed disabled:opacity-50"
+                className={`w-full bg-slate-950 border rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition resize-y leading-relaxed disabled:opacity-50 ${
+                  isOverLimit ? "border-rose-500 focus:border-rose-500" : "border-slate-800 focus:border-emerald-500"
+                }`}
               />
             </div>
 
             {/* Bottom Meta & Submit */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-slate-800">
-              <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-                <span>{prompt.length} chars</span>
-                <span>•</span>
-                <span>{wordCount} words</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className={isOverWordLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {wordCount} / {MAX_WORDS} words
+                  </span>
+                  <span className="text-slate-600">•</span>
+                  <span className={isOverCharLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {charCount} / {MAX_CHARS} chars
+                  </span>
+                </div>
+                {isOverLimit && (
+                  <span className="text-xs font-mono text-rose-400 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {isOverWordLimit
+                      ? `Exceeds limit by ${wordCount - MAX_WORDS} words!`
+                      : `Exceeds limit by ${charCount - MAX_CHARS} chars!`}
+                  </span>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={!prompt.trim() || isLoading}
+                disabled={!prompt.trim() || isOverLimit || isLoading}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold font-mono text-sm bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white transition shadow-lg shadow-emerald-600/30 disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center gap-2"
               >
                 {isLoading ? (

@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: List[str] = ["*"]
 
+    # Hard Prompt Length Limits per Player Turn
+    MAX_PROMPT_WORDS_P1: int = 80
+    MAX_PROMPT_WORDS_P2: int = 80
+    MAX_PROMPT_WORDS_P3: int = 120
+
+    MAX_PROMPT_CHARS_P1: int = 600
+    MAX_PROMPT_CHARS_P2: int = 600
+    MAX_PROMPT_CHARS_P3: int = 900
+
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),
         env_file_encoding="utf-8",

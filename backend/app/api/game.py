@@ -23,6 +23,7 @@ from backend.app.models.api_dtos import (
 )
 from backend.app.models.scenario import ScenarioSummary
 from backend.app.models.session import TurnStep
+from backend.app.core.config import get_settings
 from backend.app.services.case_loader import CaseLoader, get_case_loader
 from backend.app.services.database import MatchDatabase, get_database
 from backend.app.services.scenario_loader import ScenarioLoader, get_scenario_loader
@@ -35,6 +36,30 @@ router = APIRouter(prefix="/game", tags=["Game"])
 agent_1_extractor = node_extractor
 agent_2_reconstructor = node_reconstructor
 agent_3_detective = node_solver
+
+
+def validate_prompt_length(prompt_text: str, max_words: int, max_chars: int, player_num: int) -> None:
+    """Enforces hard upper limit on prompt word count and character count."""
+    words = prompt_text.split()
+    word_count = len(words)
+    char_count = len(prompt_text)
+
+    if word_count > max_words:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"Player {player_num} prompt exceeds the limit of {max_words} words "
+                f"(submitted {word_count} words). Please condense your prompt."
+            ),
+        )
+    if char_count > max_chars:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"Player {player_num} prompt exceeds the limit of {max_chars} characters "
+                f"(submitted {char_count} characters). Please condense your prompt."
+            ),
+        )
 
 
 @router.get("/scenarios", response_model=List[ScenarioSummary])
@@ -111,6 +136,13 @@ async def start_game(
         for item in scenario.evidence_items
     ]
 
+    settings = get_settings()
+    prompt_limits = {
+        "p1": {"max_words": settings.MAX_PROMPT_WORDS_P1, "max_chars": settings.MAX_PROMPT_CHARS_P1},
+        "p2": {"max_words": settings.MAX_PROMPT_WORDS_P2, "max_chars": settings.MAX_PROMPT_CHARS_P2},
+        "p3": {"max_words": settings.MAX_PROMPT_WORDS_P3, "max_chars": settings.MAX_PROMPT_CHARS_P3},
+    }
+
     return StartGameResponse(
         session_id=session.session_id,
         team_name=session.team_name,
@@ -122,6 +154,7 @@ async def start_game(
         theme=theme,
         images=images,
         operational_rules=scenario.operational_rules,
+        prompt_limits=prompt_limits,
     )
 
 
@@ -205,6 +238,9 @@ async def submit_step_1(
     if not prompt_text:
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
 
+    settings = get_settings()
+    validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P1, settings.MAX_PROMPT_CHARS_P1, 1)
+
     state: RelayState = {
         "session_id": session.session_id,
         "team_name": session.team_name,
@@ -249,6 +285,9 @@ async def submit_step_2(
     prompt_text = (request.prompt or request.user_2_prompt or "").strip()
     if not prompt_text:
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
+
+    settings = get_settings()
+    validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P2, settings.MAX_PROMPT_CHARS_P2, 2)
 
     state: RelayState = {
         "session_id": session.session_id,
@@ -302,6 +341,9 @@ async def submit_step_3(
     prompt_text = (request.prompt or request.user_3_prompt or "").strip()
     if not prompt_text:
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
+
+    settings = get_settings()
+    validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P3, settings.MAX_PROMPT_CHARS_P3, 3)
 
     # 1. Run Solver Node
     solver_state: RelayState = {

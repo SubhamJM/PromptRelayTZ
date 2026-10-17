@@ -19,23 +19,27 @@ export function Step2Screen() {
 
   if (!scenario) return null;
 
-  const defaultTemplate = `You are an expert timeline reconstruction specialist and intelligence analyst.
-Review the extracted evidence and factual observations provided by Agent 1.
-Your task is to synthesize these facts into a strictly chronological sequence of events:
-1. Reconstruct every timestamped movement and interaction from start to finish.
-2. Track suspect identities, location shifts, and specific actions step-by-step.
-3. Identify crucial gaps, overlapping timelines, and suspicious inconsistencies.
-4. Highlight key turning points (e.g., luggage swaps, unauthorized badge access, alarm triggers).
+  const MAX_WORDS = 80;
+  const MAX_CHARS = 600;
 
-Organize your output into a clear, time-stamped timeline format suitable for logical inference. Do not make a final legal verdict yet; focus on establishing the verified sequence of events.`;
+  const defaultTemplate = `Role: Timeline & Incident Reconstructor.
+Using the extracted facts, reconstruct the incident into a strict chronological sequence:
+- Order events by what happened first, next, and last with exact timestamps
+- Trace movements of people and objects across locations
+- Connect causal dependencies showing how actions led to conditions
+Keep uncertain relationships separate. Maintain objective neutrality without naming a culprit or verdict.`;
+
+  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
+  const charCount = prompt.length;
+  const isOverWordLimit = wordCount > MAX_WORDS;
+  const isOverCharLimit = charCount > MAX_CHARS;
+  const isOverLimit = isOverWordLimit || isOverCharLimit;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!prompt.trim() || isLoading) return;
+    if (!prompt.trim() || isOverLimit || isLoading) return;
     submitStep2(prompt.trim());
   };
-
-  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -119,6 +123,7 @@ Organize your output into a clear, time-stamped timeline format suitable for log
                 <li><strong className="text-slate-100">Entity Tracking:</strong> Follow people, items, and badge activities continuously.</li>
                 <li><strong className="text-slate-100">Anomaly Highlighting:</strong> Identify gaps, decoy diversions, and rule infringements.</li>
                 <li><strong className="text-slate-100">Prepare for Player 3:</strong> Structure the sequence clearly so Player 3 can apply deductive logic.</li>
+                <li><strong className="text-amber-400">Hard Length Cap:</strong> Max {MAX_WORDS} words / {MAX_CHARS} characters. Keep instructions concise and high-signal.</li>
               </ul>
             </div>
           )}
@@ -160,21 +165,37 @@ Organize your output into a clear, time-stamped timeline format suitable for log
                 rows={12}
                 disabled={isLoading}
                 placeholder="Write your prompt to instruct Agent 2 to reconstruct the chronological timeline, track suspects, and highlight key anomalies..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500 transition resize-y leading-relaxed disabled:opacity-50"
+                className={`w-full bg-slate-950 border rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition resize-y leading-relaxed disabled:opacity-50 ${
+                  isOverLimit ? "border-rose-500 focus:border-rose-500" : "border-slate-800 focus:border-purple-500"
+                }`}
               />
             </div>
 
             {/* Bottom Meta & Submit */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-slate-800">
-              <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-                <span>{prompt.length} chars</span>
-                <span>•</span>
-                <span>{wordCount} words</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className={isOverWordLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {wordCount} / {MAX_WORDS} words
+                  </span>
+                  <span className="text-slate-600">•</span>
+                  <span className={isOverCharLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {charCount} / {MAX_CHARS} chars
+                  </span>
+                </div>
+                {isOverLimit && (
+                  <span className="text-xs font-mono text-rose-400 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {isOverWordLimit
+                      ? `Exceeds limit by ${wordCount - MAX_WORDS} words!`
+                      : `Exceeds limit by ${charCount - MAX_CHARS} chars!`}
+                  </span>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={!prompt.trim() || isLoading}
+                disabled={!prompt.trim() || isOverLimit || isLoading}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold font-mono text-sm bg-purple-600 hover:bg-purple-500 active:scale-95 text-white transition shadow-lg shadow-purple-600/30 disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center gap-2"
               >
                 {isLoading ? (

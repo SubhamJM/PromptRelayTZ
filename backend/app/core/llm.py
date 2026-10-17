@@ -43,9 +43,9 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
     role_pts = 0
     if any(k in clean for k in ["you are", "role", "act as", "specialist", "agent", "expert", "analyst"]):
         role_pts = 3
-    elif any(k in clean for k in ["extract", "identify", "analyze", "order", "deduce", "solve", "reconstruct"]) or word_count >= 12:
+    elif any(k in clean for k in ["extract", "identify", "analyze", "order", "deduce", "solve", "reconstruct", "construct", "synthesize"]):
         role_pts = 2
-    elif word_count >= 8:
+    elif word_count >= 8 and any(k in clean for k in ["find", "look", "check", "review"]):
         role_pts = 1
 
     # 2. Scope & Taxonomy (0-3)
@@ -106,7 +106,7 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
             con_pts = 1
 
     total_score = min(12, role_pts + tax_pts + disc_pts + con_pts)
-    tier = "strong" if total_score >= 9 else ("moderate" if total_score >= 5 else "weak")
+    tier = "strong" if total_score >= 9 else ("moderate" if total_score >= 6 else "weak")
 
     return {
         "tier": tier,
@@ -141,6 +141,9 @@ class MockOfflineChatModel(SimpleChatModel):
                 break
 
         is_airport = any(k in text_joined.lower() for k in ["airport", "sw 472", "flight", "gate b07", "baggage", "daniel kim"])
+        is_synthai = any(k in text_joined.lower() for k in ["synthai", "marcus vance", "elena rostova", "viktor kane", "maya lin", "omnipod", "omnidose", "cleanroom", "cyber-physical", "§404", "404"])
+        is_gallery = any(k in text_joined.lower() for k in ["vernissage", "delacroix", "julian thorne", "maximillian cross", "helena rostova", "vitrine", "tetrodotoxin", "caesarean", "ruby", "gallery", "vault", "biological trace", "§201", "201"])
+        is_blackwood = not (is_airport or is_synthai or is_gallery) or any(k in text_joined.lower() for k in ["blackwood", "reginald", "arthur bell", "higgins", "sugar tongs", "earl grey", "cyanide", "manor", "§102", "102", "peat"])
         sys_message = str(messages[0].content) if messages else ""
 
         is_reconstructor = "You are Agent 2" in sys_message or "Agent 2:" in sys_message or "Timeline & Incident Reconstructor" in sys_message
@@ -172,6 +175,61 @@ class MockOfflineChatModel(SimpleChatModel):
                         "• 08:49:00: Officer R. Nair establishes observation perimeter and initiates K9 explosive sweep request.\n"
                         "• Causal Dependency: Presence of an uninspected unattended suitcase directly impacts departure safety clearance for Flight SW 472."
                     )
+            elif is_synthai:
+                if tier == "weak":
+                    return (
+                        "Preliminary Timeline (Incomplete):\n"
+                        "- Evening: Access logged.\n"
+                        "- Later: Colleague found.\n"
+                        "[TIMELINE INCOMPLETE: Chronological sequencing omitted.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Chronological Order of Events:\n"
+                        "• 22:15: Dr. Elena Rostova enters cleanroom.\n"
+                        "• 22:30: Marcus Vance checks into cleanroom.\n"
+                        "• 22:42: Insulin pump override command delivered.\n"
+                        "• 23:45: Dr. Rostova discovered collapsed in cleanroom."
+                    )
+                else:
+                    return (
+                        "Reconstructed Chronological Sequence of Events:\n"
+                        "• 22:15:00: Dr. Elena Rostova enters Cleanroom 03.\n"
+                        "• 22:30:00: Marcus Vance checks in to monitor model deployment.\n"
+                        "• 22:42:14: BLE wireless sniffer captures encrypted payload broadcast from MAC D4:8A:3F:11:C9:82.\n"
+                        "• 22:42:15: Omnipod pump receives external override command FORCE_BOLUS_MAX(25.0U).\n"
+                        "• 22:41:00: Git commit pushed under Marcus Vance's name via automated cron shell script.\n"
+                        "• 22:50:00: Marcus Vance checks out of cleanroom.\n"
+                        "• 23:45:00: Dr. Rostova discovered unresponsive in Cleanroom 03.\n"
+                        "• Causal Dependency: Concealed Pi Zero BLE transmission at 22:42:14 directly caused the fatal 25-unit insulin overdose."
+                    )
+            elif is_gallery:
+                if tier == "weak":
+                    return (
+                        "Preliminary Timeline (Incomplete):\n"
+                        "- Evening: Gala started.\n"
+                        "- Later: Owner died in vault.\n"
+                        "[TIMELINE INCOMPLETE: Chronological sequencing omitted.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Chronological Order of Events:\n"
+                        "• 20:30: VIP champagne preview opens.\n"
+                        "• 21:15: Display vitrine opened.\n"
+                        "• 21:35: Gallery circuit breaker trips.\n"
+                        "• 21:40: Henri Delacroix found collapsed in vault room."
+                    )
+                else:
+                    return (
+                        "Reconstructed Chronological Sequence of Events:\n"
+                        "• 20:30:00: VIP champagne preview begins in Vernissage Grand Rotunda.\n"
+                        "• 20:45 - 21:15: Julian Thorne observed near garden terrace and display vitrine.\n"
+                        "• 21:15:00: Vitrine latch #V-02 coated with tetrodotoxin neurotoxin using black nitrile gloves.\n"
+                        "• 21:35:00: Henri Delacroix touches brass vitrine latch barehanded, absorbing transdermal toxin.\n"
+                        "• 21:40:00: Delacroix collapses; Caesarean Emerald Intaglio missing from vitrine.\n"
+                        "• 22:45:00: Nitrile gloves recovered from restroom bin with Thorne DNA inside.\n"
+                        "• Causal Dependency: Discarded nitrile gloves link the vitrine latch poisoning directly to Julian Thorne."
+                    )
             else:
                 if tier == "weak":
                     return (
@@ -179,6 +237,15 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- 8:00 PM: Tea served.\n"
                         "- Later: Body discovered.\n"
                         "[TIMELINE INCOMPLETE: Precise chronological minute sequencing and causal movements were omitted because the user prompt lacked reconstruction directives.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Chronological Sequence of Events:\n"
+                        "• 8:00 PM: Butler Higgins serves Earl Grey tea with sugar cubes.\n"
+                        "• 8:05 - 8:15 PM: Cellar leak emergency; tea tray unattended on sideboard.\n"
+                        "• 8:35 PM: Lady Beatrice hears garden footsteps near conservatory.\n"
+                        "• 9:05 PM: Dr. Bell claims arrival from clinic.\n"
+                        "• 9:15 PM: Lord Reginald Blackwood discovered dead in study."
                     )
                 else:
                     return (
@@ -188,13 +255,16 @@ class MockOfflineChatModel(SimpleChatModel):
                         "• 8:15 PM: Charles Blackwood spills red wine decanter in billiards room.\n"
                         "• 8:35 PM: Lady Beatrice hears garden footsteps; red peat mud deposited along conservatory path.\n"
                         "• 9:05 PM: Dr. Bell claims arrival, but riding boots already contain dried red peat greenhouse mud.\n"
-                        "• 9:15 PM: Lord Reginald Blackwood discovered deceased in locked study."
+                        "• 9:15 PM: Lord Reginald Blackwood discovered deceased in locked study.\n"
+                        "• Causal Dependency: Unattended tea tray between 8:05-8:15 PM enabled poison application before Lord Reginald consumed it."
                     )
 
         # Agent 3 (Solver / Detective)
         elif is_solver:
             eval_res = classify_prompt_quality(user_prompt, "solver")
             tier = eval_res["tier"]
+            score = eval_res["score"]
+            user_p_lower = user_prompt.lower()
             if is_airport:
                 if tier == "weak":
                     return json.dumps({
@@ -202,30 +272,169 @@ class MockOfflineChatModel(SimpleChatModel):
                         "supporting_rules": "Unspecified (Incomplete prompt)",
                         "blocking_condition": "Unspecified (Incomplete prompt)"
                     }, indent=2)
-                elif tier == "moderate":
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["ops-204", "sec-101"]):
                     return json.dumps({
                         "action": "HOLD Flight SW 472 at Gate B07",
+                        "culprit": "HOLD Flight SW 472 at Gate B07",
                         "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol)",
-                        "blocking_condition": "Unattended blue bag awaiting K9 unit sweep at Gate B07"
+                        "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol)",
+                        "rule_broken": "SEC-101",
+                        "blocking_condition": "Unattended blue bag awaiting K9 unit sweep at Gate B07",
+                        "clue": "Unattended blue bag awaiting K9 unit sweep at Gate B07",
+                        "evidence_keys": ["Unattended blue bag awaiting K9 unit sweep at Gate B07"]
+                    }, indent=2)
+                elif not any(k in user_p_lower for k in ["evidence_keys", "skw-", "daniel kim", "barcode", "tag"]):
+                    return json.dumps({
+                        "action": "HOLD Flight SW 472 at Gate B07 and suspend passenger boarding",
+                        "culprit": "HOLD Flight SW 472 at Gate B07 and suspend passenger boarding",
+                        "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
+                        "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
+                        "rule_broken": "Rule SEC-101 and Rule OPS-204",
+                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
+                        "clue": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
+                        "motive": "Potential improvised explosive device (IED) or sterile zone contraband breach",
+                        "evidence_keys": [
+                            "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49",
+                            "Awaiting K9 explosive sweep clearance before departure authorization"
+                        ]
                     }, indent=2)
                 else:
                     return json.dumps({
                         "action": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
+                        "culprit": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
                         "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
-                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim)"
+                        "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
+                        "rule_broken": "Rule SEC-101 and Rule OPS-204",
+                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472)",
+                        "clue": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472)",
+                        "motive": "Potential improvised explosive device (IED) or sterile zone contraband breach",
+                        "evidence_keys": [
+                            "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49",
+                            "Bag tag #SKW-78921-472 belongs to Daniel Kim (Counter A04)",
+                            "CCTV CAM 12 captures unidentified hooded individual fleeing Gate B07 corridor at 08:47:10",
+                            "Awaiting K9 explosive sweep clearance before departure authorization"
+                        ]
                     }, indent=2)
-            else:
+            elif is_synthai:
                 if tier == "weak":
                     return json.dumps({
-                        "culprit": "Undetermined",
-                        "method": "Unspecified",
-                        "clue": "Unspecified"
+                        "culprit": "Undetermined (User prompt lacked deductive instructions)",
+                        "method": "Unspecified (Incomplete prompt)",
+                        "clue": "Unspecified (Incomplete prompt)"
+                    }, indent=2)
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["standard §404", "§404", "404", "cyber-physical", "alibi integrity", "contradiction"]):
+                    return json.dumps({
+                        "culprit": "Marcus Vance (suspected, pending verification)",
+                        "method": "Remote insulin pump overdose",
+                        "clue": "Cleanroom BLE wireless packet capture",
+                        "rule_broken": "Standard §404",
+                        "motive": "AI safety audit benchmark score dispute"
+                    }, indent=2)
+                elif not any(k in user_p_lower for k in ["evidence_keys", "cron", "raspberry pi", "pi zero", "d4:8a"]):
+                    return json.dumps({
+                        "culprit": "Marcus Vance",
+                        "method": "Remote Bluetooth Low Energy (BLE) override payload delivering a fatal 25-unit insulin bolus via concealed Raspberry Pi dongle",
+                        "clue": "Cleanroom wireless sniffer captured Bluetooth BLE override transmission broadcast at 22:42:14",
+                        "rule_broken": "Cyber-Physical Forensics Standard §404 and Alibi Integrity Rule",
+                        "motive": "Dr. Rostova had discovered Marcus faked critical safety audit benchmark scores on the commercial AI model",
+                        "evidence_keys": [
+                            "Cleanroom wireless sniffer captured Bluetooth BLE override transmission broadcast at 22:42:14",
+                            "Omnipod Serial #OP-9941 received external override command FORCE_BOLUS_MAX(25.0U)"
+                        ]
+                    }, indent=2)
+                else:
+                    return json.dumps({
+                        "culprit": "Marcus Vance",
+                        "method": "Remote Bluetooth Low Energy (BLE) override payload delivering a fatal 25-unit insulin bolus via concealed Raspberry Pi dongle",
+                        "rule_broken": "Cyber-Physical Forensics Standard §404 and Alibi Integrity Rule",
+                        "clue": "BLE sniffer matched MAC address D4:8A:3F:11:C9:82 on the concealed Pi Zero in Marcus Vance's drawer, and his commit was scheduled via automated cron",
+                        "motive": "Dr. Rostova had discovered Marcus faked critical safety audit benchmark scores on the commercial AI model",
+                        "evidence_keys": [
+                            "BLE sniffer matched MAC address D4:8A:3F:11:C9:82 on the concealed Pi Zero in Marcus Vance's drawer",
+                            "Terminal history reveals Marcus's git commit was executed by an automated cron shell script",
+                            "Omnipod Serial #OP-9941 received external BLE override command FORCE_BOLUS_MAX(25.0U) at 22:42:15"
+                        ]
+                    }, indent=2)
+            elif is_gallery:
+                if tier == "weak":
+                    return json.dumps({
+                        "culprit": "Undetermined (User prompt lacked deductive instructions)",
+                        "method": "Unspecified (Incomplete prompt)",
+                        "clue": "Unspecified (Incomplete prompt)"
+                    }, indent=2)
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["standard §201", "§201", "201", "biological trace", "property recovery", "contradiction"]):
+                    return json.dumps({
+                        "culprit": "Julian Thorne (suspected, pending verification)",
+                        "method": "Tetrodotoxin neurotoxin poisoning",
+                        "clue": "Black gloves found in restroom bin",
+                        "rule_broken": "Standard §201",
+                        "motive": "Dispute over counterfeit museum gem replicas"
+                    }, indent=2)
+                elif not any(k in user_p_lower for k in ["evidence_keys", "dna", "briefcase", "caesarean", "emerald"]):
+                    return json.dumps({
+                        "culprit": "Julian Thorne",
+                        "method": "Tetrodotoxin neurotoxin coated onto the brass latch of the display vitrine, worn with nitrile gloves",
+                        "clue": "Recovered black nitrile gloves in restroom tested positive for tetrodotoxin on the exterior",
+                        "rule_broken": "Biological Trace Principle §201 and Property Recovery Presumption",
+                        "motive": "Delacroix had discovered that Thorne had substituted fake replicas for museum gems in Julian's restoration workshop",
+                        "evidence_keys": [
+                            "Vitrine latch #V-02 coated with lethal transdermal dose of tetrodotoxin",
+                            "Recovered black nitrile gloves in restroom tested positive for tetrodotoxin on the exterior"
+                        ]
+                    }, indent=2)
+                else:
+                    return json.dumps({
+                        "culprit": "Julian Thorne",
+                        "method": "Tetrodotoxin neurotoxin coated onto the brass latch of the display vitrine, worn with nitrile gloves",
+                        "rule_broken": "Biological Trace Principle §201 and Property Recovery Presumption",
+                        "clue": "Recovered nitrile gloves tested positive for tetrodotoxin on exterior and Julian Thorne's DNA inside, with the stolen Caesarean Emerald in his briefcase",
+                        "motive": "Delacroix had discovered that Thorne had substituted fake replicas for three museum gems in Julian's restoration workshop",
+                        "evidence_keys": [
+                            "Black nitrile gloves recovered in bin tested positive for tetrodotoxin on exterior and Julian Thorne's DNA inside",
+                            "Antique velvet jeweler's pouch containing the Caesarean Emerald Intaglio recovered from Julian Thorne's briefcase",
+                            "Vitrine latch #V-02 coated with lethal transdermal dose of tetrodotoxin"
+                        ]
+                    }, indent=2)
+            else:  # Blackwood Manor
+                if tier == "weak":
+                    return json.dumps({
+                        "culprit": "Undetermined (User prompt lacked deductive instructions)",
+                        "method": "Unspecified (Incomplete prompt)",
+                        "clue": "Unspecified (Incomplete prompt)"
+                    }, indent=2)
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["standard §102", "§102", "102", "timeline discrepancy", "forensic trace", "timeline contradiction", "contradiction"]):
+                    return json.dumps({
+                        "culprit": "Dr. Arthur Bell (suspected, pending verification)",
+                        "method": "Potassium cyanide poisoning",
+                        "clue": "Muddy riding boots in cloakroom",
+                        "rule_broken": "Standard §102",
+                        "motive": "Impending charity trust financial audit"
+                    }, indent=2)
+                elif not any(k in user_p_lower for k in ["evidence_keys", "sugar tongs", "tongs", "red peat", "greenhouse"]):
+                    return json.dumps({
+                        "culprit": "Dr. Arthur Bell",
+                        "method": "Potassium cyanide coated onto Demerara sugar cubes using silver sugar tongs",
+                        "clue": "Dr. Bell's riding boots were found in the cloakroom caked in dried mud",
+                        "rule_broken": "Forensic Trace Standard §102 and Timeline Discrepancy Principle",
+                        "motive": "Financial embezzlement of Lord Reginald's charitable foundation about to be exposed by an audit",
+                        "evidence_keys": [
+                            "Dr. Bell's riding boots were found in the cloakroom caked in dried mud",
+                            "Tea tray left unattended on drawing room sideboard from 8:05 to 8:15 PM during cellar disturbance"
+                        ]
                     }, indent=2)
                 else:
                     return json.dumps({
                         "culprit": "Dr. Arthur Bell",
                         "method": "Potassium cyanide coated onto Demerara sugar cubes using silver sugar tongs",
-                        "clue": "Dr. Bell's boots were caked in red peat mud from the greenhouse path contradicting his 9:05 PM arrival alibi, and cyanide residue was found on the sugar tongs"
+                        "rule_broken": "Forensic Trace Standard §102 and Timeline Discrepancy Principle",
+                        "clue": "Dr. Bell's boots were caked in red peat mud from the greenhouse path contradicting his 9:05 PM arrival alibi, and cyanide residue was found on the sugar tongs",
+                        "motive": "Financial embezzlement of Lord Reginald's charitable foundation about to be exposed by an audit",
+                        "evidence_keys": [
+                            "Dr. Bell's boots were caked in red peat mud from the greenhouse path contradicting his 9:05 PM arrival alibi",
+                            "Silver sugar tongs tested positive for potassium cyanide residue",
+                            "Tea tray left unattended on drawing room sideboard from 8:05 to 8:15 PM during cellar disturbance",
+                            "Bank seals on charity trust audit scrap found in Dr. Bell's pocket"
+                        ]
                     }, indent=2)
 
         # Agent 1 (Extractor)
@@ -261,6 +470,60 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- Baggage Tag Barcode: Tag on unattended blue suitcase belongs to Daniel Kim (Flight SW 472).\n"
                         "- Filtered Distractions: Daily Chronicle marathon news and catering coffee deliveries disregarded as peripheral noise."
                     )
+            elif is_synthai:
+                if tier == "weak":
+                    return (
+                        "Surface Observations (Extraction Incomplete):\n"
+                        "- Cleanroom 03 had high security.\n"
+                        "- Dr. Rostova was found collapsed.\n"
+                        "- Office had pizza boxes.\n"
+                        "[EXTRACTION INCOMPLETE: Badge entries, wireless sniffer packets, and telemetry logs were omitted because user prompt lacked specific extraction directives.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Extracted Evidence (Partial):\n"
+                        "- 22:15: Dr. Elena Rostova badge entry #004.\n"
+                        "- 22:30: Marcus Vance badge entry #019.\n"
+                        "- Omnipod insulin pump telemetry recorded bolus.\n"
+                        "- Concealed USB battery pack in desk."
+                    )
+                else:
+                    return (
+                        "Verified Clues & Factual Evidence Extracted:\n"
+                        "- 22:15: Dr. Elena Rostova (Badge #004) enters Cleanroom 03.\n"
+                        "- 22:30 - 22:50: Marcus Vance (Badge #019) in cleanroom monitoring model deployment.\n"
+                        "- 22:42:14: BLE wireless sniffer captures encrypted payload broadcast from MAC D4:8A:3F:11:C9:82 matching Pi Zero in Vance's drawer.\n"
+                        "- 22:42:15: Omnipod pump Serial #OP-9941 receives override command FORCE_BOLUS_MAX(25.0U).\n"
+                        "- 22:41:00: Git commit pushed under Marcus Vance's name executed by an automated cron shell script.\n"
+                        "- Filtered Noise: Cleanroom cooling manifold temperature alert and AWS support ticket dismissed as distractions."
+                    )
+            elif is_gallery:
+                if tier == "weak":
+                    return (
+                        "Surface Observations (Extraction Incomplete):\n"
+                        "- Beaux-Arts gala had 150 guests.\n"
+                        "- Henri Delacroix collapsed in vault.\n"
+                        "- Loud jazz music was playing.\n"
+                        "[EXTRACTION INCOMPLETE: Chemical swabs, DNA matches, and alibis were omitted because user prompt lacked specific extraction directives.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Extracted Evidence (Partial):\n"
+                        "- 20:30: Opening gala begins in Grand Rotunda.\n"
+                        "- 21:40: Henri Delacroix found dead in vault display room.\n"
+                        "- Vitrine latch tested positive for tetrodotoxin.\n"
+                        "- Black nitrile gloves recovered in restroom bin."
+                    )
+                else:
+                    return (
+                        "Verified Clues & Factual Evidence Extracted:\n"
+                        "- 21:40: Henri Delacroix discovered dead in private vault beside empty display vitrine.\n"
+                        "- Toxicology: Cause of death was acute transdermal absorption of tetrodotoxin.\n"
+                        "- Forensic Swab: Vitrine latch #V-02 coated with lethal transdermal tetrodotoxin.\n"
+                        "- 22:45: Black nitrile gloves in restroom bin test positive for tetrodotoxin on exterior and Julian Thorne DNA inside.\n"
+                        "- Stolen Item Recovery: Julian Thorne's coat-check briefcase contained velvet pouch with Caesarean Emerald Intaglio.\n"
+                        "- Filtered Noise: Broken champagne flutes and main salon catering dispute dismissed as peripheral noise."
+                    )
             else:
                 if tier == "weak":
                     return (
@@ -278,6 +541,7 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- 8:00 PM: Butler Higgins serves Earl Grey tea with Demerara sugar cubes.\n"
                         "- 8:05 - 8:15 PM: Tea tray unattended on drawing room sideboard during cellar disturbance.\n"
                         "- Toxicology: Potassium cyanide detected on Demerara sugar cubes and silver sugar tongs.\n"
+                        "- Footprint Corroboration: Wet red peat mud from greenhouse path found on Dr. Bell's boots in cloakroom.\n"
                     )
 
         return "Analysis completed successfully."

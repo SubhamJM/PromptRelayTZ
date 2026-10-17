@@ -259,3 +259,57 @@ def test_airport_crisis_relay_progression():
     assert step3_data.get("a2_output") is not None
     assert step3_data.get("p3_prompt") is not None
 
+
+def test_prompt_length_limits_enforced():
+    start_resp = client.post(
+        "/api/game/start",
+        json={"team_name": "LengthTestTeam", "case_id": "case_01_blackwood_manor"},
+    )
+    assert start_resp.status_code == 200
+    session_id = start_resp.json()["session_id"]
+    limits = start_resp.json().get("prompt_limits", {})
+    assert limits.get("p1", {}).get("max_words") == 80
+    assert limits.get("p2", {}).get("max_words") == 80
+    assert limits.get("p3", {}).get("max_words") == 120
+
+    # 1. Step 1: Prompt exceeding 80 words
+    overlong_p1 = "word " * 85
+    p1_fail_resp = client.post(
+        "/api/game/step1",
+        json={"session_id": session_id, "prompt": overlong_p1},
+    )
+    assert p1_fail_resp.status_code == 400
+    assert "exceeds the limit of 80 words" in p1_fail_resp.json()["detail"]
+
+    # Valid P1 prompt succeeds
+    p1_ok_resp = client.post(
+        "/api/game/step1",
+        json={"session_id": session_id, "prompt": "Extract all verified clues and alibis without noise."},
+    )
+    assert p1_ok_resp.status_code == 200
+
+    # 2. Step 2: Prompt exceeding 80 words
+    overlong_p2 = "sequence " * 85
+    p2_fail_resp = client.post(
+        "/api/game/step2",
+        json={"session_id": session_id, "prompt": overlong_p2},
+    )
+    assert p2_fail_resp.status_code == 400
+    assert "exceeds the limit of 80 words" in p2_fail_resp.json()["detail"]
+
+    # Valid P2 prompt succeeds
+    p2_ok_resp = client.post(
+        "/api/game/step2",
+        json={"session_id": session_id, "prompt": "Reconstruct the timeline in chronological order."},
+    )
+    assert p2_ok_resp.status_code == 200
+
+    # 3. Step 3: Prompt exceeding 120 words
+    overlong_p3 = "verdict " * 125
+    p3_fail_resp = client.post(
+        "/api/game/step3",
+        json={"session_id": session_id, "prompt": overlong_p3},
+    )
+    assert p3_fail_resp.status_code == 400
+    assert "exceeds the limit of 120 words" in p3_fail_resp.json()["detail"]
+

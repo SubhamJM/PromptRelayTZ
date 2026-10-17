@@ -20,23 +20,28 @@ export function Step1Screen() {
 
   if (!scenario) return null;
 
-  const defaultTemplate = `You are a forensic investigator and data extraction specialist.
-Carefully examine all available evidence items (CCTV frames, logs, notes).
-Extract every verified factual detail relevant to the case:
-1. Timestamps and chronological markers
-2. Identified persons, aliases, clothing, and badge numbers
-3. Physical items (luggage tags, flight numbers, chemical names, device IDs)
-4. Key anomalies, security breaches, or suspicious interactions
+  const MAX_WORDS = 80;
+  const MAX_CHARS = 600;
 
-Ignore unsupported assumptions and red herrings. Output your findings as a clean, structured bulleted list of verified facts.`;
+  const defaultTemplate = `Role: Forensic Evidence Extractor.
+Extract all verified facts from the dossier and visual feeds:
+- People: suspect identities, descriptions, and badge numbers
+- Timestamps: chronological markers and times
+- Locations: gates, corridors, and room layouts
+- Objects: luggage tags, flight numbers, and physical items
+Distinguish confirmed facts from uncertain observations. Ignore irrelevant noise and red herrings. Do not accuse anyone.`;
+
+  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
+  const charCount = prompt.length;
+  const isOverWordLimit = wordCount > MAX_WORDS;
+  const isOverCharLimit = charCount > MAX_CHARS;
+  const isOverLimit = isOverWordLimit || isOverCharLimit;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!prompt.trim() || isLoading) return;
+    if (!prompt.trim() || isOverLimit || isLoading) return;
     submitStep1(prompt.trim());
   };
-
-  const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -92,6 +97,7 @@ Ignore unsupported assumptions and red herrings. Output your findings as a clean
                 <li><strong className="text-slate-100">Filtering Noise:</strong> Instruct the agent to ignore distractions/red herrings.</li>
                 <li><strong className="text-slate-100">Structured Output:</strong> Request bulleted facts, timestamps, and suspect attributes.</li>
                 <li><strong className="text-slate-100">No Premature Logic:</strong> Leave chronological timeline synthesis for Player 2 and final verdicts for Player 3!</li>
+                <li><strong className="text-amber-400">Hard Length Cap:</strong> Max {MAX_WORDS} words / {MAX_CHARS} characters. Keep instructions concise and high-signal.</li>
               </ul>
             </div>
           )}
@@ -133,21 +139,37 @@ Ignore unsupported assumptions and red herrings. Output your findings as a clean
                 rows={12}
                 disabled={isLoading}
                 placeholder="Write your prompt to guide Agent 1 in extracting key facts, IDs, timestamps, and evidence from the dossier..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 transition resize-y leading-relaxed disabled:opacity-50"
+                className={`w-full bg-slate-950 border rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition resize-y leading-relaxed disabled:opacity-50 ${
+                  isOverLimit ? "border-rose-500 focus:border-rose-500" : "border-slate-800 focus:border-blue-500"
+                }`}
               />
             </div>
 
             {/* Bottom Meta & Submit */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-slate-800">
-              <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-                <span>{prompt.length} chars</span>
-                <span>•</span>
-                <span>{wordCount} words</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <div className="flex items-center gap-2 text-xs font-mono">
+                  <span className={isOverWordLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {wordCount} / {MAX_WORDS} words
+                  </span>
+                  <span className="text-slate-600">•</span>
+                  <span className={isOverCharLimit ? "text-rose-400 font-bold" : "text-slate-400"}>
+                    {charCount} / {MAX_CHARS} chars
+                  </span>
+                </div>
+                {isOverLimit && (
+                  <span className="text-xs font-mono text-rose-400 font-bold flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {isOverWordLimit
+                      ? `Exceeds limit by ${wordCount - MAX_WORDS} words!`
+                      : `Exceeds limit by ${charCount - MAX_CHARS} chars!`}
+                  </span>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={!prompt.trim() || isLoading}
+                disabled={!prompt.trim() || isOverLimit || isLoading}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold font-mono text-sm bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition shadow-lg shadow-blue-600/30 disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center gap-2"
               >
                 {isLoading ? (
