@@ -653,3 +653,39 @@ def test_mafia_scenarios_all_five_tiers_distribution():
             )
 
 
+def test_text_scenarios_structural_parity():
+    """Verify that all three text-based stories have equal difficulty (Hard), 4 suspects, 3 evidence documents, and 3 decoys."""
+    from backend.app.services.scenario_loader import get_scenario_loader
+
+    loader = get_scenario_loader()
+    text_scenario_ids = [
+        "scenario_02_blackwood_manor",
+        "scenario_03_neon_nexus",
+        "scenario_04_velvet_vault",
+    ]
+
+    for s_id in text_scenario_ids:
+        scenario = loader.get(s_id)
+        assert scenario is not None, f"Scenario {s_id} not found"
+
+        # Equal difficulty
+        assert scenario.difficulty == "Hard", f"[{s_id}] Expected difficulty 'Hard', got '{scenario.difficulty}'"
+
+        # 4 suspects
+        suspects = scenario.ground_truth.suspects_or_entities
+        assert len(suspects) == 4, f"[{s_id}] Expected 4 suspects, got {len(suspects)}: {suspects}"
+
+        # 3 evidence documents
+        evidence_items = scenario.evidence_items
+        assert len(evidence_items) == 3, f"[{s_id}] Expected 3 evidence items, got {len(evidence_items)}"
+
+        # 3 decoy items
+        decoys = scenario.decoy_items
+        assert len(decoys) == 3, f"[{s_id}] Expected 3 decoy items, got {len(decoys)}: {decoys}"
+
+        # 2 operational rules
+        rules = scenario.operational_rules
+        assert len(rules) == 2, f"[{s_id}] Expected 2 operational rules, got {len(rules)}: {rules}"
+
+
+

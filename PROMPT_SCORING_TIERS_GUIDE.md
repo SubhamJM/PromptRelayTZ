@@ -34,12 +34,15 @@ Total Score (100 pts) = Player 1 (20 pts) + Player 2 (20 pts) + Player 3 (20 pts
 
 All 4 scenarios have been verified using automated regression test suites ([`tests/test_tools_and_distribution.py`](file:///home/ricing/Documents/code/Projects/PromptRelay_v2/tests/test_tools_and_distribution.py)), proving strict monotonic progression within each grade bracket:
 
-| Scenario | Tier 1 (F: 0–39) | Tier 2 (C: 40–59) | Tier 3 (B: 60–74) | Tier 4 (A: 75–89) | Tier 5 (S: 90–100) | Progression |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **01: Airport Crisis (Flight SW 472)** | 0 pts (F) | 56 pts (C) | 70 pts (B) | 88 pts (A) | 100 pts (S) | Strictly Increasing |
-| **02: Blackwood Manor** | 0 pts (F) | 49 pts (C) | 70 pts (B) | 86 pts (A) | 99 pts (S) | Strictly Increasing |
-| **03: Neon Nexus (SynthAI)** | 0 pts (F) | 48 pts (C) | 69 pts (B) | 84 pts (A) | 99 pts (S) | Strictly Increasing |
-| **04: Velvet Vault (Vernissage)** | 0 pts (F) | 47 pts (C) | 69 pts (B) | 85 pts (A) | 99 pts (S) | Strictly Increasing |
+| Scenario | Difficulty | Tier 1 (F: 0–39) | Tier 2 (C: 40–59) | Tier 3 (B: 60–74) | Tier 4 (A: 75–89) | Tier 5 (S: 90–100) | Progression |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **01: Airport Crisis (Flight SW 472)** | **Hard** *(Image+Text)* | 0 pts (F) | 56 pts (C) | 70 pts (B) | 88 pts (A) | 100 pts (S) | Strictly Increasing |
+| **02: Blackwood Manor** | **Hard** *(Text)* | 0 pts (F) | 49 pts (C) | 70 pts (B) | 86 pts (A) | 99 pts (S) | Strictly Increasing |
+| **03: Neon Nexus (SynthAI)** | **Hard** *(Text)* | 0 pts (F) | 48 pts (C) | 69 pts (B) | 84 pts (A) | 99 pts (S) | Strictly Increasing |
+| **04: Velvet Vault (Vernissage)** | **Hard** *(Text)* | 0 pts (F) | 47 pts (C) | 69 pts (B) | 85 pts (A) | 99 pts (S) | Strictly Increasing |
+
+> [!NOTE]
+> **Equal Tournament Structural Parity**: All 3 text-based stories have been standardized to equal **Hard** difficulty, featuring identical structural complexity: exactly **4 suspects**, **3 evidence items**, **3 decoy items**, and **2 operational rules** per scenario for balanced, fair judging across competing teams.
 
 ---
 

@@ -495,6 +495,7 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- 22:42:14: BLE wireless sniffer captures encrypted payload broadcast from MAC D4:8A:3F:11:C9:82 matching Pi Zero in Vance's drawer.\n"
                         "- 22:42:15: Omnipod pump Serial #OP-9941 receives override command FORCE_BOLUS_MAX(25.0U).\n"
                         "- 22:41:00: Git commit pushed under Marcus Vance's name executed by an automated cron shell script.\n"
+                        "- 22:20 - 23:10: Devon Park verified in 2nd floor hardware staging lab.\n"
                         "- Filtered Noise: Cleanroom cooling manifold temperature alert and AWS support ticket dismissed as distractions."
                     )
             elif is_gallery:
@@ -520,6 +521,7 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- 21:40: Henri Delacroix discovered dead in private vault beside empty display vitrine.\n"
                         "- Toxicology: Cause of death was acute transdermal absorption of tetrodotoxin.\n"
                         "- Forensic Swab: Vitrine latch #V-02 coated with lethal transdermal tetrodotoxin.\n"
+                        "- 21:30 - 21:40: Jean-Luc Fontaine verified resetting basement circuit breaker panel.\n"
                         "- 22:45: Black nitrile gloves in restroom bin test positive for tetrodotoxin on exterior and Julian Thorne DNA inside.\n"
                         "- Stolen Item Recovery: Julian Thorne's coat-check briefcase contained velvet pouch with Caesarean Emerald Intaglio.\n"
                         "- Filtered Noise: Broken champagne flutes and main salon catering dispute dismissed as peripheral noise."
