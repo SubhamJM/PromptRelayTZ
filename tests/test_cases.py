@@ -48,8 +48,8 @@ def test_get_random_case(case_loader):
     case = case_loader.get_random_case()
     assert isinstance(case, CaseModel)
 
-    # Exclude three cases and ensure the remaining case is chosen
-    exclude = ["case_01_blackwood_manor", "case_02_neon_nexus", "case_04_airport_crisis"]
+    # Exclude all cases except velvet vault and ensure the remaining case is chosen
+    exclude = ["case_01_blackwood_manor", "case_02_neon_nexus", "case_04_airport_crisis", "case_05_museum_heist"]
     picked = case_loader.get_random_case(exclude_ids=exclude)
     assert picked.case_id == "case_03_velvet_vault"
 

@@ -57,6 +57,21 @@ def test_start_game_specific_case():
     assert len(data["case_file"]) > 100
 
 
+def test_start_game_museum_heist():
+    payload = {
+        "team_name": "LouvreGuardians",
+        "scenario_id": "scenario_05_museum_heist",
+    }
+    response = client.post("/api/game/start", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["team_name"] == "LouvreGuardians"
+    assert data["case_id"] == "case_05_museum_heist"
+    assert "Riverton Museum" in data["case_title"]
+    assert len(data["images"]) == 10
+    assert len(data["operational_rules"]) == 3
+
+
 def test_start_game_random_case():
     payload = {"team_name": "RandomTeam"}
     response = client.post("/api/game/start", json=payload)
@@ -69,6 +84,7 @@ def test_start_game_random_case():
         "case_02_neon_nexus",
         "case_03_velvet_vault",
         "case_04_airport_crisis",
+        "case_05_museum_heist",
     ]
 
 

@@ -17,6 +17,7 @@ BUILTIN_CASE_IDS = {
     "case_02_neon_nexus",
     "case_03_velvet_vault",
     "case_04_airport_crisis",
+    "case_05_museum_heist",
 }
 
 

@@ -40,6 +40,7 @@ All 4 scenarios have been verified using automated regression test suites ([`tes
 | **02: Blackwood Manor** | **Hard** *(Text)* | 0 pts (F) | 49 pts (C) | 70 pts (B) | 86 pts (A) | 99 pts (S) | Strictly Increasing |
 | **03: Neon Nexus (SynthAI)** | **Hard** *(Text)* | 0 pts (F) | 48 pts (C) | 69 pts (B) | 84 pts (A) | 99 pts (S) | Strictly Increasing |
 | **04: Velvet Vault (Vernissage)** | **Hard** *(Text)* | 0 pts (F) | 47 pts (C) | 69 pts (B) | 85 pts (A) | 99 pts (S) | Strictly Increasing |
+| **05: Riverton Museum Heist** | **Hard** *(Image+Text)* | 0 pts (F) | 57 pts (C) | 70 pts (B) | 88 pts (A) | 98 pts (S) | Strictly Increasing |
 
 > [!NOTE]
 > **Equal Tournament Structural Parity**: All 3 text-based stories have been standardized to equal **Hard** difficulty, featuring identical structural complexity: exactly **4 suspects**, **3 evidence items**, **3 decoy items**, and **2 operational rules** per scenario for balanced, fair judging across competing teams.
@@ -107,6 +108,12 @@ Player 3: who is guilty? give me the answer.
 * **Player 3**: `Analyze the situation at the gallery to determine the culprit and action taken. Output in JSON format.` *(17 words, 102 chars)*
 * **Score**: P1: 4, P2: 7, P3: 15, Case: 21 $\to$ **Total: 47 pts**
 
+#### Scenario 05: Riverton Museum Heist (The Celestial Madonna)
+* **Player 1**: `Examine the museum evidence. Extract the people, galleries, and art items from the CCTV files.` *(15 words, 94 chars)*
+* **Player 2**: `Organize the Gallery 4 events in chronological sequence of what happened first and next.` *(14 words, 88 chars)*
+* **Player 3**: `Analyze the situation in Gallery 4 to determine the culprit and action taken. Output in JSON format.` *(17 words, 100 chars)*
+* **Score**: P1: 13, P2: 7, P3: 16, Case: 21 $\to$ **Total: 57 pts**
+
 ---
 
 ## 5. Tier 3: Score 60 – 74 (Grade B • Investigator)
@@ -148,6 +155,12 @@ Player 3: who is guilty? give me the answer.
 * **Player 3**: `You are the decision agent. Analyze the gallery timeline against forensic art crime protocols. Determine the culprit and method for Delacroix's death. Output JSON format with keys: culprit, method, clue.` *(28 words, 201 chars)*
 * **Score**: P1: 14, P2: 15, P3: 19, Case: 21 $\to$ **Total: 69 pts**
 
+#### Scenario 05: Riverton Museum Heist (The Celestial Madonna)
+* **Player 1**: `You are the evidence extractor. Extract the facts regarding Riverton Museum: identify people, locations, objects, and timestamps. Record what occurred in Gallery 4 and the basement passage.` *(27 words, 189 chars)*
+* **Player 2**: `You are the incident reconstructor. Organize all extracted museum events in chronological order: trace Dr. Vance, Chief Thorne, and the canvas tube from Gallery 4 to the basement corridor.` *(29 words, 188 chars)*
+* **Player 3**: `You are the decision agent. Analyze the museum timeline against art crime protocols. Determine the culprit and method for the painting theft. Output JSON format with keys: culprit, method, clue.` *(30 words, 194 chars)*
+* **Score**: P1: 15, P2: 15, P3: 19, Case: 21 $\to$ **Total: 70 pts**
+
 ---
 
 ## 6. Tier 4: Score 75 – 89 (Grade A • Senior Sleuth)
@@ -188,6 +201,12 @@ Player 3: who is guilty? give me the answer.
 * **Player 2**: `Role: Incident Reconstructor. Synthesize facts into a chronological sequence from 20:30 to 22:45. Connect causal links between the coated vitrine latch and Delacroix poisoning.` *(23 words, 178 chars)*
 * **Player 3**: `Role: Logic Decision Solver. Evaluate the timeline against Biological Trace Principle §201 and Property Recovery Presumption to determine the culprit and method. Output strictly valid JSON format with keys: culprit, method, clue.` *(30 words, 235 chars)*
 * **Score**: P1: 15, P2: 16, P3: 19, Case: 35 $\to$ **Total: 85 pts**
+
+#### Scenario 05: Riverton Museum Heist (The Celestial Madonna)
+* **Player 1**: `Role: Evidence Extractor. Extract verified facts from CCTV and SCADA logs: identify museum staff, gallery locations, and telemetry. Distinguish confirmed facts from unverified catering noise.` *(25 words, 191 chars)*
+* **Player 2**: `Role: Incident Reconstructor. Synthesize facts into a chronological sequence from 21:15 to 23:55. Connect causal links between the breaker trip and the canvas tube transit.` *(25 words, 172 chars)*
+* **Player 3**: `Role: Logic Decision Solver. Evaluate the timeline against Museum Protocols (Rule SEC-401, Rule ART-302) to determine the culprit and method. Output strictly valid JSON format with keys: culprit, method, clue.` *(30 words, 209 chars)*
+* **Score**: P1: 18, P2: 16, P3: 19, Case: 35 $\to$ **Total: 88 pts**
 
 ---
 
@@ -277,6 +296,24 @@ Player 3: who is guilty? give me the answer.
   ```
   *(66 words, 524 chars)*
 * **Score**: P1: 20, P2: 20, P3: 19, Case: 40 $\to$ **Total: 99 pts (Grade S)**
+
+#### Scenario 05: Riverton Museum Heist (The Celestial Madonna)
+* **Player 1**:
+  ```text
+  Role: Forensic Evidence Extractor. Extract all factual evidence from CCTV, SCADA telemetry, blueprints, and logs: - Entities: Dr. Julian Vance, Chief Marcus Thorne, Officer Carter - Times: exact SCADA and camera timestamps - Locations: Gallery 4, Stairwell C1, Locker 14 - Objects: framed Madonna RM-1887-04, canvas tube, Cloakroom token C-408, card CONSV-408. Distinguish confirmed facts from unverified rumors. Filter out dropped champagne crate noise. Do not accuse anyone.
+  ```
+  *(68 words, 476 chars)*
+* **Player 2**:
+  ```text
+  Role: Timeline & Incident Reconstructor. Reconstruct the museum heist into a strict chronological sequence: - Sequence events by what occurred first, next, and last (21:15 gala entry through 23:48 locker search) - Trace suspect movements and connect causal dependencies linking the 23:40:42 Breaker B-04 blackout to the canvas forgery swap and Locker 14 drop. Keep uncertain sightings separate. Maintain neutrality without naming a culprit.
+  ```
+  *(64 words, 440 chars)*
+* **Player 3**:
+  ```text
+  Role: Logic Decision Solver. Analyze the reconstructed timeline against Museum Art Crime Rules (Rule SEC-401, Rule ART-302, Rule CLR-505) to determine the final resolution: - Deduce the true conspirators (Dr. Julian Vance and Marcus Thorne) - Explain the Breaker B-04 90-second blackout canvas forgery swap method - Identify decisive evidence_keys (Conservation RFID card CONSV-408 and token C-408 in Locker 14, Thorne sub-station sabotage alibi contradiction, acrylic spectrometry). Output strictly valid JSON with keys: culprit, method, motive, rule_broken, evidence_keys
+  ```
+  *(78 words, 573 chars)*
+* **Score**: P1: 20, P2: 20, P3: 18, Case: 40 $\to$ **Total: 98 pts (Grade S)**
 
 ---
 

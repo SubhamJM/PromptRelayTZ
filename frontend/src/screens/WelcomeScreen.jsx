@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, Plane, Search, Shield, Brain, Layers } from "lucide-react";
+import { ArrowRight, Plane, Search, Shield, Brain, Layers, Landmark } from "lucide-react";
 import { api } from "../api/client";
 import { useGameStore } from "../store/useGameStore";
 
@@ -34,6 +34,8 @@ export function WelcomeScreen() {
 
   const imageScenarios = scenarios.filter((s) => s.type === "image");
   const textScenarios = scenarios.filter((s) => s.type === "text");
+  const activeImageScenario = imageScenarios.find((s) => s.id === selectedScenarioId) || imageScenarios[0] || {};
+  const isMuseum = selectedScenarioId === "scenario_05_museum_heist";
 
   return (
     <section className="space-y-8 animate-fade-in max-w-4xl mx-auto w-full py-4">
@@ -140,7 +142,9 @@ export function WelcomeScreen() {
             <div
               onClick={() => {
                 setSelectedType("image");
-                if (imageScenarios.length > 0) setSelectedScenarioId(imageScenarios[0].id);
+                if (imageScenarios.length > 0 && !imageScenarios.some((s) => s.id === selectedScenarioId)) {
+                  setSelectedScenarioId(imageScenarios[0].id);
+                }
               }}
               className={`cursor-pointer rounded-2xl p-5 transition flex flex-col justify-between space-y-3 ${
                 selectedType === "image"
@@ -163,38 +167,94 @@ export function WelcomeScreen() {
                   />
                 </div>
                 <h4 className="font-bold text-slate-100 text-base flex items-center gap-2">
-                  <Plane className="w-4 h-4 text-blue-400" />
-                  <span>Airport Crisis: Flight 472 Emergency</span>
+                  {isMuseum ? (
+                    <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
+                  ) : (
+                    <Plane className="w-4 h-4 text-blue-400 shrink-0" />
+                  )}
+                  <span>{activeImageScenario.title || "Visual Case Investigation"}</span>
                 </h4>
                 <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                  Surveillance CCTV feeds, digital boarding monitors, passenger WhatsApp chats,
-                  security logs, and physical luggage tags with step-by-step hints.
+                  {isMuseum
+                    ? "CCTV Wing C & basement feeds, SCADA power telemetry, lab spectrometry, architectural blueprints, and evidence locker tokens."
+                    : "Surveillance CCTV feeds, digital boarding monitors, passenger WhatsApp chats, security logs, and physical luggage tags with step-by-step hints."}
                 </p>
               </div>
 
+              {/* Scenario dropdown for image-based choices */}
+              {imageScenarios.length > 1 && (
+                <div className="pt-2 border-t border-blue-500/20">
+                  <label className="block text-[10px] font-mono text-blue-300 uppercase mb-1">
+                    Select Visual Investigation Case:
+                  </label>
+                  <select
+                    value={selectedScenarioId}
+                    onChange={(e) => {
+                      setSelectedScenarioId(e.target.value);
+                      setSelectedType("image");
+                    }}
+                    className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-blue-500/40 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-400 cursor-pointer"
+                  >
+                    {imageScenarios.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.title} ({s.difficulty})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {/* Photo Previews */}
               <div className="pt-2 border-t border-blue-500/20 flex items-center gap-2 overflow-hidden">
-                <img
-                  src="/image_data/01_cctv_checkin.png"
-                  alt="CCTV"
-                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                />
-                <img
-                  src="/image_data/04_flight_display.png"
-                  alt="FIDS"
-                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                />
-                <img
-                  src="/image_data/05_passenger_messages.png"
-                  alt="Chat"
-                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                />
-                <img
-                  src="/image_data/09_baggage_tag.png"
-                  alt="Tag"
-                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                />
-                <span className="text-[10px] font-mono text-blue-300 font-bold ml-1">+6 more</span>
+                {isMuseum ? (
+                  <>
+                    <img
+                      src="/images_for_museum/01_cctv_gallery.png"
+                      alt="CAM-04"
+                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                    />
+                    <img
+                      src="/images_for_museum/02_scada_console.png"
+                      alt="SCADA"
+                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                    />
+                    <img
+                      src="/images_for_museum/04_conservation_lab.png"
+                      alt="Lab"
+                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                    />
+                    <img
+                      src="/images_for_museum/09_evidence_locker14.png"
+                      alt="Locker 14"
+                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                    />
+                    <span className="text-[10px] font-mono text-amber-300 font-bold ml-1">+6 more</span>
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src="/image_data/01_cctv_checkin.png"
+                      alt="CCTV"
+                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                    />
+                    <img
+                      src="/image_data/04_flight_display.png"
+                      alt="FIDS"
+                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                    />
+                    <img
+                      src="/image_data/05_passenger_messages.png"
+                      alt="Chat"
+                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                    />
+                    <img
+                      src="/image_data/09_baggage_tag.png"
+                      alt="Tag"
+                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                    />
+                    <span className="text-[10px] font-mono text-blue-300 font-bold ml-1">+6 more</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -264,7 +324,7 @@ export function WelcomeScreen() {
           className="w-full py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-extrabold text-sm transition transform active:scale-[0.98] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           <span>
-            Launch {selectedType === "image" ? "Flight 472 Operation" : "Mystery Investigation"}
+            Launch {selectedType === "image" ? (isMuseum ? "Museum Heist Investigation" : "Flight 472 Operation") : "Mystery Investigation"}
           </span>
           <ArrowRight className="w-4 h-4" />
         </button>

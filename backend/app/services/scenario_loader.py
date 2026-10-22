@@ -44,6 +44,7 @@ class ScenarioLoader:
             "case_02_neon_nexus": "scenario_03_neon_nexus",
             "case_03_velvet_vault": "scenario_04_velvet_vault",
             "case_04_airport_crisis": "scenario_01_airport_crisis",
+            "case_05_museum_heist": "scenario_05_museum_heist",
         }
         target = aliases.get(scenario_id)
         if target and target in self._scenarios:

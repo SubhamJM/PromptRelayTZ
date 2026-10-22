@@ -17,23 +17,19 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
   const isImageBased = scenario.type === "image";
   const items = scenario.evidence_items || [];
 
+  // Dynamic categories for image or text scenarios
+  const dynamicCategories = [
+    "all",
+    ...Array.from(new Set(items.map((item) => item.category).filter(Boolean))),
+  ];
+
   // Filter items for image scenarios
   const filteredItems = items.filter((item) => {
     if (evidenceFilter === "all") return true;
-    if (evidenceFilter === "CCTV Surveillance") return item.category.includes("CCTV");
-    if (evidenceFilter === "Flight & Chat")
-      return item.category.includes("Flight") || item.category.includes("Chat");
-    if (evidenceFilter === "Security Log") return item.category.includes("Security");
-    if (evidenceFilter === "Physical & Layout")
-      return (
-        item.category.includes("Physical") ||
-        item.category.includes("Layout") ||
-        item.category.includes("Decoy")
-      );
-    return true;
+    return item.category === evidenceFilter;
   });
 
-  const activeItem = items[activeEvidenceIndex] || items[0];
+  const activeItem = items[activeEvidenceIndex] || items[0] || {};
 
   const handlePrev = (e) => {
     e?.stopPropagation();
@@ -221,47 +217,48 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono">
-        {["all", "CCTV Surveillance", "Flight & Chat", "Security Log", "Physical & Layout"].map(
-          (filter) => (
-            <button
-              key={filter}
-              onClick={() => setEvidenceFilter(filter)}
-              className={`px-2.5 py-1 rounded-lg transition font-bold cursor-pointer ${
-                evidenceFilter === filter
-                  ? "bg-blue-500 text-slate-950 shadow-sm"
-                  : "bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800"
-              }`}
-            >
-              {filter === "all" ? `All (${items.length})` : filter}
-            </button>
-          )
-        )}
+        {dynamicCategories.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setEvidenceFilter(filter)}
+            className={`px-2.5 py-1 rounded-lg transition font-bold cursor-pointer ${
+              evidenceFilter === filter
+                ? "bg-blue-500 text-slate-950 shadow-sm"
+                : "bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800"
+            }`}
+          >
+            {filter === "all" ? `All (${items.length})` : filter}
+          </button>
+        ))}
       </div>
 
       {/* Thumbnail Strip */}
       <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">
-        {items.map((item, idx) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveEvidenceIndex(idx)}
-            className={`group relative cursor-pointer overflow-hidden rounded-xl p-1.5 space-y-1 transition text-left ${
-              activeEvidenceIndex === idx
-                ? "border-2 border-blue-400 ring-2 ring-blue-500/40 bg-slate-900 shadow-md"
-                : "border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100"
-            }`}
-          >
-            <div className="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
-              <img
-                src={item.src}
-                alt={item.title}
-                className="h-full w-full object-cover group-hover:scale-105 transition"
-              />
-            </div>
-            <div className="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">
-              {idx + 1}. {item.badge}
-            </div>
-          </button>
-        ))}
+        {filteredItems.map((item) => {
+          const itemIdx = items.findIndex((i) => i.id === item.id);
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveEvidenceIndex(itemIdx)}
+              className={`group relative cursor-pointer overflow-hidden rounded-xl p-1.5 space-y-1 transition text-left ${
+                activeEvidenceIndex === itemIdx
+                  ? "border-2 border-blue-400 ring-2 ring-blue-500/40 bg-slate-900 shadow-md"
+                  : "border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100"
+              }`}
+            >
+              <div className="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  className="h-full w-full object-cover group-hover:scale-105 transition"
+                />
+              </div>
+              <div className="truncate text-[10px] font-mono text-slate-300 font-semibold leading-tight">
+                {itemIdx + 1}. {item.badge}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

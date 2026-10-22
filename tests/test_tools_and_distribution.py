@@ -688,4 +688,203 @@ def test_text_scenarios_structural_parity():
         assert len(rules) == 2, f"[{s_id}] Expected 2 operational rules, got {len(rules)}: {rules}"
 
 
+def test_museum_heist_tier5_master_detective_evaluation():
+    from backend.app.services.scenario_loader import get_scenario_loader
+    from backend.app.graph.evaluator import parse_json_verdict, evaluate_verdict
+
+    loader = get_scenario_loader()
+    scenario = loader.get("scenario_05_museum_heist")
+    assert scenario is not None
+    gt = scenario.ground_truth.model_dump()
+
+    p1 = (
+        "Role: Forensic Evidence Extractor. "
+        "Extract all factual evidence from CCTV, SCADA telemetry, blueprints, and logs: "
+        "- Entities: Dr. Julian Vance, Chief Marcus Thorne, Officer Carter "
+        "- Times: exact SCADA and camera timestamps "
+        "- Locations: Gallery 4, Stairwell C1, Locker 14 "
+        "- Objects: framed Madonna RM-1887-04, canvas tube, Cloakroom token C-408, card CONSV-408. "
+        "Distinguish confirmed facts from unverified rumors. "
+        "Filter out dropped champagne crate noise. Do not accuse anyone."
+    )
+    p2 = (
+        "Role: Timeline & Incident Reconstructor. "
+        "Reconstruct the museum heist into a strict chronological sequence: "
+        "- Sequence events by what occurred first, next, and last (21:15 gala entry through 23:48 locker search) "
+        "- Trace suspect movements and connect causal dependencies linking the 23:40:42 Breaker B-04 blackout to the canvas forgery swap and Locker 14 drop. "
+        "Keep uncertain sightings separate. Maintain neutrality without naming a culprit."
+    )
+    p3 = (
+        "Role: Logic Decision Solver. "
+        "Analyze the reconstructed timeline against Museum Art Crime Rules (Rule SEC-401, Rule ART-302, Rule CLR-505) "
+        "to determine the final resolution: "
+        "- Deduce the true conspirators (Dr. Julian Vance and Marcus Thorne) "
+        "- Explain the Breaker B-04 90-second blackout canvas forgery swap method "
+        "- Identify decisive evidence_keys (Conservation RFID card CONSV-408 and token C-408 in Locker 14, Thorne sub-station sabotage alibi contradiction, acrylic spectrometry). "
+        "Output strictly valid JSON with keys: culprit, method, motive, rule_broken, evidence_keys"
+    )
+
+    raw_agent3_json = """
+    {
+      "culprit": "Dr. Julian Vance (Head of Conservation) and Chief Marcus Thorne (Security Accomplice)",
+      "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+      "rule_broken": "Rule SEC-401, Rule ART-302, and Rule CLR-505",
+      "clue": "Locker 14 search yielded Conservation RFID keycard CONSV-408 and Private Vault cloakroom token C-408 matching Julian Vance, disproving Thorne's sub-station sabotage alibi and proving canvas swap forgery RM-1887-04",
+      "motive": "Replace authentic Renaissance masterpiece with synthetic acrylic forgery for illicit high-value private sale",
+      "evidence_keys": [
+        "Recovered Conservation staff access card #408 (CONSV-408) and Gala Cloakroom token No. C-408 from Locker 14",
+        "Lab spectrometry confirming wall painting RM-1887-04 is a 2023 synthetic acrylic forgery with zinc white",
+        "SCADA telemetry and Evidence #04 memo confirming Breaker B-04 trip 90-second blackout loop",
+        "Thorne sub-station sabotage alibi disproven by insider timing and Locker 14 drop"
+      ]
+    }
+    """
+    parsed_verdict, was_clean = parse_json_verdict(raw_agent3_json)
+
+    res = evaluate_verdict(
+        final_verdict=parsed_verdict,
+        ground_truth=gt,
+        user_1_prompt=p1,
+        agent_1_output="Verified factual observations extracted.",
+        user_2_prompt=p2,
+        agent_2_output="Chronological timeline with causal links.",
+        user_3_prompt=p3,
+        agent_3_output=raw_agent3_json,
+        was_clean_json=was_clean,
+    )
+
+    assert res["total_score"] >= 95
+    assert res["grade"] == "Master Detective (S)"
+    assert res["breakdown"]["culprit"]["status"] == "correct"
+    assert res["breakdown"]["culprit"]["points"] == 15
+    assert res["breakdown"]["method"]["status"] == "correct"
+    assert res["breakdown"]["method"]["points"] == 15
+    assert res["breakdown"]["clue"]["status"] == "correct"
+    assert res["breakdown"]["clue"]["points"] == 10
+
+
+def test_museum_heist_all_five_tiers_distribution():
+    """Verify that Tiers 1 through 5 for Riverton Museum Heist produce monotonic scores strictly within their designated grade brackets."""
+    from backend.app.services.scenario_loader import get_scenario_loader
+    from backend.app.graph.nodes import node_extractor, node_reconstructor, node_solver
+    from backend.app.graph.evaluator import parse_json_verdict, evaluate_verdict
+    from backend.app.core.llm import MockOfflineChatModel
+
+    loader = get_scenario_loader()
+    scenario = loader.get("scenario_05_museum_heist")
+    assert scenario is not None
+    gt = scenario.ground_truth.model_dump()
+    mock_llm = MockOfflineChatModel()
+
+    tiers_data = {
+        "Tier 1": {
+            "p1": "look at the museum evidence and tell me what happened to the painting.",
+            "p2": "make a timeline of the museum events.",
+            "p3": "who stole the painting? tell me what to do.",
+            "min_score": 0,
+            "max_score": 39,
+            "expected_grade": "Unsolved (F)",
+        },
+        "Tier 2": {
+            "p1": "Examine the museum evidence. Extract the people, galleries, and art items from the CCTV files.",
+            "p2": "Organize the Gallery 4 events in chronological sequence of what happened first and next.",
+            "p3": "Analyze the situation in Gallery 4 to determine the culprit and action taken. Output in JSON format.",
+            "min_score": 40,
+            "max_score": 59,
+            "expected_grade": "Apprentice (C)",
+        },
+        "Tier 3": {
+            "p1": "You are the evidence extractor. Extract the facts regarding Riverton Museum: identify people, locations, objects, and timestamps. Record what occurred in Gallery 4 and the basement passage.",
+            "p2": "You are the incident reconstructor. Organize all extracted museum events in chronological order: trace Dr. Vance, Chief Thorne, and the canvas tube from Gallery 4 to the basement corridor.",
+            "p3": "You are the decision agent. Analyze the museum timeline against art crime protocols. Determine the culprit and method for the painting theft. Output JSON format with keys: culprit, method, clue.",
+            "min_score": 60,
+            "max_score": 74,
+            "expected_grade": "Investigator (B)",
+        },
+        "Tier 4": {
+            "p1": "Role: Evidence Extractor. Extract verified facts from CCTV and SCADA logs: identify museum staff, gallery locations, and telemetry. Distinguish confirmed facts from unverified catering noise.",
+            "p2": "Role: Incident Reconstructor. Synthesize facts into a chronological sequence from 21:15 to 23:55. Connect causal links between the breaker trip and the canvas tube transit.",
+            "p3": "Role: Logic Decision Solver. Evaluate the timeline against Museum Protocols (Rule SEC-401, Rule ART-302) to determine the culprit and method. Output strictly valid JSON format with keys: culprit, method, clue.",
+            "min_score": 75,
+            "max_score": 89,
+            "expected_grade": "Senior Sleuth (A)",
+        },
+        "Tier 5": {
+            "p1": (
+                "Role: Forensic Evidence Extractor. "
+                "Extract all factual evidence from CCTV, SCADA telemetry, blueprints, and logs: "
+                "- Entities: Dr. Julian Vance, Chief Marcus Thorne, Officer Carter "
+                "- Times: exact SCADA and camera timestamps "
+                "- Locations: Gallery 4, Stairwell C1, Locker 14 "
+                "- Objects: framed Madonna RM-1887-04, canvas tube, Cloakroom token C-408, card CONSV-408. "
+                "Distinguish confirmed facts from unverified rumors. "
+                "Filter out dropped champagne crate noise. Do not accuse anyone."
+            ),
+            "p2": (
+                "Role: Timeline & Incident Reconstructor. "
+                "Reconstruct the museum heist into a strict chronological sequence: "
+                "- Sequence events by what occurred first, next, and last (21:15 gala entry through 23:48 locker search) "
+                "- Trace suspect movements and connect causal dependencies linking the 23:40:42 Breaker B-04 blackout to the canvas forgery swap and Locker 14 drop. "
+                "Keep uncertain sightings separate. Maintain neutrality without naming a culprit."
+            ),
+            "p3": (
+                "Role: Logic Decision Solver. "
+                "Analyze the reconstructed timeline against Museum Art Crime Rules (Rule SEC-401, Rule ART-302, Rule CLR-505) "
+                "to determine the final resolution: "
+                "- Deduce the true conspirators (Dr. Julian Vance and Marcus Thorne) "
+                "- Explain the Breaker B-04 90-second blackout canvas forgery swap method "
+                "- Identify decisive evidence_keys (Conservation RFID card CONSV-408 and token C-408 in Locker 14, Thorne sub-station sabotage alibi contradiction, acrylic spectrometry). "
+                "Output strictly valid JSON with keys: culprit, method, motive, rule_broken, evidence_keys"
+            ),
+            "min_score": 90,
+            "max_score": 100,
+            "expected_grade": "Master Detective (S)",
+        },
+    }
+
+    scores = []
+    for tier_name, data in tiers_data.items():
+        state = {
+            "scenario": scenario,
+            "p1_prompt": data["p1"],
+            "p2_prompt": data["p2"],
+            "p3_prompt": data["p3"],
+            "leak_keywords": scenario.spoiler_keywords,
+        }
+        res1 = node_extractor(state, llm=mock_llm)
+        state.update(res1)
+        res2 = node_reconstructor(state, llm=mock_llm)
+        state.update(res2)
+        res3 = node_solver(state, llm=mock_llm)
+        state.update(res3)
+
+        parsed_verdict, was_clean = parse_json_verdict(state["agent_3_output"])
+        res = evaluate_verdict(
+            final_verdict=parsed_verdict,
+            ground_truth=gt,
+            leak_detected=False,
+            was_clean_json=was_clean,
+            user_1_prompt=data["p1"],
+            agent_1_output=state["agent_1_output"],
+            user_2_prompt=data["p2"],
+            agent_2_output=state["agent_2_output"],
+            user_3_prompt=data["p3"],
+            agent_3_output=state["agent_3_output"],
+        )
+
+        total = res["total_score"]
+        scores.append(total)
+        assert data["min_score"] <= total <= data["max_score"], (
+            f"{tier_name} score {total} out of expected range [{data['min_score']}, {data['max_score']}]"
+        )
+        assert res["grade"] == data["expected_grade"], (
+            f"{tier_name} grade {res['grade']} does not match expected {data['expected_grade']}"
+        )
+
+    # Monotonic progression across tiers
+    for i in range(len(scores) - 1):
+        assert scores[i] < scores[i + 1], f"Scores should strictly increase across tiers: {scores}"
+
+
+
 

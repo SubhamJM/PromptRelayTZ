@@ -140,10 +140,14 @@ class MockOfflineChatModel(SimpleChatModel):
                 user_prompt = content.split("USER PROMPT:", 1)[1].split("\n\n", 1)[0].strip()
                 break
 
-        is_airport = any(k in text_joined.lower() for k in ["airport", "sw 472", "flight", "gate b07", "baggage", "daniel kim"])
-        is_synthai = any(k in text_joined.lower() for k in ["synthai", "marcus vance", "elena rostova", "viktor kane", "maya lin", "omnipod", "omnidose", "cleanroom", "cyber-physical", "§404", "404"])
-        is_gallery = any(k in text_joined.lower() for k in ["vernissage", "delacroix", "julian thorne", "maximillian cross", "helena rostova", "vitrine", "tetrodotoxin", "caesarean", "ruby", "gallery", "vault", "biological trace", "§201", "201"])
-        is_blackwood = not (is_airport or is_synthai or is_gallery) or any(k in text_joined.lower() for k in ["blackwood", "reginald", "arthur bell", "higgins", "sugar tongs", "earl grey", "cyanide", "manor", "§102", "102", "peat"])
+        is_museum = any(k in text_joined.lower() for k in [
+            "celestial madonna", "gallery 4", "riverton", "julian vance", "marcus thorne",
+            "breaker b-04", "locker 14", "c-408", "consv-408", "sec-401", "art-302", "rm-1887-04"
+        ])
+        is_airport = not is_museum and any(k in text_joined.lower() for k in ["airport", "sw 472", "flight sw", "gate b07", "baggage", "daniel kim", "skyways"])
+        is_synthai = not is_museum and any(k in text_joined.lower() for k in ["synthai", "marcus vance", "elena rostova", "viktor kane", "maya lin", "omnipod", "omnidose", "cleanroom", "cyber-physical", "§404", "404"])
+        is_gallery = not is_museum and any(k in text_joined.lower() for k in ["vernissage", "delacroix", "julian thorne", "maximillian cross", "helena rostova", "vitrine", "tetrodotoxin", "caesarean", "ruby", "biological trace", "§201", "201"])
+        is_blackwood = not (is_airport or is_museum or is_synthai or is_gallery) or any(k in text_joined.lower() for k in ["blackwood", "reginald", "arthur bell", "higgins", "sugar tongs", "earl grey", "cyanide", "manor", "§102", "102", "peat"])
         sys_message = str(messages[0].content) if messages else ""
 
         is_reconstructor = "You are Agent 2" in sys_message or "Agent 2:" in sys_message or "Timeline & Incident Reconstructor" in sys_message
@@ -174,6 +178,34 @@ class MockOfflineChatModel(SimpleChatModel):
                         "• 08:47:10: Unidentified person in dark hooded windbreaker flees Gate B07 corridor.\n"
                         "• 08:49:00: Officer R. Nair establishes observation perimeter and initiates K9 explosive sweep request.\n"
                         "• Causal Dependency: Presence of an uninspected unattended suitcase directly impacts departure safety clearance for Flight SW 472."
+                    )
+            elif is_museum:
+                if tier == "weak":
+                    return (
+                        "Preliminary Timeline (Incomplete):\n"
+                        "- Evening: Gala began.\n"
+                        "- Later: Power tripped and painting was missing.\n"
+                        "[TIMELINE INCOMPLETE: Chronological sequencing omitted.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Chronological Order of Events:\n"
+                        "• 21:15: Dr. Julian Vance checks in with Conservation credentials.\n"
+                        "• 23:40: Breaker B-04 trips and Chief Thorne goes to sub-station.\n"
+                        "• 23:41: Gallery 4 alarm trips during blackout.\n"
+                        "• 23:42: Suspect flees through basement passage carrying canvas tube.\n"
+                        "• 23:48: Officer Carter finds token C-408 and card in Locker 14."
+                    )
+                else:
+                    return (
+                        "Reconstructed Chronological Sequence of Events:\n"
+                        "• 21:15:42: Dr. Julian Vance enters with Conservation clearance CONSV-04.\n"
+                        "• 23:40:42.286: Breaker B-04 manually tripped, initiating 90-second auxiliary failover and disabling Beam Grid #7.\n"
+                        "• 23:40:50: Chief Marcus Thorne dispatched to sub-station, providing inside cover.\n"
+                        "• 23:41:00: Original 'The Celestial Madonna' sliced and replaced with Vance's synthetic acrylic forgery RM-1887-04.\n"
+                        "• 23:42:10: Masked courier flees CAM-18 basement passage carrying canvas tube, depositing it at Locker 14 within the 90-second gap.\n"
+                        "• 23:48:00: Officer Carter recovers Cloakroom token No. C-408 and Conservation RFID badge #408 from Locker 14.\n"
+                        "• Causal Dependency: The 90-second Breaker B-04 blackout directly enabled the canvas forgery swap and drop-off at Locker 14."
                     )
             elif is_synthai:
                 if tier == "weak":
@@ -313,6 +345,47 @@ class MockOfflineChatModel(SimpleChatModel):
                             "Bag tag #SKW-78921-472 belongs to Daniel Kim (Counter A04)",
                             "CCTV CAM 12 captures unidentified hooded individual fleeing Gate B07 corridor at 08:47:10",
                             "Awaiting K9 explosive sweep clearance before departure authorization"
+                        ]
+                    }, indent=2)
+            elif is_museum:
+                if tier == "weak":
+                    return json.dumps({
+                        "culprit": "Undetermined (User prompt lacked deductive instructions)",
+                        "method": "Unspecified (Incomplete prompt)",
+                        "clue": "Unspecified (Incomplete prompt)"
+                    }, indent=2)
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["sec-401", "art-302", "401", "302", "lockdown protocol", "custody standard"]):
+                    return json.dumps({
+                        "culprit": "Dr. Julian Vance (suspected, pending verification)",
+                        "method": "Blackout during museum gala",
+                        "clue": "Locker 14 in service corridor",
+                        "rule_broken": "Rule SEC-401",
+                        "motive": "Priceless artwork theft and forgery distribution"
+                    }, indent=2)
+                elif not any(k in user_p_lower for k in ["evidence_keys", "consv-408", "c-408", "token", "sub-station", "acrylic"]):
+                    return json.dumps({
+                        "culprit": "Dr. Julian Vance and Marcus Thorne",
+                        "method": "Breaker B-04 blackout exploiting 90-second auxiliary power gap to swap canvas with synthetic forgery under Rule SEC-401 and Rule ART-302",
+                        "clue": "Torn memo scrap recovered from Gallery 4 Row B seating area",
+                        "rule_broken": "Rule SEC-401 and Rule ART-302",
+                        "motive": "Replace historic masterpiece with synthetic acrylic forgery for illicit overseas private sale",
+                        "evidence_keys": [
+                            "Breaker B-04 tripped at 23:40:42 disabling Beam Grid #7 for 90-second generator window",
+                            "Torn memo scrap recovered from Gallery 4 Row B seating area"
+                        ]
+                    }, indent=2)
+                else:
+                    return json.dumps({
+                        "culprit": "Dr. Julian Vance (Head of Conservation) and Chief Marcus Thorne (Security Accomplice)",
+                        "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+                        "rule_broken": "Rule SEC-401, Rule ART-302, and Rule CLR-505",
+                        "clue": "Locker 14 search yielded Conservation RFID keycard CONSV-408 and Private Vault cloakroom token C-408 matching Julian Vance, disproving Thorne's sub-station sabotage alibi and proving canvas swap forgery RM-1887-04",
+                        "motive": "Replace authentic Renaissance masterpiece with synthetic acrylic forgery for illicit high-value private sale",
+                        "evidence_keys": [
+                            "Recovered Conservation staff access card #408 (CONSV-408) and Gala Cloakroom token No. C-408 from Locker 14",
+                            "Lab spectrometry confirming wall painting RM-1887-04 is a 2023 synthetic acrylic forgery with zinc white",
+                            "SCADA telemetry and Evidence #04 memo confirming Breaker B-04 trip 90-second blackout loop",
+                            "Thorne sub-station sabotage alibi disproven by insider timing and Locker 14 drop"
                         ]
                     }, indent=2)
             elif is_synthai:
@@ -469,6 +542,36 @@ class MockOfflineChatModel(SimpleChatModel):
                         "- 08:49:00: Security Officer R. Nair logs unattended blue suitcase, cordons area, requests urgent K9 explosive sweep.\n"
                         "- Baggage Tag Barcode: Tag on unattended blue suitcase belongs to Daniel Kim (Flight SW 472).\n"
                         "- Filtered Distractions: Daily Chronicle marathon news and catering coffee deliveries disregarded as peripheral noise."
+                    )
+            elif is_museum:
+                if tier == "weak":
+                    return (
+                        "Surface Observations (Extraction Incomplete):\n"
+                        "- Winter Gala at Riverton Museum was attended by hundreds of patrons.\n"
+                        "- Luxe Catering delivered champagne and broke a crate at 21:25.\n"
+                        "- Elena Rossi was coordinating the event schedule.\n"
+                        "[EXTRACTION INCOMPLETE: Timestamps, SCADA logs, lab spectrometry, torn notes, and evidence locker items were omitted because user prompt lacked specific extraction directives.]"
+                    )
+                elif tier == "moderate":
+                    return (
+                        "Extracted Evidence (Partial):\n"
+                        "- 21:15: Dr. Julian Vance (Badge CONSV-04) checked into gala.\n"
+                        "- 23:40:42: Breaker B-04 tripped, disrupting Wing C Gallery 4 Beam Grid #7.\n"
+                        "- 23:42:10: CCTV CAM-18 caught masked individual with canvas tube in basement passage.\n"
+                        "- Lab analysis RM-1887-04 showed synthetic acrylic binder in the framed painting.\n"
+                        "- Locker 14 search yielded Gala token C-408 and staff card #408."
+                    )
+                else:
+                    return (
+                        "Verified Clues & Factual Evidence Extracted:\n"
+                        "- 21:15:42: Dr. Julian Vance (Head of Conservation, Badge CONSV-04) checked into gala with access to Gallery 4 and Private Vault.\n"
+                        "- 23:40:42.286: SCADA logged Breaker B-04 trip causing 90-second auxiliary power blackout loop and disrupting Beam Grid #7.\n"
+                        "- 23:40: Chief Marcus Thorne dispatched in person to basement sub-station.\n"
+                        "- 23:42:10: CCTV CAM-18 recorded masked suspect fleeing basement corridor carrying canvas travel tube toward Stairwell C1 / Fire Exit.\n"
+                        "- 23:48:00: Officer J. Carter searched Locker 14, recovering Gala Cloakroom token No. C-408 and Conservation staff RFID access card #408 (CONSV-408).\n"
+                        "- Lab Spectrometry: Painting RM-1887-04 left on wall confirmed as modern synthetic acrylic forgery (circa 2023) with zinc white.\n"
+                        "- Evidence #04 Memo: 'Breaker B-04 loop: 90 sec gap before aux power - switch canvas - drop tube at Locker 14.'\n"
+                        "- Filtered Distractions: Luxe Catering dropped crate at 21:25 and Elena Rossi logistics disregarded as peripheral noise."
                     )
             elif is_synthai:
                 if tier == "weak":

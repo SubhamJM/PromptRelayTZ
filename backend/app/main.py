@@ -13,6 +13,7 @@ settings = get_settings()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
 IMAGE_DATA_DIR = BASE_DIR / "image_data"
+MUSEUM_IMAGE_DIR = BASE_DIR / "images_for_museum"
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -34,6 +35,9 @@ app.add_middleware(
 # Mount Image Evidence Directory
 if IMAGE_DATA_DIR.exists():
     app.mount("/image_data", StaticFiles(directory=str(IMAGE_DATA_DIR)), name="image_data")
+
+if MUSEUM_IMAGE_DIR.exists():
+    app.mount("/images_for_museum", StaticFiles(directory=str(MUSEUM_IMAGE_DIR)), name="images_for_museum")
 
 # API Routers
 app.include_router(health_router, prefix="/api")

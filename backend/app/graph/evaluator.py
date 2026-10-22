@@ -584,10 +584,12 @@ def evaluate_verdict(
                 has_delivery_vehicle = any(v in act_m_lower for v in [
                     "sugar", "tongs", "demerara", "tea tray",
                     "ble", "bluetooth", "dongle", "raspberry pi", "firmware", "override payload",
-                    "vitrine", "latch", "handle", "gloves", "nitrile", "transdermal"
+                    "vitrine", "latch", "handle", "gloves", "nitrile", "transdermal",
+                    "breaker", "b-04", "blackout", "auxiliary", "failover", "90-second", "90 sec", "canvas swap", "tube", "canister"
                 ])
                 has_lethal_agent = any(a in act_m_lower for a in [
-                    "cyanide", "poison", "insulin", "bolus", "tetrodotoxin", "neurotoxin"
+                    "cyanide", "poison", "insulin", "bolus", "tetrodotoxin", "neurotoxin",
+                    "forgery", "counterfeit", "acrylic", "synthetic", "replica", "zinc white", "sec-401", "art-302"
                 ])
 
                 if (has_lethal_agent and has_delivery_vehicle) or ratio >= 0.40:
@@ -662,12 +664,14 @@ def evaluate_verdict(
                 has_alibi_contradiction = any(ac in act_c_lower for ac in [
                     "red peat", "greenhouse", "contradict", "arrival alibi",
                     "cron", "automated", "mac address", "pi zero", "d4:8a", "f4:d4", "zoom",
-                    "dna", "inside", "interior", "briefcase", "caesarean", "emerald", "leica", "camera lens"
+                    "dna", "inside", "interior", "briefcase", "caesarean", "emerald", "leica", "camera lens",
+                    "locker 14", "c-408", "consv-408", "consv-04", "sub-station", "synthetic acrylic", "rm-1887-04"
                 ])
                 has_physical_clue = any(pc in act_c_lower for pc in [
                     "boots", "tongs", "residue", "sugar tongs",
                     "sniffer", "packet", "dongle", "mac", "ssd",
-                    "gloves", "nitrile", "vitrine", "latch", "swab", "binder"
+                    "gloves", "nitrile", "vitrine", "latch", "swab", "binder",
+                    "rfid", "keycard", "access card", "token", "canvas tube", "memo", "torn note", "acrylic binder", "zinc white"
                 ])
 
                 if has_alibi_contradiction and (has_physical_clue or ratio >= 0.35):
@@ -685,7 +689,7 @@ def evaluate_verdict(
             else:
                 clue_keywords = [
                     "tongs", "boots", "peat", "charity", "mac address", "macbook", "sandisk", "gloves", "vitrine", "leica",
-                    "unscreened", "container", "breach", "door", "cargo"
+                    "unscreened", "container", "breach", "door", "cargo", "locker 14", "c-408", "consv-408", "token", "forgery"
                 ]
 
                 if ratio >= 0.20 or any(kw in act_c_lower for kw in clue_keywords if kw in exp_c_lower):

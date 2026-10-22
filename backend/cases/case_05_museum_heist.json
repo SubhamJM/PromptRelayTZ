@@ -1,0 +1,153 @@
+{
+  "case_id": "case_05_museum_heist",
+  "theme": "Art Heist & Forgery",
+  "title": "The Riverton Museum Heist: The Celestial Madonna",
+  "difficulty": "Hard",
+  "synopsis": "During the Riverton Museum Winter Gala Preview, the priceless Renaissance masterpiece 'The Celestial Madonna' is stolen from Wing C Gallery 4 during an intentional 90-second breaker blackout and replaced with a forged replica. A 3-agent relay team must extract visual forensic evidence from CCTV cameras, SCADA telemetry, blueprints, incident logs, torn memos, and physical evidence lockers to unmask the insider conspiracy, prove the canvas swap forgery, and intercept the stolen masterpiece.",
+  "images": [
+    {
+      "id": "img_01",
+      "filename": "01_cctv_gallery.png",
+      "title": "CCTV: Wing C Gallery 4 Crime Scene",
+      "category": "CCTV Surveillance",
+      "badge": "CAM-04 • Wing C Gallery 4",
+      "timestamp": "2024-11-20 23:41:15 UTC",
+      "prompt_hint": "Inspect the high-security gallery scene. Prompt Agent 1 to read the visible camera timestamp, identify the neoclassical gallery wing, observe the laser tripwire beam grid, and record the status of the displayed framed artwork.",
+      "description": "High-resolution surveillance camera overlooking Gallery 4, showing neoclassical hall, laser tripwires, velvet stanchions, and framed painting 'The Celestial Madonna'.",
+      "src": "/images_for_museum/01_cctv_gallery.png"
+    },
+    {
+      "id": "img_02",
+      "filename": "02_scada_console.png",
+      "title": "SCADA Security & Power Console",
+      "category": "Security Console",
+      "badge": "SCADA Console • Wing C",
+      "timestamp": "2024-11-20 23:40:42.286",
+      "prompt_hint": "Analyze the central security console telemetry. Prompt Agent 1 to extract the exact millisecond timestamps, the tripped circuit breaker code (Breaker B-04), the disrupted laser beam zone (Beam Grid #7), and the voltage drop graph.",
+      "description": "Central security terminal displaying alarm logs: Breaker B-04 trip at 23:40:42.286, Beam Grid #7 disrupted at 23:40:42.317, voltage drop graph, and live PIP feed of Gallery 4.",
+      "src": "/images_for_museum/02_scada_console.png"
+    },
+    {
+      "id": "img_03",
+      "filename": "03_cctv_basement.png",
+      "title": "CCTV: Basement Service Passage",
+      "category": "CCTV Surveillance",
+      "badge": "CAM-18 • Basement Passage",
+      "timestamp": "2024-11-20 23:42:10 UTC",
+      "prompt_hint": "Track the escaping suspect. Prompt Agent 1 to record the camera timestamp (23:42:10), describe the subject's formal attire disguise, identify the matte black cylindrical tube being carried, and note their flight direction toward the fire exit.",
+      "description": "Masked operative in black evening wear carrying a cylindrical matte black canvas travel tube toward the fire exit past Riverton Museum transport crates.",
+      "src": "/images_for_museum/03_cctv_basement.png"
+    },
+    {
+      "id": "img_04",
+      "filename": "04_conservation_lab.png",
+      "title": "Conservation Science Lab Spectrometry",
+      "category": "Forensic Analysis",
+      "badge": "Lab Workstation • RM-1887-04",
+      "timestamp": "2024-11-20 23:55:00",
+      "prompt_hint": "Review the forensic chemical test report. Prompt Agent 1 to extract the painting catalog ID (RM-1887-04), identify the synthetic acrylic binder and Zinc White pigment findings, and deduce the conclusive proof that the painting left in the frame is a modern forgery.",
+      "description": "Forensic spectrometer analysis of 'The Celestial Madonna' left in the frame, detecting modern synthetic acrylic binder (~2023), Zinc White, and absence of historic craquelure.",
+      "src": "/images_for_museum/04_conservation_lab.png"
+    },
+    {
+      "id": "img_05",
+      "filename": "05_incident_logbook.png",
+      "title": "Security Incident Logbook #INC-994",
+      "category": "Security Log",
+      "badge": "Logbook #INC-994 • Carter",
+      "timestamp": "2024-11-20 Night Shift",
+      "prompt_hint": "Transcribe the physical handwritten logbook. Prompt Agent 1 to record Officer J. Carter's entries: 21:30 catering noise, 23:40 Breaker B-04 failure, Chief Marcus Thorne's dispatch to the sub-station, the 23:41 alarm, and the gallery floor sketch.",
+      "description": "Physical incident logbook penned by Officer J. Carter (ID 4173). Logs 21:30 catering noise, 23:40 Breaker B-04 trip, dispatching Chief Thorne to the sub-station, and gallery perimeter sketch.",
+      "src": "/images_for_museum/05_incident_logbook.png"
+    },
+    {
+      "id": "img_06",
+      "filename": "06_blueprint_wing_c.png",
+      "title": "Architectural Blueprint: Wing C",
+      "category": "Physical & Layout",
+      "badge": "Blueprint RM-FAC-WC-01",
+      "timestamp": "Architectural Plan",
+      "prompt_hint": "Inspect the architectural blueprints of Wing C. Prompt Agent 1 to map the suspect's escape route from Gallery 4 down Stairwell C1 to the basement service passage, noting the exact location of Locker 14 and the freight loading bay.",
+      "description": "Official Riverton Museum architectural blueprint (RM-FAC-WC-01) detailing Wing C Level 1, Sub-Level Basement, Stairwell C1, Locker Room, and loading bays.",
+      "src": "/images_for_museum/06_blueprint_wing_c.png"
+    },
+    {
+      "id": "img_07",
+      "filename": "07_gala_checkin_kiosk.png",
+      "title": "VIP Gala Check-in Kiosk Tablet",
+      "category": "Gala Records",
+      "badge": "Tablet UI • Gala Registry",
+      "timestamp": "2024-11-20 21:37:26",
+      "prompt_hint": "Extract the roster of key gala guests and staff. Prompt Agent 1 to identify Marcus Thorne (Chief of Security, SEC-108), Dr. Julian Vance (Head of Conservation, CONSV-04), Beatrice Moreau (VIP-202), and Elena Rossi (STAFF-031).",
+      "description": "Digital check-in kiosk tablet interface showing guest list, badge IDs, entry times, and headshots for Marcus Thorne, Dr. Julian Vance, Beatrice Moreau, and staff.",
+      "src": "/images_for_museum/07_gala_checkin_kiosk.png"
+    },
+    {
+      "id": "img_08",
+      "filename": "08_evidence_torn_memo.png",
+      "title": "Evidence Item #04: Torn Handwritten Memo",
+      "category": "Physical Evidence",
+      "badge": "Evidence Item #04 • Gallery 4",
+      "timestamp": "Found post-heist",
+      "prompt_hint": "Perform detailed OCR on the torn handwritten memo found at Gallery 4. Prompt Agent 1 to transcribe the instructions: 'Breaker B-04 loop: 90 sec gap before aux power - switch canvas - drop tube at Locker 14.'",
+      "description": "Evidence bag containing torn handwritten heist memo found at Gallery 4 Row B: 'Breaker B-04 loop: 90 sec gap before aux power - switch canvas - drop tube at Locker 14.' with latent thumbprint.",
+      "src": "/images_for_museum/08_evidence_torn_memo.png"
+    },
+    {
+      "id": "img_09",
+      "filename": "09_evidence_locker14.png",
+      "title": "Evidence Item #07: Recovered Locker 14 Contents",
+      "category": "Physical Evidence",
+      "badge": "Evidence Item #07 • Locker 14",
+      "timestamp": "2024-11-20 23:48:00",
+      "prompt_hint": "Examine the smoking gun evidence found inside Locker 14. Prompt Agent 1 to extract the red Gala Cloakroom token number (No. C-408), the RFID access card badge number (#408 / CONSV-408), and the department (Conservation & Archival Restoration).",
+      "description": "Evidence tray logged by Officer J. Carter from Locker 14 containing red embossed gala cloakroom token No. C-408 and Conservation staff RFID access card #408 (CONSV-408).",
+      "src": "/images_for_museum/09_evidence_locker14.png"
+    },
+    {
+      "id": "img_10",
+      "filename": "10_catering_beverage_log.png",
+      "title": "Luxe Catering Services Beverage Delivery Log",
+      "category": "Peripheral Decoy & Log",
+      "badge": "Catering Log • Received 21:10",
+      "timestamp": "2024-11-20 21:10 - 21:25",
+      "prompt_hint": "Read the crinkled catering delivery log. Prompt Agent 1 to note the 21:10 champagne delivery, the 21:25 dropped crate in Courtyard Service Hall, and filter it out as peripheral corroboration for Carter's 21:30 noise log.",
+      "description": "Crinkled Luxe Catering beverage log with wine ring stain, detailing 21:10 champagne delivery and 21:25 dropped crate in Courtyard Service Hall.",
+      "src": "/images_for_museum/10_catering_beverage_log.png"
+    }
+  ],
+  "noisy_case_file": "INCIDENT DOSSIER - RIVERTON MUSEUM OF ART AND HISTORY\nDate: 20 Nov 2024 | Location: Wing C, 2nd Floor Gallery 4 & Sub-Level Corridor | Ref: #INC-994\nInvestigating Desk: Museum Security & Conservation Forensics Taskforce\n\nOVERVIEW:\nVisual evidence, digital telemetry, physical crime scene artifacts, and administrative logs have been assembled concerning the heist of 'The Celestial Madonna' (Catalog #RM-1887-04) during the annual Winter Gala Preview.\n\nCOLLECTION OF MULTI-SOURCE VISUAL EVIDENCE:\n1. CCTV Feed [CAM-04 - Wing C Gallery 4] (Timestamp: 2024-11-20 23:41:15 UTC)\n2. SCADA Building & Security Console [Wing C Power & Beam Grid] (Timestamp: 2024-11-20 23:40:42.286)\n3. CCTV Feed [CAM-18 - Basement Service Passage] (Timestamp: 2024-11-20 23:42:10 UTC)\n4. Conservation Science Lab Spectrometry [Spec-Analytic 9 Workstation] (Timestamp: 2024-11-20 23:55:00)\n5. Security Incident Logbook #INC-994 [Night Shift Officer J. Carter] (Date: 2024-11-20)\n6. Architectural Blueprint Drawing RM-FAC-WC-01 [Wing C Level 1 & Sub-Level 1]\n7. VIP Gala Check-in Kiosk Tablet [Attendee & Staff Registry] (Timestamp: 2024-11-20 21:37:26)\n8. Evidence Item #04 [Torn Handwritten Heist Memo found at Gallery 4 Row B]\n9. Evidence Item #07 [Locker 14 Contents: Gala Cloakroom Token C-408 & Conservation RFID Card #408]\n10. Luxe Catering Services Beverage Delivery Log [Corroborating 21:25 dropped crate noise]",
+  "operational_rules": [
+    "Rule SEC-401 (Auxiliary Power Blackout Lockdown Protocol): Upon intentional interruption or tripping of primary breaker circuits (such as Breaker B-04) during museum exhibition hours, all perimeter access points, emergency egress corridors, and freight loading docks must undergo immediate biometric lockdown.",
+    "Rule ART-302 (Masterpiece Forgery & Physical Chain of Custody Standard): When an exhibited masterwork exhibits synthetic binder or pigment discrepancies indicative of an in-situ forgery swap, all conservation staff possessing departmental keycards and private vault access must surrender access tokens and undergo immediate administrative detainment.",
+    "Rule CLR-505 (Art Crime Evidence Recovery & Containment Protocol): To recover stolen cultural property before egress, security units must immediately execute a targeted search of secondary drop points identified in logistics communications (Locker 14) and seal private vault/cloakroom depository units (Unit C-408)."
+  ],
+  "ground_truth": {
+    "culprit": "Dr. Julian Vance",
+    "weapon_or_method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+    "key_clue": "Conservation staff access card CONSV-408 and Private Vault cloakroom token C-408 recovered from Locker 14, matching Dr. Julian Vance (Badge CONSV-04 / Conservation), Thorne's sub-station sabotage alibi contradiction, and modern acrylic forgery RM-1887-04",
+    "motive": "High-value cultural art theft replacing historic Renaissance masterpiece with expert synthetic replica for private illicit export",
+    "suspects": [
+      "Dr. Julian Vance",
+      "Marcus Thorne",
+      "Officer J. Carter",
+      "Beatrice Moreau",
+      "Elena Rossi",
+      "R. Singh"
+    ]
+  },
+  "leak_keywords": [
+    "Julian Vance",
+    "Marcus Thorne",
+    "Locker 14",
+    "C-408",
+    "CONSV-408",
+    "synthetic acrylic forgery",
+    "Breaker B-04"
+  ],
+  "decoy_clues": [
+    "Luxe Catering dropped champagne crate at 21:25",
+    "Elena Rossi event coordination checklist",
+    "Beatrice Moreau guest registration"
+  ]
+}
