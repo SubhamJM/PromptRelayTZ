@@ -14,6 +14,44 @@ from backend.app.models.scenario import Scenario
 logger = logging.getLogger(__name__)
 
 
+def is_placeholder_value(val: Any) -> bool:
+    """
+    Check if a verdict field value is an unresolved placeholder indicating
+    that prompt deduction failed to complete or was omitted by the agent.
+    """
+    if not val:
+        return True
+    s = str(val).strip()
+    if not s:
+        return True
+    s_lower = s.lower().strip("[](){}\"' ")
+
+    exact_placeholders = {
+        "undetermined", "unspecified", "unknown", "none", "n/a", "na",
+        "not specified", "pending", "unresolved", "null", "undefined",
+        "pending verification", "to be determined", "tbd"
+    }
+    if s_lower in exact_placeholders:
+        return True
+
+    if re.match(r"^(?:undetermined|unspecified|unknown|none|n/a)\b\s*[\(\:\-\[]", s_lower):
+        return True
+
+    system_rejection_phrases = [
+        "lacked deductive instructions",
+        "prompt quality: low",
+        "incomplete: user prompt",
+        "incomplete prompt",
+        "user prompt lacked",
+        "deductive instructions missing",
+        "prompt was incomplete",
+    ]
+    if any(phrase in s_lower for phrase in system_rejection_phrases):
+        return True
+
+    return False
+
+
 def parse_json_verdict(raw_text: str) -> Tuple[Dict[str, Any], bool]:
     """
     Robustly extract the structured JSON decision / verdict from LLM output.
@@ -121,7 +159,11 @@ def enrich_verdict_dict(data: Dict[str, Any]) -> Dict[str, Any]:
                     clue_items.append(clean_part)
 
     # 1. Direct clue/proof fields
-    for k in ["proof", "blocking_condition", "clue", "key_clue", "evidence", "key_evidence", "target_proof_or_clue"]:
+    for k in [
+        "proof", "blocking_condition", "clue", "key_clue", "evidence",
+        "key_evidence", "target_proof_or_clue", "rule_broken", "rules_broken",
+        "supporting_rules"
+    ]:
         add_clue(data.get(k))
 
     # 2. evidence_keys field (mandated by Agent 3 system prompt and scoring guide)
@@ -359,7 +401,16 @@ def evaluate_player_3_prompt(prompt: str, agent_output: str, was_clean_json: boo
 
     # Agent 3 Output Performance (0-8)
     out_lower = (agent_output or "").lower()
-    has_undetermined = any(u in out_lower for u in ["undetermined", "unspecified", "incomplete: user prompt"])
+    failure_patterns = [
+        r"\bundetermined\s*\(",
+        r"\bunspecified\s*\(",
+        r"incomplete:\s*user prompt",
+        r"prompt quality:\s*low",
+        r"lacked deductive instructions",
+        r"user prompt lacked",
+        r'"(?:culprit|action)"\s*:\s*"(?:undetermined|unspecified|unknown|none|n/a)"',
+    ]
+    has_undetermined = any(re.search(pat, out_lower) for pat in failure_patterns)
     if was_clean_json and not has_undetermined:
         agent_pts = 8
     elif not has_undetermined and len(out_lower) >= 15:
@@ -422,7 +473,10 @@ def evaluate_verdict(
                     seen_sources.add(clean_part.lower())
                     clue_sources.append(clean_part)
 
-    for k in ["clue", "proof", "key_clue", "proof_or_clue", "blocking_condition", "evidence", "key_evidence"]:
+    for k in [
+        "clue", "proof", "key_clue", "proof_or_clue", "blocking_condition",
+        "evidence", "key_evidence", "rule_broken", "rules_broken", "supporting_rules"
+    ]:
         add_eval_clue(final_verdict.get(k))
 
     add_eval_clue(final_verdict.get("evidence_keys") or final_verdict.get("clues"))
@@ -433,11 +487,10 @@ def evaluate_verdict(
 
     actual_clue = "; ".join(clue_sources).strip()
 
-    rejection_markers = [
-        "undetermined", "unspecified", "prompt quality: low", "lacked deductive instructions",
-        "incomplete: user prompt"
-    ]
-    is_rejected = any(any(m in str(v).lower() for m in rejection_markers) for v in final_verdict.values())
+    is_culprit_rejected = not actual_culprit or is_placeholder_value(actual_culprit)
+    is_method_rejected = not actual_method or is_placeholder_value(actual_method)
+    is_clue_rejected = not actual_clue or is_placeholder_value(actual_clue)
+    all_placeholders = is_culprit_rejected and is_method_rejected and is_clue_rejected
 
     has_prompts = bool(user_1_prompt or user_2_prompt or user_3_prompt)
     if has_prompts:
@@ -455,10 +508,9 @@ def evaluate_verdict(
     culprit_status = "incorrect"
     culprit_feedback = ""
 
-    is_culprit_rejected = not actual_culprit or any(m in actual_culprit.lower() for m in rejection_markers)
     if is_culprit_rejected:
         culprit_status = "missing"
-        culprit_feedback = "No culprit was named."
+        culprit_feedback = "No culprit was named (or placeholder provided)."
     else:
         exp_lower = expected_culprit.lower()
         act_lower = actual_culprit.lower()
@@ -549,10 +601,9 @@ def evaluate_verdict(
     method_status = "incorrect"
     method_feedback = ""
 
-    is_method_rejected = not actual_method or any(m in actual_method.lower() for m in rejection_markers)
     if is_method_rejected:
         method_status = "missing"
-        method_feedback = "No method/rules deduced."
+        method_feedback = "No method/rules deduced (or placeholder provided)."
     else:
         exp_m_lower = expected_method.lower()
         act_m_lower = actual_method.lower()
@@ -627,10 +678,9 @@ def evaluate_verdict(
     clue_status = "incorrect"
     clue_feedback = ""
 
-    is_clue_rejected = not actual_clue or any(m in actual_clue.lower() for m in rejection_markers)
     if is_clue_rejected:
         clue_status = "missing"
-        clue_feedback = "No key clue cited."
+        clue_feedback = "No key clue cited (or placeholder provided)."
     else:
         exp_c_lower = expected_clue.lower()
         act_c_lower = actual_clue.lower()
@@ -706,7 +756,7 @@ def evaluate_verdict(
                     clue_feedback = "Missed the primary key clue."
 
     # 4. Format Scoring
-    if is_rejected:
+    if all_placeholders:
         format_pts = 0
         format_status = "failed"
         format_feedback = "JSON fields contained rejection placeholders."
@@ -720,7 +770,7 @@ def evaluate_verdict(
         format_feedback = "Output contained formatting irregularities."
 
     # 5. Total Score
-    if is_rejected:
+    if all_placeholders:
         accuracy_score = 0
         culprit_pts = 0
         method_pts = 0

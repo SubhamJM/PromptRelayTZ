@@ -1,3 +1,4 @@
+import json
 import pytest
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
 
@@ -286,4 +287,61 @@ def test_evaluator_moderate_prompt_verdict(sample_case):
     assert result["breakdown"]["culprit"]["status"] == "correct"
     assert result["breakdown"]["culprit"]["points"] == 40
     assert result["breakdown"]["format"]["status"] == "compliant"
+
+
+def test_evaluator_unspecified_narrative_does_not_reject_verdict(sample_case):
+    """Verifies that natural language containing 'unspecified' in narrative fields does not falsely reject the match."""
+    verdict = {
+        "culprit": "Dr. Arthur Bell",
+        "method": "Contaminated the Demerara sugar cubes and silver tongs with potassium cyanide during the unattended window on the drawing room sideboard (8:05-8:15 PM), later ingested by Lord Reginald Blackwood around 8:55-9:00 PM.",
+        "motive": "Unspecified financial or personal gain leading to the premeditated murder of Lord Reginald Blackwood.",
+        "rule_broken": "Forensic Trace Standard §102 & Timeline Discrepancy Principle",
+    }
+    result = evaluate_verdict(
+        final_verdict=verdict,
+        ground_truth=sample_case.ground_truth.model_dump(),
+        user_1_prompt="Role: Extractor. Extract people Arthur Bell, time 8:00, location drawing room.",
+        agent_1_output="Extracted facts: Arthur Bell present at 8:00 PM in drawing room.",
+        user_2_prompt="Role: Reconstructor. First Arthur Bell served tea, next lights out at 8:30.",
+        agent_2_output="Timeline: 8:05 tea served. 8:30 lights out. 8:55 ingestion.",
+        user_3_prompt="Analyze rules and output culprit, method, clue in json format.",
+        agent_3_output=json.dumps(verdict),
+        was_clean_json=True,
+    )
+    assert result["total_score"] > 50
+    assert result["breakdown"]["case_accuracy"]["score"] >= 30
+    assert result["breakdown"]["culprit"]["status"] == "correct"
+    assert result["breakdown"]["culprit"]["points"] == 15
+    assert result["breakdown"]["method"]["status"] == "correct"
+    assert result["breakdown"]["method"]["points"] == 15
+    assert result["breakdown"]["format"]["status"] == "compliant"
+
+
+def test_evaluator_incorrect_verdict_preserves_prompt_scores(sample_case):
+    """Verifies that an incorrect final verdict does not wipe player prompt engineering points to 0."""
+    wrong_verdict = {
+        "culprit": "Charles Blackwood",
+        "method": "Arsenic in evening mutton",
+        "clue": "Torn threatening letter in violet ink",
+    }
+    result = evaluate_verdict(
+        final_verdict=wrong_verdict,
+        ground_truth=sample_case.ground_truth.model_dump(),
+        user_1_prompt="Role: Extractor. Extract people Arthur Bell, time 8:00, location drawing room.",
+        agent_1_output="Extracted facts: Arthur Bell present at 8:00 PM in drawing room.",
+        user_2_prompt="Role: Reconstructor. First Arthur Bell served tea, next lights out at 8:30.",
+        agent_2_output="Timeline: 8:05 tea served. 8:30 lights out. 8:55 ingestion.",
+        user_3_prompt="Analyze rules and output culprit, method, clue in json format.",
+        agent_3_output=json.dumps(wrong_verdict),
+        was_clean_json=True,
+    )
+    p_sum = (
+        result["breakdown"]["player_1"]["score"]
+        + result["breakdown"]["player_2"]["score"]
+        + result["breakdown"]["player_3"]["score"]
+    )
+    assert p_sum > 0
+    assert result["total_score"] == p_sum + result["breakdown"]["case_accuracy"]["score"]
+    assert result["total_score"] > 0
+
 
