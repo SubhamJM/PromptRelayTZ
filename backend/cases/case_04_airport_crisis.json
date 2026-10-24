@@ -132,7 +132,7 @@
     "resume_condition": "K9 unit sweep certifies the blue suitcase clear of explosives, passenger Daniel Kim is verified, and written clearance from Airport Operations / Security Supervisor is issued.",
     "culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase",
     "weapon_or_method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)",
-    "key_clue": "Unattended blue suitcase at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
+    "key_clue": "Unattended blue suitcase at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim)",
     "motive": "Prevent potential explosive hazard and sterile zone breach before flight departure",
     "suspects": [
       "Daniel Kim",

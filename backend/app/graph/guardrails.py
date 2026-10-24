@@ -2,11 +2,11 @@ import re
 from typing import Any, List, Optional
 
 ACCUSATION_PATTERNS = [
-    r"(?i)\b(?:the\s+)?(?:killer|murderer|culprit|perpetrator)\s+(?:is|was|must\s+be)\s+[^.,;\n]+",
-    r"(?i)\b[^.,;\n]+\s+(?:is|was|must\s+be)\s+(?:the\s+)?(?:killer|murderer|culprit|guilty\s+of\s+murder)",
-    r"(?i)\b(?:guilty\s+suspect|true\s+culprit|identified\s+killer)\s*:\s*[^.,;\n]+",
-    r"(?i)\b(?:i\s+conclude|we\s+can\s+conclude|it\s+is\s+clear)\s+that\s+[^.,;\n]+\s+(?:killed|murdered|poisoned)",
-    r"(?i)\bconclusion\s*:\s*[^.,;\n]+(?:killed|murdered|guilty)",
+    r"(?i)\b(?:the\s+)?(?:killer|murderer|culprit|perpetrator|thief)\s+(?:is|was|must\s+be)\s+[^.,;\n]+",
+    r"(?i)\b[^.,;\n]+\s+(?:is|was|must\s+be)\s+(?:the\s+)?(?:killer|murderer|culprit|thief|guilty\s+of\s+murder|guilty\s+of\s+theft)",
+    r"(?i)\b(?:guilty\s+suspect|true\s+culprit|identified\s+killer|identified\s+thief)\s*:\s*[^.,;\n]+",
+    r"(?i)\b(?:i\s+conclude|we\s+can\s+conclude|it\s+is\s+clear)\s+that\s+[^.,;\n]+\s+(?:killed|murdered|poisoned|stole)",
+    r"(?i)\bconclusion\s*:\s*[^.,;\n]+(?:killed|murdered|guilty|stole)",
 ]
 
 FINAL_ACTION_PATTERNS = [
@@ -106,7 +106,7 @@ def sanitize_reconstructor_output(
 
         for sp in all_spoilers:
             if sp and len(sp) > 3 and sp.lower() in line.lower():
-                if any(w in line.lower() for w in ["killed", "poisoned", "murdered", "verdict", "guilty", "ground", "arrest", "killer"]):
+                if any(w in line.lower() for w in ["killed", "poisoned", "murdered", "verdict", "guilty", "ground", "arrest", "killer", "stole", "theft"]):
                     line = re.sub(rf"(?i)\b{re.escape(sp)}\b", "[Entity]", line)
 
         sanitized.append(line)

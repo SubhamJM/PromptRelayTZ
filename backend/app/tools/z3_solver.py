@@ -71,28 +71,35 @@ class Z3ConstraintSolverTool:
 
             valid_action = " AND ".join(action_parts)
         else:
-            # Logic Constraints for Murder Mystery
-            SuspectGuilty = z3.Bool("SuspectGuilty")
-            AlibiValid = z3.Bool("AlibiValid")
-            PhysicalTraceCorroborated = z3.Bool("PhysicalTraceCorroborated")
-            PoisonDeliveryProved = z3.Bool("PoisonDeliveryProved")
+            # Logic Constraints for Museum Heist
+            WingLockdown = z3.Bool("WingLockdown")
+            BreakerTripped = z3.Bool("BreakerTripped")
+            AuxiliaryFailover = z3.Bool("AuxiliaryFailover")
+            LockerSearchRequired = z3.Bool("LockerSearchRequired")
+            ForgeryDetected = z3.Bool("ForgeryDetected")
+            SuspectDetained = z3.Bool("SuspectDetained")
 
-            has_mud_trace = any(w in text for w in ["mud", "peat", "greenhouse", "boots", "footprint"])
-            has_poison_trace = any(w in text for w in ["cyanide", "sugar", "tongs", "cup", "tea", "almond", "residue"])
+            has_blackout = any(w in text for w in ["breaker", "blackout", "failover", "power", "b-04"])
+            has_forgery = any(w in text for w in ["forgery", "acrylic", "synthetic", "canvas", "tube", "rm-1887"])
+            has_locker = any(w in text for w in ["locker 14", "c-408", "consv-408", "token"])
 
-            solver.add(PhysicalTraceCorroborated == has_mud_trace)
-            solver.add(PoisonDeliveryProved == has_poison_trace)
-            solver.add(AlibiValid == z3.Not(PhysicalTraceCorroborated))
-            solver.add(SuspectGuilty == z3.And(z3.Not(AlibiValid), PoisonDeliveryProved))
+            solver.add(BreakerTripped == has_blackout)
+            solver.add(ForgeryDetected == has_forgery)
+            solver.add(LockerSearchRequired == has_locker)
+            solver.add(z3.Implies(BreakerTripped, z3.And(WingLockdown, AuxiliaryFailover)))
+            solver.add(z3.Implies(z3.And(ForgeryDetected, LockerSearchRequired), SuspectDetained))
 
             is_sat = (solver.check() == z3.sat)
-            valid_action = "Deduce primary culprit through timeline contradiction and physical forensic corroboration"
-            supporting_rules = [
-                "Forensic Trace Standard §102: Physical Evidence Overrides Uncorroborated Alibi",
-                "Timeline Inconsistency Principle: Contradiction in Suspect Movement Sequence",
-            ]
-            blocking_condition = "Conflicting suspect statement disproven by timestamped physical forensic evidence"
-            resume_condition = "Formal prosecutorial filing and presentation before magistrate"
+            valid_action = "Lockdown Wing C, search Locker 14, and detain Dr. Julian Vance and Chief Marcus Thorne for masterpiece theft and forgery swap"
+            if rules:
+                supporting_rules = list(rules[:2])
+            else:
+                supporting_rules = [
+                    "Rule SEC-401: Emergency Blackout & Wing Perimeter Lockdown Protocol",
+                    "Rule ART-302: Masterpiece Authentication & Physical Custody Standard",
+                ]
+            blocking_condition = "Breaker B-04 auxiliary failover exploited to swap canvas; Locker 14 contains CONSV-408 access badge and C-408 cloakroom token"
+            resume_condition = "Custody confirmation of Vance and Thorne, forensic recovery of original canvas, and reopening of galleries"
 
         return {
             "status": "success",

@@ -27,10 +27,11 @@ def test_list_cases():
     response = client.get("/api/game/cases")
     assert response.status_code == 200
     cases = response.json()
-    assert len(cases) >= 3
+    assert len(cases) == 2
 
     case_ids = {c["case_id"] for c in cases}
-    assert "case_01_blackwood_manor" in case_ids
+    assert "case_04_airport_crisis" in case_ids
+    assert "case_05_museum_heist" in case_ids
 
     # Ensure secrets are not leaked
     first_case = cases[0]
@@ -45,15 +46,15 @@ def test_list_cases():
 def test_start_game_specific_case():
     payload = {
         "team_name": "CyberDetectives",
-        "case_id": "case_01_blackwood_manor",
+        "case_id": "case_04_airport_crisis",
     }
     response = client.post("/api/game/start", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["session_id"].startswith("relay_")
     assert data["team_name"] == "CyberDetectives"
-    assert data["case_id"] == "case_01_blackwood_manor"
-    assert "Blackwood Manor" in data["case_title"]
+    assert data["case_id"] == "case_04_airport_crisis"
+    assert "Airport Crisis" in data["case_title"]
     assert len(data["case_file"]) > 100
 
 
@@ -80,9 +81,6 @@ def test_start_game_random_case():
     assert "session_id" in data
     assert data["team_name"] == "RandomTeam"
     assert data["case_id"] in [
-        "case_01_blackwood_manor",
-        "case_02_neon_nexus",
-        "case_03_velvet_vault",
         "case_04_airport_crisis",
         "case_05_museum_heist",
     ]
@@ -107,11 +105,11 @@ def test_full_wizard_progression(mock_step3, mock_step2, mock_step1):
         "leak_keywords_found": [],
     }
     mock_step3.return_value = {
-        "raw_agent_3_output": '{"culprit": "Dr. Arthur Bell", "method": "Cyanide in sugar", "clue": "Muddy boots and tongs"}',
+        "raw_agent_3_output": '{"culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase", "method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)", "clue": "Unattended blue suitcase at Gate B07 window seats with Daniel Kim bag tag awaiting K9 explosive clearance"}',
         "final_verdict": {
-            "culprit": "Dr. Arthur Bell",
-            "method": "Potassium cyanide in sugar cubes using silver sugar tongs",
-            "clue": "Muddy boots from greenhouse path and cyanide on tongs",
+            "culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase",
+            "method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)",
+            "clue": "Unattended blue suitcase at Gate B07 window seats with Daniel Kim bag tag awaiting K9 explosive clearance",
         },
         "_was_clean_json": True,
     }
@@ -119,7 +117,7 @@ def test_full_wizard_progression(mock_step3, mock_step2, mock_step1):
     # 1. Start session
     start_resp = client.post(
         "/api/game/start",
-        json={"team_name": "VictoryVanguard", "case_id": "case_01_blackwood_manor"},
+        json={"team_name": "VictoryVanguard", "case_id": "case_04_airport_crisis"},
     )
     assert start_resp.status_code == 200
     session_id = start_resp.json()["session_id"]
@@ -159,7 +157,7 @@ def test_full_wizard_progression(mock_step3, mock_step2, mock_step1):
     step3_data = step3_resp.json()
     assert step3_data["total_score"] == 100
     assert step3_data["grade"] == "Master Detective (S)"
-    assert step3_data["final_verdict"]["culprit"] == "Dr. Arthur Bell"
+    assert "Flight SW 472" in step3_data["final_verdict"]["culprit"]
     assert step3_data["evaluation"]["breakdown"]["culprit"]["status"] == "correct"
 
     # 5. Get Session Status
@@ -175,7 +173,7 @@ def test_out_of_order_step_rejected():
     # Start session
     start_resp = client.post(
         "/api/game/start",
-        json={"team_name": "RuleBreakers", "case_id": "case_01_blackwood_manor"},
+        json={"team_name": "RuleBreakers", "case_id": "case_04_airport_crisis"},
     )
     session_id = start_resp.json()["session_id"]
 
@@ -279,7 +277,7 @@ def test_airport_crisis_relay_progression():
 def test_prompt_length_limits_enforced():
     start_resp = client.post(
         "/api/game/start",
-        json={"team_name": "LengthTestTeam", "case_id": "case_01_blackwood_manor"},
+        json={"team_name": "LengthTestTeam", "case_id": "case_04_airport_crisis"},
     )
     assert start_resp.status_code == 200
     session_id = start_resp.json()["session_id"]

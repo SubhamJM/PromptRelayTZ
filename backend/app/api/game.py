@@ -125,9 +125,6 @@ async def start_game(
 
     SCENARIO_TO_CASE = {
         "scenario_01_airport_crisis": "case_04_airport_crisis",
-        "scenario_02_blackwood_manor": "case_01_blackwood_manor",
-        "scenario_03_neon_nexus": "case_02_neon_nexus",
-        "scenario_04_velvet_vault": "case_03_velvet_vault",
         "scenario_05_museum_heist": "case_05_museum_heist",
     }
     case_id = request.case_id or SCENARIO_TO_CASE.get(scenario.id, scenario.id)

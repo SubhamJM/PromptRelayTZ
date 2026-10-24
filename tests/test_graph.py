@@ -17,7 +17,7 @@ from backend.app.services.case_loader import get_case_loader
 @pytest.fixture
 def sample_case():
     loader = get_case_loader()
-    return loader.get_case("case_01_blackwood_manor")
+    return loader.get_case("case_05_museum_heist")
 
 
 # -------------------------------------------------------------
@@ -25,27 +25,27 @@ def sample_case():
 # -------------------------------------------------------------
 
 def test_parse_json_verdict_clean():
-    raw = '{"culprit": "Dr. Arthur Bell", "method": "Potassium cyanide", "clue": "Sugar tongs"}'
+    raw = '{"culprit": "Dr. Julian Vance", "method": "Breaker blackout", "clue": "Locker 14"}'
     parsed, was_clean = parse_json_verdict(raw)
     assert was_clean is True
-    assert parsed["culprit"] == "Dr. Arthur Bell"
-    assert parsed["method"] == "Potassium cyanide"
-    assert parsed["clue"] == "Sugar tongs"
+    assert parsed["culprit"] == "Dr. Julian Vance"
+    assert parsed["method"] == "Breaker blackout"
+    assert parsed["clue"] == "Locker 14"
 
 
 def test_parse_json_verdict_markdown_fenced():
-    raw = '```json\n{"culprit": "Dr. Arthur Bell", "method": "Cyanide in sugar", "clue": "Muddy boots"}\n```'
+    raw = '```json\n{"culprit": "Dr. Julian Vance", "method": "Breaker blackout", "clue": "Locker 14"}\n```'
     parsed, was_clean = parse_json_verdict(raw)
     assert was_clean is True
-    assert parsed["culprit"] == "Dr. Arthur Bell"
+    assert parsed["culprit"] == "Dr. Julian Vance"
 
 
 def test_parse_json_verdict_conversational_wrapper():
-    raw = 'Based on the timeline, here is my verdict:\n{"culprit": "Dr. Arthur Bell", "method": "Cyanide", "clue": "Muddy boots"}\nLet me know if you need more details.'
+    raw = 'Based on the timeline, here is my verdict:\n{"culprit": "Dr. Julian Vance", "method": "Breaker blackout", "clue": "Locker 14"}\nLet me know if you need more details.'
     parsed, was_clean = parse_json_verdict(raw)
     assert was_clean is False  # Had outside conversational text
-    assert parsed["culprit"] == "Dr. Arthur Bell"
-    assert parsed["method"] == "Cyanide"
+    assert parsed["culprit"] == "Dr. Julian Vance"
+    assert parsed["method"] == "Breaker blackout"
 
 
 def test_parse_json_verdict_broken():
@@ -61,9 +61,9 @@ def test_parse_json_verdict_broken():
 
 def test_evaluator_perfect_score(sample_case):
     verdict = {
-        "culprit": "Dr. Arthur Bell",
-        "method": "Potassium cyanide in sugar cubes using silver sugar tongs",
-        "clue": "Dr. Bell's muddy boots from the greenhouse path and cyanide on tongs",
+        "culprit": "Dr. Julian Vance",
+        "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+        "clue": "Conservation staff access card CONSV-408 and Private Vault cloakroom token C-408 recovered from Locker 14, matching Dr. Julian Vance (Badge CONSV-04 / Conservation), Thorne's sub-station sabotage alibi contradiction, and modern acrylic forgery RM-1887-04",
     }
     result = evaluate_verdict(
         final_verdict=verdict,
@@ -82,9 +82,9 @@ def test_evaluator_perfect_score(sample_case):
 
 def test_evaluator_wrong_culprit(sample_case):
     verdict = {
-        "culprit": "Charles Blackwood",
-        "method": "Poisoned tea",
-        "clue": "Threatening letter in violet ink",
+        "culprit": "Officer J. Carter",
+        "method": "Unlocked gate",
+        "clue": "Dropped keys",
     }
     result = evaluate_verdict(
         final_verdict=verdict,
@@ -99,9 +99,9 @@ def test_evaluator_wrong_culprit(sample_case):
 
 def test_evaluator_pure_merit_score(sample_case):
     verdict = {
-        "culprit": "Dr. Arthur Bell",
-        "method": "Cyanide poison",
-        "clue": "Muddy boots and tongs",
+        "culprit": "Dr. Julian Vance",
+        "method": "Breaker B-04 intentional blackout to swap canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+        "clue": "Conservation staff access card CONSV-408 and Private Vault cloakroom token C-408 recovered from Locker 14, matching Dr. Julian Vance and modern acrylic forgery RM-1887-04",
     }
     result = evaluate_verdict(
         final_verdict=verdict,
@@ -130,14 +130,14 @@ def test_node_1_extractor(sample_case):
 
 def test_node_1_extractor_guardrail_sanitizes_premature_solving(sample_case):
     # LLM accidentally tries to name the culprit in Step 1
-    mock_llm = FakeListChatModel(responses=["Facts: Tea was served. The killer is Dr. Arthur Bell who is guilty."])
+    mock_llm = FakeListChatModel(responses=["Facts: Breaker tripped. The culprit is Dr. Julian Vance who stole the painting."])
     state: GameState = {
         "case_file": sample_case.noisy_case_file,
         "user_1_prompt": "Who did it?",
         "ground_truth": sample_case.ground_truth.model_dump(),
     }
     output = agent_1_extractor(state, llm=mock_llm)
-    assert "The killer is Dr. Arthur Bell" not in output["agent_1_output"]
+    assert "The culprit is Dr. Julian Vance" not in output["agent_1_output"]
 
 
 def test_node_2_reconstructor_safe(sample_case):
@@ -154,27 +154,27 @@ def test_node_2_reconstructor_safe(sample_case):
 
 def test_node_2_reconstructor_guardrail_sanitizes_accusation(sample_case):
     # LLM accidentally includes an accusation in Step 2
-    mock_llm = FakeListChatModel(responses=["8:00 PM tea served. The killer is Dr. Arthur Bell who poisoned Reginald."])
+    mock_llm = FakeListChatModel(responses=["23:40 blackout occurred. The thief is Dr. Julian Vance who stole the painting."])
     state: GameState = {
-        "agent_1_output": "8:00 PM tea, 9:05 PM doctor arrived.",
+        "agent_1_output": "21:15 gala began, 23:40 blackout.",
         "user_2_prompt": "Build timeline.",
         "ground_truth": sample_case.ground_truth.model_dump(),
         "leak_keywords": sample_case.leak_keywords,
     }
     output = agent_2_reconstructor(state, llm=mock_llm)
     # Guardrail ensures the accusation is scrubbed before reaching Player 3
-    assert "The killer is Dr. Arthur Bell" not in output["agent_2_output"]
+    assert "The thief is Dr. Julian Vance" not in output["agent_2_output"]
 
 
 def test_node_3_detective(sample_case):
-    json_response = '{"culprit": "Dr. Arthur Bell", "method": "Cyanide", "clue": "Muddy boots"}'
+    json_response = '{"culprit": "Dr. Julian Vance", "method": "Breaker blackout", "clue": "Locker 14"}'
     mock_llm = FakeListChatModel(responses=[json_response])
     state: GameState = {
         "agent_2_output": "Timeline of events...",
         "user_3_prompt": "Who did it? Output JSON.",
     }
     output = agent_3_detective(state, llm=mock_llm)
-    assert output["final_verdict"]["culprit"] == "Dr. Arthur Bell"
+    assert output["final_verdict"]["culprit"] == "Dr. Julian Vance"
     assert output["_was_clean_json"] is True
 
 
@@ -183,9 +183,9 @@ def test_node_3_detective(sample_case):
 # -------------------------------------------------------------
 
 def test_full_relay_graph_execution(sample_case):
-    step1_response = "Fact 1: Tea served with sugar. Fact 2: Mud on boots. Fact 3: Charity audit document."
-    step2_response = "Timeline: 8:00 PM tea served. 8:35 PM footsteps. 9:05 PM guest arrived."
-    step3_response = '{"culprit": "Dr. Arthur Bell", "method": "Potassium cyanide in sugar cubes", "clue": "Muddy boots from greenhouse path and cyanide on sugar tongs"}'
+    step1_response = "Fact 1: Breaker B-04 tripped at 23:40:42. Fact 2: Locker 14 in basement."
+    step2_response = "Timeline: 21:15 gala began. 23:40 blackout. 23:48 locker search."
+    step3_response = '{"culprit": "Dr. Julian Vance", "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302", "clue": "Conservation staff access card CONSV-408 and Private Vault cloakroom token C-408 recovered from Locker 14, matching Dr. Julian Vance (Badge CONSV-04 / Conservation), Thorne\'s sub-station sabotage alibi contradiction, and modern acrylic forgery RM-1887-04"}'
 
     mock_llm = FakeListChatModel(responses=[step1_response, step2_response, step3_response])
     graph = create_relay_graph(llm=mock_llm)
@@ -273,16 +273,15 @@ def test_evaluator_weak_prompt_verdict(sample_case):
 def test_evaluator_moderate_prompt_verdict(sample_case):
     """Moderate prompt identifies culprit and broad method, but misses specific mechanism and decisive clue."""
     verdict = {
-        "culprit": "Dr. Arthur Bell",
-        "method": "Poisoning",
-        "clue": "Present in the manor",
+        "culprit": "Dr. Julian Vance",
+        "method": "Breaker blackout",
+        "clue": "Present in museum",
     }
     result = evaluate_verdict(
         final_verdict=verdict,
         ground_truth=sample_case.ground_truth.model_dump(),
         was_clean_json=True,
     )
-    # Culprit = 40, Method (partial) = 15, Clue (generic/missed) = 0, Format = 15 -> 70 pts
     assert result["total_score"] >= 55
     assert result["breakdown"]["culprit"]["status"] == "correct"
     assert result["breakdown"]["culprit"]["points"] == 40
@@ -292,18 +291,18 @@ def test_evaluator_moderate_prompt_verdict(sample_case):
 def test_evaluator_unspecified_narrative_does_not_reject_verdict(sample_case):
     """Verifies that natural language containing 'unspecified' in narrative fields does not falsely reject the match."""
     verdict = {
-        "culprit": "Dr. Arthur Bell",
-        "method": "Contaminated the Demerara sugar cubes and silver tongs with potassium cyanide during the unattended window on the drawing room sideboard (8:05-8:15 PM), later ingested by Lord Reginald Blackwood around 8:55-9:00 PM.",
-        "motive": "Unspecified financial or personal gain leading to the premeditated murder of Lord Reginald Blackwood.",
-        "rule_broken": "Forensic Trace Standard §102 & Timeline Discrepancy Principle",
+        "culprit": "Dr. Julian Vance",
+        "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14.",
+        "motive": "Unspecified financial or personal gain leading to illicit export of the painting.",
+        "rule_broken": "Rule SEC-401 & Rule ART-302",
     }
     result = evaluate_verdict(
         final_verdict=verdict,
         ground_truth=sample_case.ground_truth.model_dump(),
-        user_1_prompt="Role: Extractor. Extract people Arthur Bell, time 8:00, location drawing room.",
-        agent_1_output="Extracted facts: Arthur Bell present at 8:00 PM in drawing room.",
-        user_2_prompt="Role: Reconstructor. First Arthur Bell served tea, next lights out at 8:30.",
-        agent_2_output="Timeline: 8:05 tea served. 8:30 lights out. 8:55 ingestion.",
+        user_1_prompt="Role: Extractor. Extract people Julian Vance, time 21:15, location gallery.",
+        agent_1_output="Extracted facts: Julian Vance present at 21:15 in gallery.",
+        user_2_prompt="Role: Reconstructor. First Julian Vance attended gala, next blackout occurred at 23:40.",
+        agent_2_output="Timeline: 21:15 gala began. 23:40 blackout. 23:48 locker search.",
         user_3_prompt="Analyze rules and output culprit, method, clue in json format.",
         agent_3_output=json.dumps(verdict),
         was_clean_json=True,
@@ -320,17 +319,17 @@ def test_evaluator_unspecified_narrative_does_not_reject_verdict(sample_case):
 def test_evaluator_incorrect_verdict_preserves_prompt_scores(sample_case):
     """Verifies that an incorrect final verdict does not wipe player prompt engineering points to 0."""
     wrong_verdict = {
-        "culprit": "Charles Blackwood",
-        "method": "Arsenic in evening mutton",
-        "clue": "Torn threatening letter in violet ink",
+        "culprit": "Officer J. Carter",
+        "method": "Left gate unlocked during perimeter patrol",
+        "clue": "Dropped patrol keys by fire escape",
     }
     result = evaluate_verdict(
         final_verdict=wrong_verdict,
         ground_truth=sample_case.ground_truth.model_dump(),
-        user_1_prompt="Role: Extractor. Extract people Arthur Bell, time 8:00, location drawing room.",
-        agent_1_output="Extracted facts: Arthur Bell present at 8:00 PM in drawing room.",
-        user_2_prompt="Role: Reconstructor. First Arthur Bell served tea, next lights out at 8:30.",
-        agent_2_output="Timeline: 8:05 tea served. 8:30 lights out. 8:55 ingestion.",
+        user_1_prompt="Role: Extractor. Extract people Julian Vance, time 21:15, location gallery.",
+        agent_1_output="Extracted facts: Julian Vance present at 21:15 in gallery.",
+        user_2_prompt="Role: Reconstructor. First Julian Vance attended gala, next blackout occurred at 23:40.",
+        agent_2_output="Timeline: 21:15 gala began. 23:40 blackout. 23:48 locker search.",
         user_3_prompt="Analyze rules and output culprit, method, clue in json format.",
         agent_3_output=json.dumps(wrong_verdict),
         was_clean_json=True,

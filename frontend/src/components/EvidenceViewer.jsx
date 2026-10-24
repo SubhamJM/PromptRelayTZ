@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, ZoomIn, Lightbulb, FileText, Camera } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn, Lightbulb } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
 
 export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = false }) {
@@ -14,16 +14,15 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
 
   if (!scenario) return null;
 
-  const isImageBased = scenario.type === "image";
   const items = scenario.evidence_items || [];
 
-  // Dynamic categories for image or text scenarios
+  // Dynamic categories for evidence items
   const dynamicCategories = [
     "all",
     ...Array.from(new Set(items.map((item) => item.category).filter(Boolean))),
   ];
 
-  // Filter items for image scenarios
+  // Filter items
   const filteredItems = items.filter((item) => {
     if (evidenceFilter === "all") return true;
     return item.category === evidenceFilter;
@@ -41,81 +40,6 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
     setActiveEvidenceIndex((activeEvidenceIndex + 1) % items.length);
   };
 
-  if (!isImageBased) {
-    // TEXT-BASED SCENARIO VIEWER
-    return (
-      <div className="space-y-4">
-        <div className="rounded-2xl border border-amber-500/30 bg-slate-900/90 shadow-xl overflow-hidden">
-          <div className="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-amber-400" />
-              <h3 className="text-sm font-bold text-slate-100 font-serif">
-                Case Dossier: {scenario.title}
-              </h3>
-            </div>
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/30 font-semibold">
-              Difficulty: {scenario.difficulty}
-            </span>
-          </div>
-
-          {/* Document Tabs */}
-          <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs font-mono">
-            <button
-              onClick={() => setActiveEvidenceIndex(-1)}
-              className={`px-3 py-1 rounded-lg transition shrink-0 cursor-pointer ${
-                activeEvidenceIndex === -1
-                  ? "bg-amber-500 text-slate-950 font-bold"
-                  : "bg-slate-900 text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              Full Briefing
-            </button>
-            {items.map((doc, idx) => (
-              <button
-                key={doc.id}
-                onClick={() => setActiveEvidenceIndex(idx)}
-                className={`px-3 py-1 rounded-lg transition shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  activeEvidenceIndex === idx
-                    ? "bg-amber-500 text-slate-950 font-bold"
-                    : "bg-slate-900 text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                <span>{doc.title}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Active Content Box */}
-          <div className="p-4 max-h-[340px] overflow-y-auto text-xs sm:text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap">
-            {activeEvidenceIndex === -1 || !activeItem ? (
-              scenario.dossier_text
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="font-bold text-amber-300">{activeItem.title}</span>
-                  <span className="text-slate-500 text-[11px]">{activeItem.badge}</span>
-                </div>
-                <p className="text-slate-300">{activeItem.description}</p>
-                {activeItem.ocr_ledger && (
-                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-slate-300">
-                    {activeItem.ocr_ledger}
-                  </div>
-                )}
-                {activeItem.prompt_hint && (
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                    <p>{activeItem.prompt_hint}</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // IMAGE-BASED SCENARIO VIEWER
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-blue-500/40 bg-slate-900/90 shadow-2xl overflow-hidden">

@@ -23,6 +23,9 @@ def create_mock_session(
     format_score: int = 15,
 ) -> GameSession:
     """Helper to construct a mock completed GameSession."""
+    culprit_val = case.ground_truth.culprit
+    method_val = case.ground_truth.weapon_or_method
+    clue_val = case.ground_truth.key_clue
     return GameSession(
         session_id=session_id,
         team_name=team_name,
@@ -36,15 +39,15 @@ def create_mock_session(
             "ground_truth": case.ground_truth.model_dump(),
             "leak_keywords": case.leak_keywords,
             "user_1_prompt": "Extract facts without spoilers.",
-            "agent_1_output": "Extracted facts: Earl Grey tea, 8:00 PM.",
+            "agent_1_output": "Extracted facts: Gate B07, 08:49 AM.",
             "user_2_prompt": "Synthesize timeline without naming culprit.",
             "agent_2_output": "Timeline synthesized.",
-            "user_3_prompt": "Who is the killer? Return JSON.",
-            "raw_agent_3_output": '{"culprit": "Dr. Arthur Bell"}',
+            "user_3_prompt": "Determine valid action. Return JSON.",
+            "raw_agent_3_output": f'{{"culprit": "{culprit_val}"}}',
             "final_verdict": {
-                "culprit": "Dr. Arthur Bell",
-                "method": "Potassium cyanide in sugar cubes",
-                "clue": "Muddy boots from greenhouse path",
+                "culprit": culprit_val,
+                "method": method_val,
+                "clue": clue_val,
             },
             "evaluation": {
                 "total_score": total_score,
@@ -78,7 +81,7 @@ def test_save_and_retrieve_match(tmp_path: Path):
     db_file = tmp_path / "test_match.sqlite"
     db = MatchDatabase(db_path=db_file)
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     session = create_mock_session("relay_001", "SherlockSquad", case, total_score=95, grade="Master Detective (S)")
     db.save_match(session, completed_at="2026-09-24T12:00:00+00:00")
@@ -87,17 +90,17 @@ def test_save_and_retrieve_match(tmp_path: Path):
     assert match is not None
     assert match["session_id"] == "relay_001"
     assert match["team_name"] == "SherlockSquad"
-    assert match["case_id"] == "case_01_blackwood_manor"
+    assert match["case_id"] == "case_04_airport_crisis"
     assert match["total_score"] == 95
     assert match["grade"] == "Master Detective (S)"
     assert match["culprit_score"] == 40
     assert match["method_score"] == 25
     assert match["clue_score"] == 20
     assert match["format_score"] == 15
-    assert match["final_verdict"]["culprit"] == "Dr. Arthur Bell"
+    assert match["final_verdict"]["culprit"] == case.ground_truth.culprit
     assert match["evaluation"]["total_score"] == 95
     assert match["user_1_prompt"] == "Extract facts without spoilers."
-    assert match["agent_1_output"] == "Extracted facts: Earl Grey tea, 8:00 PM."
+    assert match["agent_1_output"] == "Extracted facts: Gate B07, 08:49 AM."
 
 
 def test_get_match_not_found(tmp_path: Path):
@@ -110,7 +113,7 @@ def test_leaderboard_ranking_and_tie_breaking(tmp_path: Path):
     db_file = tmp_path / "test_ranking.sqlite"
     db = MatchDatabase(db_path=db_file)
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     # Team Alpha: 100 points, completed at 10:00
     s_alpha = create_mock_session("relay_alpha", "Team Alpha", case, total_score=100)
@@ -152,7 +155,7 @@ def test_leaderboard_limit(tmp_path: Path):
     db_file = tmp_path / "test_limit.sqlite"
     db = MatchDatabase(db_path=db_file)
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     for i in range(5):
         s = create_mock_session(f"relay_{i}", f"Team {i}", case, total_score=50 + i * 10)
@@ -170,7 +173,7 @@ def test_upsert_existing_session(tmp_path: Path):
     db_file = tmp_path / "test_upsert.sqlite"
     db = MatchDatabase(db_path=db_file)
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     session = create_mock_session("relay_upsert", "OriginalTeam", case, total_score=60)
     db.save_match(session)
@@ -189,7 +192,7 @@ def test_clear_database(tmp_path: Path):
     db_file = tmp_path / "test_clear.sqlite"
     db = MatchDatabase(db_path=db_file)
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     db.save_match(create_mock_session("relay_001", "Team 1", case))
     assert len(db.get_leaderboard()) == 1
@@ -222,7 +225,7 @@ def test_api_empty_leaderboard(clean_db: MatchDatabase):
 
 def test_api_leaderboard_with_records(clean_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
 
     s1 = create_mock_session("relay_api_1", "BinaryBakers", case, total_score=90, grade="Lead Investigator (A)")
     s2 = create_mock_session("relay_api_2", "QuantumQuirks", case, total_score=100, grade="Master Detective (S)")
@@ -248,7 +251,7 @@ def test_api_leaderboard_with_records(clean_db: MatchDatabase):
 
 def test_api_delete_leaderboard(clean_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     clean_db.save_match(create_mock_session("relay_to_delete", "DoomedTeam", case))
 
     assert len(clean_db.get_leaderboard()) == 1
@@ -278,17 +281,17 @@ def test_api_match_completion_persists_to_leaderboard(
         "leak_keywords_found": [],
     }
     mock_step3.return_value = {
-        "raw_agent_3_output": '{"culprit": "Dr. Arthur Bell", "method": "Cyanide", "clue": "Muddy boots"}',
+        "raw_agent_3_output": '{"culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase", "method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)", "clue": "Unattended blue suitcase at Gate B07 window seats with Daniel Kim bag tag awaiting K9 explosive clearance"}',
         "final_verdict": {
-            "culprit": "Dr. Arthur Bell",
-            "method": "Potassium cyanide in sugar cubes using silver sugar tongs",
-            "clue": "Muddy boots from greenhouse path and cyanide on tongs",
+            "culprit": "Hold Flight SW 472 at Gate B07 and dispatch K9 unit to inspect unattended blue suitcase",
+            "method": "Rule SEC-101 (Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold)",
+            "clue": "Unattended blue suitcase at Gate B07 window seats with Daniel Kim bag tag awaiting K9 explosive clearance",
         },
         "_was_clean_json": True,
     }
 
     # 1. Start game
-    start = client.post("/api/game/start", json={"team_name": "RelayRoyals", "case_id": "case_01_blackwood_manor"})
+    start = client.post("/api/game/start", json={"team_name": "RelayRoyals", "case_id": "case_04_airport_crisis"})
     assert start.status_code == 200
     sess_id = start.json()["session_id"]
 

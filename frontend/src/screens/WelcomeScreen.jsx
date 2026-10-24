@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, Plane, Search, Shield, Brain, Layers, Landmark } from "lucide-react";
+import { ArrowRight, Plane, Landmark, CheckCircle2 } from "lucide-react";
 import { api } from "../api/client";
 import { useGameStore } from "../store/useGameStore";
 
@@ -7,20 +7,22 @@ export function WelcomeScreen() {
   const { startGame, isLoading } = useGameStore();
   const [teamName, setTeamName] = useState("");
   const [scenarios, setScenarios] = useState([]);
-  const [selectedType, setSelectedType] = useState("image"); // "image" or "text"
   const [selectedScenarioId, setSelectedScenarioId] = useState("scenario_01_airport_crisis");
 
   useEffect(() => {
-    api.getScenarios().then((list) => {
-      setScenarios(list);
-      // Default to airport crisis if present
-      const airport = list.find((s) => s.id === "scenario_01_airport_crisis");
-      if (airport) {
-        setSelectedScenarioId(airport.id);
-      } else if (list.length > 0) {
-        setSelectedScenarioId(list[0].id);
-      }
-    }).catch(console.error);
+    api
+      .getScenarios()
+      .then((list) => {
+        setScenarios(list);
+        // Default to airport crisis if present, else first scenario
+        const airport = list.find((s) => s.id === "scenario_01_airport_crisis");
+        if (airport) {
+          setSelectedScenarioId(airport.id);
+        } else if (list.length > 0) {
+          setSelectedScenarioId(list[0].id);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleStart = (e) => {
@@ -32,10 +34,7 @@ export function WelcomeScreen() {
     startGame(teamName, selectedScenarioId);
   };
 
-  const imageScenarios = scenarios.filter((s) => s.type === "image");
-  const textScenarios = scenarios.filter((s) => s.type === "text");
-  const activeImageScenario = imageScenarios.find((s) => s.id === selectedScenarioId) || imageScenarios[0] || {};
-  const isMuseum = selectedScenarioId === "scenario_05_museum_heist";
+  const activeScenario = scenarios.find((s) => s.id === selectedScenarioId) || scenarios[0] || {};
 
   return (
     <section className="space-y-8 animate-fade-in max-w-4xl mx-auto w-full py-4">
@@ -124,194 +123,141 @@ export function WelcomeScreen() {
           />
         </div>
 
-        {/* Challenge Category Selector */}
+        {/* Challenge Scenario Selector */}
         <div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <label className="block text-xs font-mono text-slate-300 uppercase tracking-wider">
-              Select Challenge Scenario Category
+              Select Visual Investigation Case
             </label>
             <span className="text-[11px] font-mono text-blue-400 font-semibold">
-              {selectedType === "image"
-                ? "Active: 🖼️ Image-Based Stories"
-                : "Active: 📝 Text-Based Stories"}
+              2 Visual Cases Available
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Mode 1: Image-Based Stories */}
+            {/* Story 1: Airport Crisis */}
             <div
-              onClick={() => {
-                setSelectedType("image");
-                if (imageScenarios.length > 0 && !imageScenarios.some((s) => s.id === selectedScenarioId)) {
-                  setSelectedScenarioId(imageScenarios[0].id);
-                }
-              }}
+              onClick={() => setSelectedScenarioId("scenario_01_airport_crisis")}
               className={`cursor-pointer rounded-2xl p-5 transition flex flex-col justify-between space-y-3 ${
-                selectedType === "image"
+                selectedScenarioId === "scenario_01_airport_crisis"
                   ? "border-2 border-blue-500 bg-blue-950/30 shadow-lg shadow-blue-500/15 ring-1 ring-blue-500/30"
-                  : "border border-slate-800 bg-slate-950/70 hover:bg-slate-850"
+                  : "border border-slate-800 bg-slate-950/70 hover:bg-slate-850 hover:border-slate-700"
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 font-mono text-[10px] font-bold border border-blue-500/30 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                    🖼️ IMAGE-BASED STORIES
+                    CASE 01 • AIRPORT CRISIS
                   </span>
                   <span
-                    className={`w-3.5 h-3.5 rounded-full ${
-                      selectedType === "image"
+                    className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                      selectedScenarioId === "scenario_01_airport_crisis"
                         ? "bg-blue-400 ring-4 ring-blue-500/30"
                         : "bg-slate-700"
                     }`}
-                  />
+                  >
+                    {selectedScenarioId === "scenario_01_airport_crisis" && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-950" />
+                    )}
+                  </span>
                 </div>
                 <h4 className="font-bold text-slate-100 text-base flex items-center gap-2">
-                  {isMuseum ? (
-                    <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
-                  ) : (
-                    <Plane className="w-4 h-4 text-blue-400 shrink-0" />
-                  )}
-                  <span>{activeImageScenario.title || "Visual Case Investigation"}</span>
+                  <Plane className="w-4 h-4 text-blue-400 shrink-0" />
+                  <span>Flight SW 472: Baggage Contraband</span>
                 </h4>
                 <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                  {isMuseum
-                    ? "CCTV Wing C & basement feeds, SCADA power telemetry, lab spectrometry, architectural blueprints, and evidence locker tokens."
-                    : "Surveillance CCTV feeds, digital boarding monitors, passenger WhatsApp chats, security logs, and physical luggage tags with step-by-step hints."}
+                  Surveillance CCTV feeds, digital boarding monitors, passenger WhatsApp chats,
+                  security logs, and physical luggage tags at Gate B07.
                 </p>
               </div>
 
-              {/* Scenario dropdown for image-based choices */}
-              {imageScenarios.length > 1 && (
-                <div className="pt-2 border-t border-blue-500/20">
-                  <label className="block text-[10px] font-mono text-blue-300 uppercase mb-1">
-                    Select Visual Investigation Case:
-                  </label>
-                  <select
-                    value={selectedScenarioId}
-                    onChange={(e) => {
-                      setSelectedScenarioId(e.target.value);
-                      setSelectedType("image");
-                    }}
-                    className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-blue-500/40 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-400 cursor-pointer"
-                  >
-                    {imageScenarios.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.title} ({s.difficulty})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               {/* Photo Previews */}
-              <div className="pt-2 border-t border-blue-500/20 flex items-center gap-2 overflow-hidden">
-                {isMuseum ? (
-                  <>
-                    <img
-                      src="/images_for_museum/01_cctv_gallery.png"
-                      alt="CAM-04"
-                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
-                    />
-                    <img
-                      src="/images_for_museum/02_scada_console.png"
-                      alt="SCADA"
-                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
-                    />
-                    <img
-                      src="/images_for_museum/04_conservation_lab.png"
-                      alt="Lab"
-                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
-                    />
-                    <img
-                      src="/images_for_museum/09_evidence_locker14.png"
-                      alt="Locker 14"
-                      className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
-                    />
-                    <span className="text-[10px] font-mono text-amber-300 font-bold ml-1">+6 more</span>
-                  </>
-                ) : (
-                  <>
-                    <img
-                      src="/image_data/01_cctv_checkin.png"
-                      alt="CCTV"
-                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                    />
-                    <img
-                      src="/image_data/04_flight_display.png"
-                      alt="FIDS"
-                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                    />
-                    <img
-                      src="/image_data/05_passenger_messages.png"
-                      alt="Chat"
-                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                    />
-                    <img
-                      src="/image_data/09_baggage_tag.png"
-                      alt="Tag"
-                      className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
-                    />
-                    <span className="text-[10px] font-mono text-blue-300 font-bold ml-1">+6 more</span>
-                  </>
-                )}
+              <div className="pt-3 border-t border-blue-500/20 flex items-center gap-2 overflow-hidden">
+                <img
+                  src="/image_data/01_cctv_checkin.png"
+                  alt="CCTV"
+                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                />
+                <img
+                  src="/image_data/04_flight_display.png"
+                  alt="FIDS"
+                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                />
+                <img
+                  src="/image_data/05_passenger_messages.png"
+                  alt="Chat"
+                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                />
+                <img
+                  src="/image_data/09_baggage_tag.png"
+                  alt="Tag"
+                  className="w-14 h-8 object-cover rounded border border-blue-500/40 shrink-0"
+                />
+                <span className="text-[10px] font-mono text-blue-300 font-bold ml-1">+6 more</span>
               </div>
             </div>
 
-            {/* Mode 2: Text-Based Stories */}
+            {/* Story 2: Museum Heist */}
             <div
-              onClick={() => {
-                setSelectedType("text");
-                if (textScenarios.length > 0) setSelectedScenarioId(textScenarios[0].id);
-              }}
+              onClick={() => setSelectedScenarioId("scenario_05_museum_heist")}
               className={`cursor-pointer rounded-2xl p-5 transition flex flex-col justify-between space-y-3 ${
-                selectedType === "text"
+                selectedScenarioId === "scenario_05_museum_heist"
                   ? "border-2 border-amber-500 bg-amber-950/30 shadow-lg shadow-amber-500/15 ring-1 ring-amber-500/30"
-                  : "border border-slate-800 bg-slate-950/70 hover:bg-slate-850"
+                  : "border border-slate-800 bg-slate-950/70 hover:bg-slate-850 hover:border-slate-700"
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-mono text-[10px] font-bold border border-slate-700">
-                    📝 TEXT-BASED STORIES
+                  <span className="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    CASE 02 • MUSEUM HEIST
                   </span>
                   <span
-                    className={`w-3.5 h-3.5 rounded-full ${
-                      selectedType === "text"
+                    className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                      selectedScenarioId === "scenario_05_museum_heist"
                         ? "bg-amber-400 ring-4 ring-amber-500/30"
                         : "bg-slate-700"
                     }`}
-                  />
+                  >
+                    {selectedScenarioId === "scenario_05_museum_heist" && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-950" />
+                    )}
+                  </span>
                 </div>
-                <h4 className="font-bold text-slate-200 text-base flex items-center gap-2">
-                  <Search className="w-4 h-4 text-amber-400" />
-                  <span>Murder Mystery Investigations</span>
+                <h4 className="font-bold text-slate-100 text-base flex items-center gap-2">
+                  <Landmark className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>The Celestial Madonna: Museum Heist</span>
                 </h4>
-                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                  Classic detective dossiers, coroner autopsy reports, witness statements, and alibis
-                  solved through 3 text reasoning agents.
+                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                  CCTV Wing C & basement feeds, SCADA power telemetry, lab spectrometry,
+                  architectural blueprints, and evidence locker tokens.
                 </p>
               </div>
 
-              {/* Scenario dropdown */}
-              <div className="pt-2 border-t border-slate-800">
-                <label className="block text-[10px] font-mono text-slate-400 uppercase mb-1">
-                  Select Mystery Dossier:
-                </label>
-                <select
-                  value={selectedScenarioId}
-                  onChange={(e) => {
-                    setSelectedScenarioId(e.target.value);
-                    setSelectedType("text");
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-400 cursor-pointer"
-                >
-                  {textScenarios.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.title} ({s.difficulty})
-                    </option>
-                  ))}
-                </select>
+              {/* Photo Previews */}
+              <div className="pt-3 border-t border-amber-500/20 flex items-center gap-2 overflow-hidden">
+                <img
+                  src="/images_for_museum/01_cctv_gallery.png"
+                  alt="CAM-04"
+                  className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                />
+                <img
+                  src="/images_for_museum/02_scada_console.png"
+                  alt="SCADA"
+                  className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                />
+                <img
+                  src="/images_for_museum/04_conservation_lab.png"
+                  alt="Lab"
+                  className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                />
+                <img
+                  src="/images_for_museum/09_evidence_locker14.png"
+                  alt="Locker 14"
+                  className="w-14 h-8 object-cover rounded border border-amber-500/40 shrink-0"
+                />
+                <span className="text-[10px] font-mono text-amber-300 font-bold ml-1">+6 more</span>
               </div>
             </div>
           </div>
@@ -324,7 +270,7 @@ export function WelcomeScreen() {
           className="w-full py-4 px-6 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-extrabold text-sm transition transform active:scale-[0.98] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           <span>
-            Launch {selectedType === "image" ? (isMuseum ? "Museum Heist Investigation" : "Flight 472 Operation") : "Mystery Investigation"}
+            Launch {selectedScenarioId === "scenario_05_museum_heist" ? "Museum Heist Investigation" : "Flight 472 Operation"}
           </span>
           <ArrowRight className="w-4 h-4" />
         </button>

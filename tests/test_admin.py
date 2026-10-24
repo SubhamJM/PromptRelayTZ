@@ -36,8 +36,8 @@ def test_admin_stats_empty(clean_admin_db: MatchDatabase):
 
 def test_admin_stats_with_data(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case1 = loader.get_case("case_01_blackwood_manor")
-    case2 = loader.get_case("case_02_neon_nexus")
+    case1 = loader.get_case("case_04_airport_crisis")
+    case2 = loader.get_case("case_05_museum_heist")
 
     s1 = create_mock_session("relay_s1", "Team 1", case1, total_score=100, culprit_score=40)
     s2 = create_mock_session("relay_s2", "Team 2", case1, total_score=80, culprit_score=40)
@@ -57,12 +57,12 @@ def test_admin_stats_with_data(clean_admin_db: MatchDatabase):
     assert data["perfect_or_s_count"] == 1
     assert data["culprit_solved_count"] == 2
     assert data["culprit_solve_rate"] == pytest.approx(66.7, 0.1)
-    assert "Blackwood Manor" in data["most_popular_case"]
+    assert "Airport Crisis" in data["most_popular_case"]
 
 
 def test_admin_list_and_get_matches(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     s = create_mock_session("relay_inspect_1", "SherlockTrio", case, total_score=95)
     clean_admin_db.save_match(s)
 
@@ -81,7 +81,7 @@ def test_admin_list_and_get_matches(clean_admin_db: MatchDatabase):
     assert detail_res.status_code == 200
     detail = detail_res.json()
     assert detail["session_id"] == "relay_inspect_1"
-    assert detail["final_verdict"]["culprit"] == "Dr. Arthur Bell"
+    assert detail["final_verdict"]["culprit"] == case.ground_truth.culprit
     assert detail["evaluation"]["total_score"] == 95
 
     # 404 for nonexistent match
@@ -91,7 +91,7 @@ def test_admin_list_and_get_matches(clean_admin_db: MatchDatabase):
 
 def test_admin_delete_single_match(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     s1 = create_mock_session("relay_keep", "Keepers", case, total_score=80)
     s2 = create_mock_session("relay_delete", "Deleters", case, total_score=20)
     clean_admin_db.save_match(s1)
@@ -115,7 +115,7 @@ def test_admin_delete_single_match(clean_admin_db: MatchDatabase):
 
 def test_admin_export_csv(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     s = create_mock_session("relay_csv_1", "DataWizards", case, total_score=100)
     clean_admin_db.save_match(s)
 
@@ -131,7 +131,7 @@ def test_admin_export_csv(clean_admin_db: MatchDatabase):
 
 def test_admin_export_json(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     s = create_mock_session("relay_json_1", "JsonJedi", case, total_score=90)
     clean_admin_db.save_match(s)
 
@@ -151,7 +151,7 @@ def test_admin_cases_inspector():
     response = client.get("/api/admin/cases")
     assert response.status_code == 200
     cases = response.json()
-    assert len(cases) >= 3
+    assert len(cases) >= 2
     for c in cases:
         assert "case_id" in c
         assert "title" in c
@@ -162,7 +162,7 @@ def test_admin_cases_inspector():
 
 def test_admin_reset_tournament(clean_admin_db: MatchDatabase):
     loader = get_case_loader()
-    case = loader.get_case("case_01_blackwood_manor")
+    case = loader.get_case("case_04_airport_crisis")
     clean_admin_db.save_match(create_mock_session("relay_wipe", "WipeSquad", case))
 
     assert len(clean_admin_db.get_all_matches()) == 1
@@ -216,7 +216,7 @@ def test_admin_create_and_delete_custom_case():
 
 
 def test_admin_delete_builtin_case_rejected():
-    res = client.delete("/api/admin/cases/case_01_blackwood_manor")
+    res = client.delete("/api/admin/cases/case_04_airport_crisis")
     assert res.status_code == 400
     assert "cannot delete built-in case" in res.json()["detail"].lower()
 
@@ -255,9 +255,9 @@ def test_mock_offline_chat_model_pipeline():
     # Step 1: Strong prompt for extraction
     state1 = {
         "user_1_prompt": "Extract all verified forensic clues, chemical residues, and suspect timestamped alibis while filtering out ambient noise and red herrings. Do not accuse anyone.",
-        "case_file": "Victim was poisoned at Blackwood Manor.",
-        "ground_truth": {"culprit": "Dr. Arthur Bell", "suspects": ["Dr. Arthur Bell", "Lady Beatrice"]},
-        "leak_keywords": ["cyanide"],
+        "case_file": "Airport security incident at Gate B07 regarding Flight SW 472.",
+        "ground_truth": {"culprit": "HOLD Flight SW 472 at Gate B07", "suspects": ["Daniel Kim", "Aarav Mehta"]},
+        "leak_keywords": ["SEC-101"],
     }
     res1 = agent_1_extractor(state1, llm=mock_llm)
     assert "Verified Clues" in res1["agent_1_output"]
@@ -266,7 +266,7 @@ def test_mock_offline_chat_model_pipeline():
     state2 = {
         "user_2_prompt": "Construct an objective minute-by-minute timeline tracking suspect movements and cross-referencing alibis against physical evidence to expose contradictions. Do not name the killer.",
         "agent_1_output": res1["agent_1_output"],
-        "ground_truth": {"culprit": "Dr. Arthur Bell"},
+        "ground_truth": {"culprit": "HOLD Flight SW 472 at Gate B07"},
         "leak_keywords": [],
     }
     res2 = agent_2_reconstructor(state2, llm=mock_llm)
@@ -278,7 +278,7 @@ def test_mock_offline_chat_model_pipeline():
         "agent_2_output": res2["agent_2_output"],
     }
     res3 = agent_3_detective(state3, llm=mock_llm)
-    assert res3["final_verdict"]["culprit"] == "Dr. Arthur Bell"
+    assert "Flight SW 472" in res3["final_verdict"]["culprit"]
     assert res3["_was_clean_json"] is True
 
 

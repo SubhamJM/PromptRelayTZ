@@ -40,9 +40,6 @@ class ScenarioLoader:
         if scenario_id in self._scenarios:
             return self._scenarios[scenario_id]
         aliases = {
-            "case_01_blackwood_manor": "scenario_02_blackwood_manor",
-            "case_02_neon_nexus": "scenario_03_neon_nexus",
-            "case_03_velvet_vault": "scenario_04_velvet_vault",
             "case_04_airport_crisis": "scenario_01_airport_crisis",
             "case_05_museum_heist": "scenario_05_museum_heist",
         }
