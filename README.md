@@ -211,3 +211,38 @@ cd ..
 uv run uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 # Entire SPA and API served together at http://localhost:8000
 ```
+
+---
+
+## 6. 3-Laptop Wi-Fi LAN Multiplayer Setup (Zero Cloud Hosting)
+
+PromptRelay V2 supports synchronized 3-laptop multiplayer over the same local Wi-Fi network without requiring public hosting or cloud servers.
+
+### How to Run on 3 Laptops:
+1. **Connect all 3 laptops to the same Wi-Fi router / mobile hotspot.**
+2. **Laptop 1 (Host & Server):**
+   - Start the unified server listening on all network interfaces:
+     ```bash
+     uv run uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+     ```
+   - Open browser to `http://localhost:8000`.
+   - On the Welcome Screen, select **💻 3-Laptop Team Room (Same Wi-Fi)**.
+   - Choose **Host New Room**, select the scenario (Airport Crisis or Museum Heist), enter team name, your player name, and pick your seat (e.g., Player 1: Evidence Extractor).
+   - Click **Create Multiplayer Room**. The screen will display:
+     - **4-Letter Room PIN** (e.g. `XK9P`)
+     - **Local LAN Link** (e.g. `http://192.168.1.X:8000?room=XK9P`)
+3. **Laptop 2 & Laptop 3 (Teammates):**
+   - Open browser on Laptop 2 & Laptop 3 and navigate to the LAN link shown on Laptop 1:
+     `http://<laptop-1-ip>:8000?room=XK9P`
+   - The room PIN will be auto-filled. Enter your player name and select an available role:
+     - **Player 2**: Timeline & Graph Reconstructor
+     - **Player 3**: Logic Solver & Schema Architect
+   - Click **Join Room**.
+4. **Synchronized Simultaneous Gameplay:**
+   - Hand out physical or digital copies of the pre-information briefing docs:
+     - [PRE_INFO_AIRPORT_CRISIS.md](file:///home/ricing/Documents/code/Projects/PromptRelay_v2/PRE_INFO_AIRPORT_CRISIS.md)
+     - [PRE_INFO_MUSEUM_HEIST.md](file:///home/ricing/Documents/code/Projects/PromptRelay_v2/PRE_INFO_MUSEUM_HEIST.md)
+   - Host clicks **Begin Synchronized Mission**.
+   - All 3 players see live status of each other (`Ready ✅` or `Typing... ✍️`) while drafting in their tailored role workspaces simultaneously.
+   - Each player clicks **Lock In My Prompt**.
+   - Once all 3 lock in, the server automatically executes the 3 AI agents sequentially live with streaming updates in the **Execution Theater**, revealing final scores, rubric breakdown, and leaderboard rankings across all 3 laptops!

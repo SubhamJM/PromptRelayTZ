@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
+import { useMultiplayerStore } from "../store/useMultiplayerStore";
 
 export function ResultsScreen() {
   const {
@@ -33,6 +34,11 @@ export function ResultsScreen() {
 
   const [expandedSection, setExpandedSection] = useState("scorecards"); // scorecards, chain, truth
 
+  const handleExitMatch = () => {
+    useMultiplayerStore.getState().disconnect();
+    resetMatch();
+  };
+
   if (!evaluation) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
@@ -42,7 +48,7 @@ export function ResultsScreen() {
           Awaiting evaluation payload or session completed.
         </p>
         <button
-          onClick={resetMatch}
+          onClick={handleExitMatch}
           className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-mono font-bold text-white transition"
         >
           Return to Lobby
@@ -279,7 +285,7 @@ export function ResultsScreen() {
           </button>
 
           <button
-            onClick={resetMatch}
+            onClick={handleExitMatch}
             className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-mono font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-blue-600/30 cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />

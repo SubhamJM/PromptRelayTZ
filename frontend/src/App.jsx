@@ -4,6 +4,7 @@ import { HandoffModal } from "./components/HandoffModal";
 import { LeaderboardModal } from "./components/LeaderboardModal";
 import { AdminModal } from "./components/AdminModal";
 import { LightboxModal } from "./components/LightboxModal";
+import { PartyCreatedModal } from "./components/PartyCreatedModal";
 
 import { WelcomeScreen } from "./screens/WelcomeScreen";
 import { Step1Screen } from "./screens/Step1Screen";
@@ -11,7 +12,12 @@ import { Step2Screen } from "./screens/Step2Screen";
 import { Step3Screen } from "./screens/Step3Screen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 
+import { RoomLobbyScreen } from "./screens/multiplayer/RoomLobbyScreen";
+import { MultiplayerWorkspace } from "./screens/multiplayer/MultiplayerWorkspace";
+import { ExecutionTheater } from "./screens/multiplayer/ExecutionTheater";
+
 import { useGameStore } from "./store/useGameStore";
+import { useMultiplayerStore } from "./store/useMultiplayerStore";
 import { AlertTriangle, X, Loader2 } from "lucide-react";
 
 export function App() {
@@ -24,11 +30,23 @@ export function App() {
     recoverActiveSession,
   } = useGameStore();
 
+  const { room } = useMultiplayerStore();
+
   useEffect(() => {
     recoverActiveSession();
   }, [recoverActiveSession]);
 
   const renderActiveScreen = () => {
+    // If connected to a 3-Laptop LAN room, route based on room synchronization state
+    if (room) {
+      if (room.status === "lobby") return <RoomLobbyScreen />;
+      if (room.status === "prompting") return <MultiplayerWorkspace />;
+      if (room.status === "executing") return <ExecutionTheater />;
+      if (room.status === "completed") {
+        return currentStep === "completed" ? <ResultsScreen /> : <ExecutionTheater />;
+      }
+    }
+
     switch (currentStep) {
       case "welcome":
         return <WelcomeScreen />;
@@ -86,6 +104,7 @@ export function App() {
       <LeaderboardModal />
       <AdminModal />
       <LightboxModal />
+      <PartyCreatedModal />
 
       {/* Global High-Tech Loading Spinner Overlay */}
       {isLoading && (

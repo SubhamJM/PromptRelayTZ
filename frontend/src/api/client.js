@@ -74,4 +74,25 @@ export const api = {
       body: JSON.stringify(config),
     }),
   resetTournament: () => request("/admin/reset", { method: "POST" }),
+
+  // 3-Laptop Multiplayer Room Endpoints
+  getServerInfo: () => request("/rooms/network/server-info"),
+  createRoom: (payload) =>
+    request("/rooms/create", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  joinRoom: (payload) =>
+    request("/rooms/join", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  getRoom: (roomCode) => request(`/rooms/${roomCode}`),
+  startRoomPrompting: (roomCode) =>
+    request(`/rooms/${roomCode}/start`, { method: "POST" }),
+  lockInPrompt: (roomCode, role, prompt) =>
+    request(`/rooms/${roomCode}/lock-in`, {
+      method: "POST",
+      body: JSON.stringify({ room_code: roomCode, role, prompt }),
+    }),
 };

@@ -7,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from backend.app.api.health import router as health_router
 from backend.app.api.game import router as game_router
 from backend.app.api.admin import router as admin_router
+from backend.app.api.rooms import router as rooms_router
+from backend.app.api.websocket import router as websocket_router
 from backend.app.core.config import get_settings
 
 settings = get_settings()
@@ -43,6 +45,8 @@ if MUSEUM_IMAGE_DIR.exists():
 app.include_router(health_router, prefix="/api")
 app.include_router(game_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(rooms_router, prefix="/api")
+app.include_router(websocket_router)
 
 # Compatibility endpoints for legacy frontend tests
 HTML_STATION_FALLBACK = """<!DOCTYPE html>
@@ -94,7 +98,7 @@ if FRONTEND_DIST.exists():
     async def serve_react_app(request: Request, full_path: str):
         accept = request.headers.get("accept", "")
         # If API client requesting root without asking for HTML
-        if full_path == "" and "text/html" not in accept:
+        if full_path == "" and "text/html" not in accept and "Mozilla" not in request.headers.get("user-agent", ""):
             return JSONResponse({
                 "message": "Prompt Relay API",
                 "project": settings.PROJECT_NAME,
@@ -107,9 +111,7 @@ if FRONTEND_DIST.exists():
         if file_path.is_file():
             return FileResponse(file_path)
 
-        # In browser, return HTML
-        if "text/html" in accept or "Mozilla" in request.headers.get("user-agent", ""):
-            return HTMLResponse(content=HTML_STATION_FALLBACK)
+        # In browser or client navigation, return modern React application
         return FileResponse(FRONTEND_DIST / "index.html")
 else:
     @app.get("/")
