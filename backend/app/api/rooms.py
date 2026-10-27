@@ -59,6 +59,8 @@ async def create_room(req: CreateRoomRequest):
             "id": scenario.id,
             "title": scenario.title,
             "difficulty": scenario.difficulty,
+            "evidence_items": scenario.evidence_items,
+            "operational_rules": scenario.operational_rules,
             "evidence_count": len(scenario.evidence_items),
         },
     }

@@ -1,15 +1,19 @@
 import React, { useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Maximize2, Tag, Info } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
+import { useMultiplayerStore } from "../store/useMultiplayerStore";
 
 export function LightboxModal() {
   const {
-    scenario,
+    scenario: gameScenario,
     activeEvidenceIndex,
     setActiveEvidenceIndex,
     isLightboxOpen,
     setIsLightboxOpen,
   } = useGameStore();
+
+  const multiScenario = useMultiplayerStore((s) => s.scenario);
+  const scenario = gameScenario || multiScenario;
 
   const items = scenario?.evidence_items || [];
   const currentItem = items[activeEvidenceIndex] || items[0];

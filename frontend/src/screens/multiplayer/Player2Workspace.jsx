@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Network, MapPin, Lock, CheckCircle2, Route, Clock, GitMerge, AlertTriangle } from "lucide-react";
+import { Network, MapPin, Lock, CheckCircle2, Route, Clock, GitMerge, AlertTriangle, Eye } from "lucide-react";
+import { EvidenceViewer } from "../../components/EvidenceViewer";
 import { useMultiplayerStore } from "../../store/useMultiplayerStore";
 
 export function Player2Workspace() {
@@ -7,6 +8,7 @@ export function Player2Workspace() {
     useMultiplayerStore();
 
   const isMuseum = scenario?.id === "scenario_05_museum_heist";
+  const [activeTab, setActiveTab] = useState("evidence"); // "evidence" | "layout"
   const [charCount, setCharCount] = useState(myPrompt.length);
   const words = myPrompt.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
@@ -32,15 +34,23 @@ export function Player2Workspace() {
     lockInPrompt();
   };
 
+  const evidenceCount = scenario?.evidence_items?.length || 10;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      {/* Left 7 Columns: Spatial Layout & Chronology Canvas */}
+      {/* Left 7 Columns: Evidence Feeds & Layout Canvas */}
       <div className="lg:col-span-7 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Network className="w-5 h-5 text-purple-400" />
+            {activeTab === "evidence" ? (
+              <Eye className="w-5 h-5 text-purple-400" />
+            ) : (
+              <Network className="w-5 h-5 text-purple-400" />
+            )}
             <h2 className="font-bold text-slate-100 text-base font-serif">
-              Facility Layout & Chronological Staging Canvas
+              {activeTab === "evidence"
+                ? "Visual Evidence & Surveillance Console"
+                : "Facility Layout & Chronological Staging Canvas"}
             </h2>
           </div>
           <span className="text-[11px] font-mono text-purple-400 bg-purple-500/10 border border-purple-500/30 px-2 py-0.5 rounded">
@@ -48,63 +58,105 @@ export function Player2Workspace() {
           </span>
         </div>
 
-        {/* Spatial Diagram / Blueprint Card */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-purple-400" />
-              <h3 className="font-bold text-slate-200 text-xs font-mono uppercase tracking-wider">
-                {isMuseum ? "Wing C & Basement Blueprint Layout" : "Terminal 1 Concourse B Spatial Map"}
-              </h3>
-            </div>
-            <span className="text-[10px] font-mono text-slate-400">
-              Reference Blueprint
+        {/* View Switcher Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("evidence")}
+            className={`px-3 py-1.5 rounded-xl font-mono text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeTab === "evidence"
+                ? "bg-purple-500 text-slate-950 shadow-lg shadow-purple-500/20"
+                : "bg-slate-900/90 text-slate-400 hover:text-slate-200 border border-slate-800"
+            }`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Surveillance Feeds</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded font-extrabold ${
+                activeTab === "evidence"
+                  ? "bg-slate-950/20 text-slate-950"
+                  : "bg-purple-950/60 text-purple-300"
+              }`}
+            >
+              {evidenceCount} Feeds
             </span>
-          </div>
+          </button>
 
-          {/* Blueprint Image Preview */}
-          <div className="rounded-xl overflow-hidden border border-purple-500/30 bg-slate-950 flex items-center justify-center p-2">
-            <img
-              src={
-                isMuseum
-                  ? "/images_for_museum/06_museum_floorplan.png"
-                  : "/image_data/06_terminal_map.png"
-              }
-              alt="Floor Plan"
-              className="max-h-64 object-contain rounded"
-            />
-          </div>
-
-          {/* Chronological Transit Vector Guide */}
-          <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-            <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
-              <span className="text-purple-300 font-bold block text-[10px]">1. FIRST (Origin)</span>
-              <p className="text-slate-300 text-[11px]">
-                {isMuseum
-                  ? "21:15 Gala Reception at Gallery 4 with authentic framed Madonna."
-                  : "08:14 Check-in at Island A; blue suitcase tagged & dispatched."}
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
-              <span className="text-purple-300 font-bold block text-[10px]">2. NEXT (Transit)</span>
-              <p className="text-slate-300 text-[11px]">
-                {isMuseum
-                  ? "23:40:42 Breaker B-04 trip ➔ 90s blackout ➔ canvas tube moved down Stairwell C1."
-                  : "08:46 WhatsApp chatter ➔ 08:47 hooded subject walking away from B07 corridor."}
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
-              <span className="text-purple-300 font-bold block text-[10px]">3. LAST (Drop Point)</span>
-              <p className="text-slate-300 text-[11px]">
-                {isMuseum
-                  ? "23:48 Basement Locker 14 search yields card CONSV-408 and token C-408."
-                  : "08:49 Officer R. Nair logs unattended blue suitcase near B07 window seats."}
-              </p>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab("layout")}
+            className={`px-3 py-1.5 rounded-xl font-mono text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
+              activeTab === "layout"
+                ? "bg-purple-500 text-slate-950 shadow-lg shadow-purple-500/20"
+                : "bg-slate-900/90 text-slate-400 hover:text-slate-200 border border-slate-800"
+            }`}
+          >
+            <Network className="w-3.5 h-3.5" />
+            <span>Facility Blueprint & Staging</span>
+          </button>
         </div>
+
+        {activeTab === "evidence" ? (
+          <EvidenceViewer isStep2={true} />
+        ) : (
+          /* Spatial Diagram / Blueprint Card */
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-purple-400" />
+                <h3 className="font-bold text-slate-200 text-xs font-mono uppercase tracking-wider">
+                  {isMuseum ? "Wing C & Basement Blueprint Layout" : "Terminal 1 Concourse B Spatial Map"}
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                Reference Blueprint
+              </span>
+            </div>
+
+            {/* Blueprint Image Preview */}
+            <div className="rounded-xl overflow-hidden border border-purple-500/30 bg-slate-950 flex items-center justify-center p-2">
+              <img
+                src={
+                  isMuseum
+                    ? "/images_for_museum/6.png"
+                    : "/image_data/7.png"
+                }
+                alt="Floor Plan"
+                className="max-h-64 object-contain rounded"
+              />
+            </div>
+
+            {/* Chronological Transit Vector Guide */}
+            <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+              <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
+                <span className="text-purple-300 font-bold block text-[10px]">1. FIRST (Origin)</span>
+                <p className="text-slate-300 text-[11px]">
+                  {isMuseum
+                    ? "21:15 Gala Reception at Gallery 4 with authentic framed Madonna."
+                    : "08:14 Check-in at Island A; blue suitcase tagged & dispatched."}
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
+                <span className="text-purple-300 font-bold block text-[10px]">2. NEXT (Transit)</span>
+                <p className="text-slate-300 text-[11px]">
+                  {isMuseum
+                    ? "23:40:42 Breaker B-04 trip ➔ 90s blackout ➔ canvas tube moved down Stairwell C1."
+                    : "08:46 WhatsApp chatter ➔ 08:47 hooded subject walking away from B07 corridor."}
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
+                <span className="text-purple-300 font-bold block text-[10px]">3. LAST (Drop Point)</span>
+                <p className="text-slate-300 text-[11px]">
+                  {isMuseum
+                    ? "23:48 Basement Locker 14 search yields card CONSV-408 and token C-408."
+                    : "08:49 Officer R. Nair logs unattended blue suitcase near B07 window seats."}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Right 5 Columns: Prompt Crafting & Directives */}

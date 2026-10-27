@@ -12,7 +12,7 @@
       "category": "CCTV Surveillance",
       "badge": "CAM 03 • Check-in A",
       "timestamp": "08:14:23",
-      "src": "/image_data/01_cctv_checkin.png",
+      "src": "/image_data/1.png",
       "prompt_hint": "Inspect the airline counter transaction. Direct Agent 1 to read the visible camera timestamp, identify the passenger checking in, describe the luggage item and color, and extract counter details.",
       "description": "Passenger Daniel Kim checks in luggage at airline counter; blue suitcase tagged and dispatched onto conveyor system.",
       "ocr_ledger": "FEED METADATA: Camera CAM 03 | Location: Terminal 1 Main Concourse, Check-in Island A, Counter 04 | Video Stream Sync: 2024-11-12 08:14:23 UTC+05:30.\nVISUAL SUBJECTS: Ticket Agent (ID badge: SkyWays Staff 412) and Passenger Daniel Kim (wearing grey overcoat, passport in hand).\nOBJECTS & ACTIONS: Passenger Daniel Kim places a medium blue hard-shell polycarbonate suitcase onto baggage belt scale. Scale display reads: 18.4 kg. SkyWays automated luggage tag generated and affixed. Passenger receives boarding boarding pass for Flight SW 472, Seat 14A. Suitcase clears check-in scanner and is dispatched onto primary conveyor bay."
@@ -23,7 +23,7 @@
       "category": "CCTV Surveillance",
       "badge": "CAM 12 • Gate B07 Corridor",
       "timestamp": "08:47:10",
-      "src": "/image_data/02_cctv_gate_b07.png",
+      "src": "/image_data/2.png",
       "prompt_hint": "Observe the person moving rapidly through the concourse. Direct Agent 1 to record the camera timestamp, describe the subject's clothing and appearance, identify gate signage, and note their direction of movement.",
       "description": "Unidentified person in dark hooded jacket and gloves captured walking rapidly away from Gate B07 corridor.",
       "ocr_ledger": "FEED METADATA: Camera CAM 12 | Location: Concourse B Passenger Corridor adjacent to Gate B07 | Timestamp: 2024-11-12 08:47:10.\nVISUAL SUBJECTS: Unidentified individual of medium build, wearing a dark navy hooded windbreaker with hood pulled low, black face covering, dark trousers, and dark leather gloves.\nMOVEMENT DYNAMICS: Subject is walking at elevated pace (approx. 2.1 m/s) heading east along Corridor B, moving away from Gate B07 passenger waiting area toward Terminal 1 central atrium. Subject glances back over shoulder toward Gate B07 at 08:47:12. Carries no luggage or personal carry-on item."
@@ -34,7 +34,7 @@
       "category": "CCTV Surveillance",
       "badge": "CAM 21 • Apron Bay",
       "timestamp": "09:02:55",
-      "src": "/image_data/03_cctv_baggage_bay.png",
+      "src": "/image_data/3.png",
       "prompt_hint": "Review ground operations on the apron. Direct Agent 1 to record the timestamp, observe ramp crew loading actions, and evaluate whether this shows routine operations or an emergency anomaly.",
       "description": "Ramp crew loading checked cargo containers onto apron; routine ground operations.",
       "ocr_ledger": "FEED METADATA: Camera CAM 21 | Location: Sub-terminal Apron Bay 3, Aircraft Stand B07 Ground Level | Timestamp: 2024-11-12 09:02:55.\nOPERATIONAL OBSERVATIONS: Ramp baggage handlers wearing high-visibility orange vests and hearing protection operate motorized baggage tug and belt loader under fuselage of Boeing 777-300ER (Flight SW 472). Standard cargo containers (ULD type AKE) being loaded into aft cargo hold. Normal ramp operating conditions without security anomalies or unauthorized personnel present."
@@ -45,7 +45,7 @@
       "category": "Flight Monitor",
       "badge": "Terminal 1 FIDS",
       "timestamp": "08:30:00",
-      "src": "/image_data/04_flight_display.png",
+      "src": "/image_data/4.png",
       "prompt_hint": "Perform OCR on the digital flight monitor screen. Direct Agent 1 to extract system date/time, flight numbers, destinations, assigned gates, and operational status for Flight SW 472 and adjacent flights.",
       "description": "Flight SW 472 to New York listed as 'Boarding' at Gate B07. Other flights on time or delayed.",
       "ocr_ledger": "DISPLAY OCR TRANSCRIPTION: Terminal 1 Departures Board | System Clock: 12-Nov-2024 08:30:00.\n- Flight SW 472 | Destination: NEW YORK (JFK) | Sched: 09:15 | Gate: B07 | Status: BOARDING (Priority Call Group 1)\n- Flight SW 318 | Destination: LONDON (LHR) | Sched: 09:30 | Gate: B04 | Status: ON TIME\n- Flight SW 561 | Destination: DUBAI (DXB) | Sched: 09:45 | Gate: B09 | Status: DELAYED (Tech Inspection)\n- Flight SW 209 | Destination: SINGAPORE (SIN) | Sched: 10:10 | Gate: B12 | Status: ON TIME"
@@ -56,7 +56,7 @@
       "category": "Passenger Chat",
       "badge": "WhatsApp Screenshot",
       "timestamp": "08:35 - 08:47",
-      "src": "/image_data/05_passenger_messages.png",
+      "src": "/image_data/5.png",
       "prompt_hint": "Transcribe the passenger chat thread. Direct Agent 1 to extract sender name, message timestamps, and the specific security observation reported regarding unattended property near the gate.",
       "description": "Passenger Aarav Mehta messages: 'There\\'s a blue bag near the seats... looks unattended. No passenger in sight.'",
       "ocr_ledger": "CHAT LOG OCR TRANSCRIPTION: WhatsApp Messenger Mobile Screenshot | User: Aarav Mehta | Contact: Priya M.\n- [08:35] Aarav Mehta: 'Hey, I just reached Gate B07. Boarding queue already forming.'\n- [08:36] Priya M.: 'Safe travels! Running slightly behind in traffic.'\n- [08:46] Aarav Mehta: 'Wait... there is a blue hard-shell bag sitting right under the window seats at Gate B07. Completely unattended for at least 10 minutes. Nobody is near it.'\n- [08:46] Aarav Mehta: 'Should I alert security or airline ground staff?'\n- [08:47] Priya M.: 'Yes immediately! Don\\'t touch it.'"
@@ -67,7 +67,7 @@
       "category": "Security Log",
       "badge": "Officer R. Nair Incident Log",
       "timestamp": "08:49:00",
-      "src": "/image_data/06_security_report.png",
+      "src": "/image_data/6.png",
       "prompt_hint": "Transcribe the official security observation log. Direct Agent 1 to extract report date, logged time, gate location, reporting officer name, physical description of the item, and immediate security action taken.",
       "description": "Officer R. Nair logs unattended blue suitcase near B07 window seats. Area under observation awaiting K9 explosive sweep.",
       "ocr_ledger": "INCIDENT REPORT OCR TRANSCRIPTION: SkyWays Aviation Security Patrol Incident Slip #SEC-0849\nDate: 12-Nov-2024 | Time Logged: 08:49:00 | Reporting Officer: R. Nair (Badge #AVSEC-9042)\nIncident Location: Terminal 1, Departure Gate B07, Window Seating Bay (Row 4, Seat 22 Area)\nSubject Description: Unattended blue hard-shell polycarbonate wheeled suitcase with extendable handle.\nObservations: Item abandoned with no owner in immediate 15m radius. No passenger claiming custody.\nImmediate Action Taken: Established 10-meter preliminary observation perimeter. Alerted Terminal Operations Security Control Desk. Formally requested immediate K9 Explosive Detection Sweep. Gate B07 boarding hold requested pending clearance."
@@ -78,7 +78,7 @@
       "category": "Terminal Layout",
       "badge": "Terminal 1 Map",
       "timestamp": "Concourse Plan",
-      "src": "/image_data/07_airport_map.png",
+      "src": "/image_data/7.png",
       "prompt_hint": "Inspect the concourse floor plan. Direct Agent 1 to identify the position of Gate B07, surrounding passenger gates, and security perimeter boundaries required for cordon procedures.",
       "description": "Concourse map showing Gate B07 location, passenger corridors, and restricted apron access doors.",
       "ocr_ledger": "DIAGRAM OCR & LAYOUT ANALYSIS: Concourse B Architectural Blueprint.\n- Gate B07 is positioned at the north-east terminus of Concourse B sterile lounge, adjacent to emergency access door E-04 and Gate B09.\n- Window seating row 4 directly borders the glass curtain wall overlooking Aircraft Stand B07.\n- Sterile Departure Zone: Access strictly limited to screened passengers and badged personnel. Any breach or unattended hazard directly compromises the passenger boarding jet bridge to Stand B07."
@@ -89,7 +89,7 @@
       "category": "Physical Clue",
       "badge": "Paper Scrap",
       "timestamp": "Found near B07",
-      "src": "/image_data/08_handwritten_note.png",
+      "src": "/image_data/8.png",
       "prompt_hint": "Perform OCR on the paper scrap recovered at the gate. Direct Agent 1 to extract the exact handwritten message and note the physical location where it was discovered.",
       "description": "Slip of paper recovered near Gate B07 seating area with handwritten text: 'Meet at B07'.",
       "ocr_ledger": "PHYSICAL CLUE OCR TRANSCRIPTION: Torn piece of lined yellow notepad paper, approx 6cm x 9cm, found beneath seat cushion at Gate B07 window bay.\nHandwritten in black ballpoint ink: 'Meet at B07 - deliver package before 08:45'. Smudge of graphite on bottom right corner."
@@ -100,7 +100,7 @@
       "category": "Physical Clue",
       "badge": "SkyWays Bag Tag",
       "timestamp": "Attached to Bag",
-      "src": "/image_data/09_baggage_tag.png",
+      "src": "/image_data/9.png",
       "prompt_hint": "Perform detailed OCR on the airline luggage tag attached to the unattended item. Direct Agent 1 to extract airline name, passenger full name, assigned flight number, and destination.",
       "description": "SkyWays baggage tag on the blue suitcase reading: 'Passenger: Daniel Kim | Flight: SW 472'.",
       "ocr_ledger": "BAGGAGE TAG OCR TRANSCRIPTION: SkyWays Automated Barcode Tag #SKW-78921-472\n- Airline: SkyWays International Airlines\n- Passenger Name: KIM / DANIEL\n- Flight: SW 472\n- Destination: JFK (New York)\n- Date: 12-NOV-2024\n- Class: Y | Weight: 18.4 KG\n- Routing: DEL -> JFK Direct\nCross-referencing confirms this tag matches the bag checked in by Daniel Kim at Counter A04 at 08:14:23."
@@ -111,7 +111,7 @@
       "category": "Peripheral Decoy",
       "badge": "Daily Chronicle",
       "timestamp": "Morning Edition",
-      "src": "/image_data/10_witness_statement.png",
+      "src": "/image_data/10.png",
       "prompt_hint": "Review the newspaper article clipping found in the seating area. Direct Agent 1 to read the headline and determine whether this material contains incident facts or represents irrelevant peripheral noise to filter out.",
       "description": "Discarded newspaper article: 'City Marathon Brings Thousands Together'; no relation to flight operations.",
       "ocr_ledger": "PRINT MEDIA OCR TRANSCRIPTION: The Daily Chronicle | Vol. 48 No. 312 | Morning City Edition\nHeadline: 'City Marathon Brings Thousands Together - Over 25,000 runners participate in annual charity run through central avenues. Roads reopened at 06:00 AM. Mayor commends community turnout.'\nASSESSMENT: Completely irrelevant peripheral chatter and decoy material. No bearing on aviation security."

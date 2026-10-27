@@ -3,113 +3,113 @@
 const DEFAULT_AIRPORT_IMAGES = [
   {
     id: "img_01",
-    filename: "01_cctv_checkin.png",
+    filename: "1.png",
     title: "CCTV: Check-in Area A",
     category: "CCTV Surveillance",
     badge: "CAM 03 • Check-in A",
     timestamp: "08:14:23",
     prompt_hint: "Inspect the airline counter transaction. Prompt Agent 1 to read the visible camera timestamp, identify the passenger checking in, describe the luggage item and color, and extract any counter details.",
     description: "Passenger Daniel Kim checks in luggage at airline counter; blue suitcase tagged and dispatched onto conveyor system.",
-    src: "/image_data/01_cctv_checkin.png"
+    src: "/image_data/1.png"
   },
   {
     id: "img_02",
-    filename: "02_cctv_gate_b07.png",
+    filename: "2.png",
     title: "CCTV: Gate B07 Corridor",
     category: "CCTV Surveillance",
     badge: "CAM 12 • Gate B07 Corridor",
     timestamp: "08:47:10",
     prompt_hint: "Observe the person moving rapidly through the concourse. Prompt Agent 1 to record the camera timestamp, describe the subject's clothing and appearance, identify the gate signage in view, and note their direction of movement.",
     description: "Unidentified person in dark hooded jacket and gloves captured walking rapidly away from Gate B07 corridor.",
-    src: "/image_data/02_cctv_gate_b07.png"
+    src: "/image_data/2.png"
   },
   {
     id: "img_03",
-    filename: "03_cctv_baggage_bay.png",
+    filename: "3.png",
     title: "CCTV: Baggage Handling Area",
     category: "CCTV Surveillance",
     badge: "CAM 21 • Apron Bay",
     timestamp: "09:02:55",
     prompt_hint: "Review ground operations on the apron. Prompt Agent 1 to record the timestamp, observe ramp crew loading actions, and evaluate if this shows routine ground operations or an emergency anomaly.",
     description: "Ramp crew loading checked cargo containers onto apron; routine ground operations.",
-    src: "/image_data/03_cctv_baggage_bay.png"
+    src: "/image_data/3.png"
   },
   {
     id: "img_04",
-    filename: "04_flight_display.png",
+    filename: "4.png",
     title: "Flight Information Display",
     category: "Flight Monitor",
     badge: "Terminal 1 FIDS",
     timestamp: "08:30:00",
     prompt_hint: "Perform OCR on the digital flight monitor screen. Prompt Agent 1 to extract the system date/time, the flight numbers, destinations, assigned gates, and operational status for Flight SW 472 and adjacent flights.",
     description: "Flight SW 472 to New York listed as 'Boarding' at Gate B07. Other flights on time or delayed.",
-    src: "/image_data/04_flight_display.png"
+    src: "/image_data/4.png"
   },
   {
     id: "img_05",
-    filename: "05_passenger_messages.png",
+    filename: "5.png",
     title: "Passenger Messages (Chat)",
     category: "Passenger Chat",
     badge: "WhatsApp Screenshot",
     timestamp: "08:35 - 08:47",
     prompt_hint: "Transcribe the passenger chat thread. Prompt Agent 1 to extract the sender name, message timestamps, and the specific security observation reported regarding unattended property near the gate.",
     description: "Passenger Aarav Mehta messages: 'There\\'s a blue bag near the seats... looks unattended. No passenger in sight.'",
-    src: "/image_data/05_passenger_messages.png"
+    src: "/image_data/5.png"
   },
   {
     id: "img_06",
-    filename: "06_security_report.png",
+    filename: "6.png",
     title: "Security Observation Report",
     category: "Security Log",
     badge: "Officer R. Nair Incident Log",
     timestamp: "08:49:00",
     prompt_hint: "Transcribe the official security observation log. Prompt Agent 1 to extract the report date, logged time, gate location, reporting officer name, physical description of the item found, and the immediate security action taken.",
     description: "Officer R. Nair logs unattended blue suitcase near B07 window seats. Area under observation awaiting K9 explosive sweep.",
-    src: "/image_data/06_security_report.png"
+    src: "/image_data/6.png"
   },
   {
     id: "img_07",
-    filename: "07_airport_map.png",
+    filename: "7.png",
     title: "Terminal 1 Departure Map",
     category: "Terminal Layout",
     badge: "Terminal 1 Map",
     timestamp: "Concourse Plan",
     prompt_hint: "Inspect the concourse floor plan. Prompt Agent 1 to identify the position of Gate B07, surrounding passenger gates, and security perimeter boundaries required for cordon procedures.",
     description: "Concourse map showing Gate B07 location, passenger corridors, and restricted apron access doors.",
-    src: "/image_data/07_airport_map.png"
+    src: "/image_data/7.png"
   },
   {
     id: "img_08",
-    filename: "08_handwritten_note.png",
+    filename: "8.png",
     title: "Handwritten Note near B07",
     category: "Physical Clue",
     badge: "Paper Scrap",
     timestamp: "Found near B07",
     prompt_hint: "Perform OCR on the paper scrap recovered at the gate. Prompt Agent 1 to extract the exact handwritten message and note the physical location where it was discovered.",
     description: "Slip of paper recovered near Gate B07 seating area with handwritten text: 'Meet at B07'.",
-    src: "/image_data/08_handwritten_note.png"
+    src: "/image_data/8.png"
   },
   {
     id: "img_09",
-    filename: "09_baggage_tag.png",
+    filename: "9.png",
     title: "Baggage Tag: Recovered Luggage",
     category: "Physical Clue",
     badge: "SkyWays Bag Tag",
     timestamp: "Attached to Bag",
     prompt_hint: "Perform detailed OCR on the airline luggage tag attached to the unattended item. Prompt Agent 1 to extract the airline name, passenger full name, assigned flight number, and destination.",
     description: "SkyWays baggage tag on the blue suitcase reading: 'Passenger: Daniel Kim | Flight: SW 472'.",
-    src: "/image_data/09_baggage_tag.png"
+    src: "/image_data/9.png"
   },
   {
     id: "img_10",
-    filename: "10_witness_statement.png",
+    filename: "10.png",
     title: "Daily Chronicle Newspaper (Decoy)",
     category: "Peripheral Decoy",
     badge: "Daily Chronicle",
     timestamp: "Morning Edition",
     prompt_hint: "Review the newspaper article clipping found in the seating area. Prompt Agent 1 to read the headline and determine whether this material contains operational incident facts or represents irrelevant peripheral noise to filter out.",
     description: "Discarded newspaper article: 'City Marathon Brings Thousands Together'; no relation to flight operations.",
-    src: "/image_data/10_witness_statement.png"
+    src: "/image_data/10.png"
   }
 ];
 

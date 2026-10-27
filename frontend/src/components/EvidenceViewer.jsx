@@ -1,10 +1,11 @@
 import React from "react";
 import { ChevronLeft, ChevronRight, ZoomIn, Lightbulb } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
+import { useMultiplayerStore } from "../store/useMultiplayerStore";
 
 export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = false }) {
   const {
-    scenario,
+    scenario: gameScenario,
     activeEvidenceIndex,
     setActiveEvidenceIndex,
     evidenceFilter,
@@ -12,9 +13,49 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
     setIsLightboxOpen,
   } = useGameStore();
 
+  const multiScenario = useMultiplayerStore((s) => s.scenario);
+  const scenario = gameScenario || multiScenario;
+
   if (!scenario) return null;
 
   const items = scenario.evidence_items || [];
+
+  // Dynamic theme colors based on role
+  const theme = isStep3
+    ? {
+        border: "border-emerald-500/40",
+        feedBadge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+        badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+        zoomBtn: "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border-emerald-500/40",
+        hintBox: "from-emerald-950/60 to-slate-900 border-emerald-500/30",
+        hintLabel: "text-emerald-300",
+        activeFilter: "bg-emerald-500 text-slate-950 shadow-sm",
+        activeThumb: "border-2 border-emerald-400 ring-2 ring-emerald-500/40 bg-slate-900 shadow-md",
+        thumbHover: "hover:border-emerald-500/50",
+      }
+    : isStep2
+    ? {
+        border: "border-purple-500/40",
+        feedBadge: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+        badge: "bg-purple-500/20 text-purple-300 border-purple-500/40",
+        zoomBtn: "bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/40",
+        hintBox: "from-purple-950/60 to-slate-900 border-purple-500/30",
+        hintLabel: "text-purple-300",
+        activeFilter: "bg-purple-500 text-slate-950 shadow-sm",
+        activeThumb: "border-2 border-purple-400 ring-2 ring-purple-500/40 bg-slate-900 shadow-md",
+        thumbHover: "hover:border-purple-500/50",
+      }
+    : {
+        border: "border-blue-500/40",
+        feedBadge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+        badge: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+        zoomBtn: "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border-blue-500/40",
+        hintBox: "from-blue-950/60 to-slate-900 border-blue-500/30",
+        hintLabel: "text-blue-300",
+        activeFilter: "bg-blue-500 text-slate-950 shadow-sm",
+        activeThumb: "border-2 border-blue-400 ring-2 ring-blue-500/40 bg-slate-900 shadow-md",
+        thumbHover: "hover:border-blue-500/50",
+      };
 
   // Dynamic categories for evidence items
   const dynamicCategories = [
@@ -42,14 +83,14 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-500/40 bg-slate-900/90 shadow-2xl overflow-hidden">
+      <div className={`rounded-2xl border ${theme.border} bg-slate-900/90 shadow-2xl overflow-hidden`}>
         {/* Header Bar */}
         <div className="px-4 py-3 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-wrap min-w-0">
-            <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono text-xs font-bold border border-blue-500/30">
+            <span className={`px-2 py-0.5 rounded ${theme.feedBadge} font-mono text-xs font-bold border`}>
               Feed {activeEvidenceIndex + 1} of {items.length}
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 truncate">
+            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${theme.badge} border truncate`}>
               {activeItem.badge}
             </span>
             <h3 className="text-xs sm:text-sm font-bold text-slate-100 font-mono truncate">
@@ -76,7 +117,7 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
             </button>
             <button
               onClick={() => setIsLightboxOpen(true)}
-              className="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1"
+              className={`px-2.5 py-1 rounded-lg ${theme.zoomBtn} text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1`}
               title="Click to Zoom Fullscreen"
             >
               <ZoomIn className="w-3.5 h-3.5" />
@@ -121,11 +162,11 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
         </div>
 
         {/* Prompting Hint Box */}
-        <div className="p-4 bg-gradient-to-br from-blue-950/60 to-slate-900 border-t border-blue-500/30 space-y-2">
+        <div className={`p-4 bg-gradient-to-br ${theme.hintBox} border-t space-y-2`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Lightbulb className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-300">
+              <span className={`text-xs font-mono font-bold uppercase tracking-wider ${theme.hintLabel}`}>
                 Investigative Prompting Hint (Extract from Image)
               </span>
             </div>
@@ -147,7 +188,7 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
             onClick={() => setEvidenceFilter(filter)}
             className={`px-2.5 py-1 rounded-lg transition font-bold cursor-pointer ${
               evidenceFilter === filter
-                ? "bg-blue-500 text-slate-950 shadow-sm"
+                ? theme.activeFilter
                 : "bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800"
             }`}
           >
@@ -166,8 +207,8 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
               onClick={() => setActiveEvidenceIndex(itemIdx)}
               className={`group relative cursor-pointer overflow-hidden rounded-xl p-1.5 space-y-1 transition text-left ${
                 activeEvidenceIndex === itemIdx
-                  ? "border-2 border-blue-400 ring-2 ring-blue-500/40 bg-slate-900 shadow-md"
-                  : "border border-slate-800 bg-slate-950/80 hover:border-blue-500/50 opacity-75 hover:opacity-100"
+                  ? theme.activeThumb
+                  : `border border-slate-800 bg-slate-950/80 ${theme.thumbHover} opacity-75 hover:opacity-100`
               }`}
             >
               <div className="aspect-[2/1] w-full overflow-hidden rounded bg-slate-950 flex items-center justify-center">

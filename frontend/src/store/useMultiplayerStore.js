@@ -119,6 +119,11 @@ export const useMultiplayerStore = create((set, get) => ({
         isLockedIn: false,
       });
 
+      // Synchronize scenario into useGameStore for EvidenceViewer & LightboxModal
+      if (data.scenario) {
+        useGameStore.setState({ scenario: data.scenario });
+      }
+
       // Connect WebSocket
       get().connectWebSocket(room.room_code, role);
       return room;
@@ -150,6 +155,11 @@ export const useMultiplayerStore = create((set, get) => ({
         isLoading: false,
         isLockedIn: false,
       });
+
+      // Synchronize scenario into useGameStore for EvidenceViewer & LightboxModal
+      if (data.scenario) {
+        useGameStore.setState({ scenario: data.scenario });
+      }
 
       // Connect WebSocket
       get().connectWebSocket(room.room_code, role);

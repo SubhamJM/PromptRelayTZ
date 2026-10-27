@@ -92,8 +92,8 @@ def test_airport_crisis_case_details(case_loader):
     assert len(case.images) == 10
     
     first_img = case.images[0]
-    assert first_img["filename"] == "01_cctv_checkin.png"
-    assert first_img["src"] == "/image_data/01_cctv_checkin.png"
+    assert first_img["filename"] == "1.png"
+    assert first_img["src"] == "/image_data/1.png"
     assert len(case.operational_rules) == 3
     assert any("SEC-101" in r for r in case.operational_rules)
     assert any("OPS-204" in r for r in case.operational_rules)
@@ -132,7 +132,7 @@ def test_airport_crisis_static_images_served():
     from backend.app.main import app
 
     client = TestClient(app)
-    res = client.get("/image_data/01_cctv_checkin.png")
+    res = client.get("/image_data/1.png")
     assert res.status_code == 200
     assert "image/png" in res.headers.get("content-type", "")
     assert len(res.content) > 1000
@@ -149,5 +149,5 @@ def test_vision_ocr_tool_with_image_attachments(case_loader):
     
     assert "=== OCR & VISION TOOL EXTRACTION REPORT ===" in report
     assert "Visual Image Files Processed (10):" in report
-    assert "01_cctv_checkin.png" in report
+    assert "1.png" in report
     assert "08:14:23" in report
