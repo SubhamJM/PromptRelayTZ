@@ -248,19 +248,6 @@ export function Player3Workspace() {
             </div>
           </div>
 
-          {/* Strategy Tips */}
-          <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs text-slate-300 space-y-1.5 font-sans leading-relaxed">
-            <span className="font-bold text-emerald-300 font-mono text-[11px] block">
-              💡 Key Objectives for Player 3:
-            </span>
-            <ul className="list-disc list-inside space-y-1 text-slate-300 text-[11px]">
-              <li>Define role: <em>Logic Decision Solver and Operational Authority</em></li>
-              <li>Evaluate timeline against governing rules ({isMuseum ? "SEC-401, ART-302, CLR-505" : "SEC-101, OPS-204"})</li>
-              <li>Deduce authorized dispatch action / conspirators and decisive evidence keys</li>
-              <li><strong>Plain English:</strong> Write naturally without technical data formatting requirements</li>
-            </ul>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleLockIn} className="space-y-3">
             <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
@@ -275,15 +262,11 @@ export function Player3Workspace() {
             </div>
 
             <textarea
-              rows={8}
+              rows={9}
               disabled={isLockedIn}
               value={myPrompt}
               onChange={handleTextChange}
-              placeholder={
-                isMuseum
-                  ? "e.g. Role: Logic Decision Solver. Evaluate the reconstructed timeline against Rule SEC-401, Rule ART-302, and Rule CLR-505. Deduce the conspirators Dr. Julian Vance and Marcus Thorne. Explain the Breaker B-04 90-second blackout forgery swap method. Cite key evidence (card CONSV-408, token C-408, acrylic spectrometry)."
-                  : "e.g. Role: Logic Decision Solver. Evaluate the reconstructed timeline against Rule SEC-101, Rule BAGG-204, and Rule OPS-204. Deduce the culprit Tariq Malik, the luggage swap method using the duplicate tag and Maintenance Cart #MC-08, and cite the decisive clues (REPRINT-MGR-02 watermark, 6.3kg discrepancy, Door B-Staff-03 log)."
-              }
+              placeholder="Write your prompt to instruct Agent 3 to deduce the culprit, method, and decisive evidence..."
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn
                   ? "border-emerald-500/40 bg-emerald-950/10 opacity-80"

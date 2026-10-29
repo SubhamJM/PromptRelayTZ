@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Users, Wifi, Clock, Copy, Check, ShieldCheck, Sparkles } from "lucide-react";
+import React, { useState } from "react";
+import { Users, Wifi, Copy, Check, ShieldCheck, Sparkles } from "lucide-react";
 import { useMultiplayerStore } from "../../store/useMultiplayerStore";
 import { copyToClipboard } from "../../utils/clipboard";
 
@@ -17,30 +17,6 @@ export function SharedStatusBar() {
   } = useMultiplayerStore();
 
   const [copied, setCopied] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(room?.round_duration_seconds || 420);
-
-  // Synchronized countdown timer
-  useEffect(() => {
-    if (!room?.started_prompting_at || room?.status !== "prompting") return;
-
-    const startMs = new Date(room.started_prompting_at).getTime();
-    const durationMs = (room.round_duration_seconds || 420) * 1000;
-    const endMs = startMs + durationMs;
-
-    const interval = setInterval(() => {
-      const nowMs = Date.now();
-      const diffSec = Math.max(0, Math.floor((endMs - nowMs) / 1000));
-      setSecondsLeft(diffSec);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [room?.started_prompting_at, room?.status, room?.round_duration_seconds]);
-
-  const formatTime = (secs) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m}:${s < 10 ? "0" : ""}${s}`;
-  };
 
   const handleCopyLink = async () => {
     const url = getJoinUrl();
@@ -154,21 +130,8 @@ export function SharedStatusBar() {
           </div>
         </div>
 
-        {/* Right: Round Timer & My Seat Info */}
+        {/* Right: My Seat Info */}
         <div className="flex items-center gap-3">
-          {room?.status === "prompting" && (
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-bold ${
-                secondsLeft <= 60
-                  ? "bg-rose-950 border-rose-500 text-rose-300 animate-pulse"
-                  : "bg-slate-950 border-slate-700 text-slate-200"
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              <span>{formatTime(secondsLeft)}</span>
-            </div>
-          )}
-
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200">
             <span className="text-slate-400">Seat:</span>
             <span className="font-bold text-blue-400">{roleLabelMap[myRole]}</span>

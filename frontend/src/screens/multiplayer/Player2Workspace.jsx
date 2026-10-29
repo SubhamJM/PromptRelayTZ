@@ -187,19 +187,6 @@ export function Player2Workspace() {
             </div>
           </div>
 
-          {/* Strategy Tips */}
-          <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/20 text-xs text-slate-300 space-y-1.5 font-sans leading-relaxed">
-            <span className="font-bold text-purple-300 font-mono text-[11px] block">
-              💡 Key Objectives for Player 2:
-            </span>
-            <ul className="list-disc list-inside space-y-1 text-slate-300 text-[11px]">
-              <li>Define role: <em>Timeline & Incident Reconstructor</em></li>
-              <li>Order events chronologically: what happened <strong>first</strong>, <strong>next</strong>, and <strong>last</strong></li>
-              <li>Trace suspect & object transit vectors and connect causal dependencies</li>
-              <li>Keep uncertain sightings separate; <strong>maintain strict neutrality</strong></li>
-            </ul>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleLockIn} className="space-y-3">
             <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
@@ -214,15 +201,11 @@ export function Player2Workspace() {
             </div>
 
             <textarea
-              rows={8}
+              rows={9}
               disabled={isLockedIn}
               value={myPrompt}
               onChange={handleTextChange}
-              placeholder={
-                isMuseum
-                  ? "e.g. Role: Timeline & Incident Reconstructor. Order all facts chronologically from 21:15 to 23:48. Trace suspect movements, connect Breaker B-04 blackout to Locker 14, and highlight alibi gaps. Maintain neutrality without naming culprits."
-                  : "e.g. Role: Timeline & Incident Reconstructor. Reconstruct events chronologically from 08:14 to 09:02. Trace Daniel Kim's 18.4 kg checked bag, the duplicate tag reprint, Gate B07 decoy, and Cart #MC-08 diversion. Maintain neutrality."
-              }
+              placeholder="Write your prompt to instruct Agent 2 to reconstruct the chronological timeline, track movements, and highlight key anomalies..."
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn
                   ? "border-emerald-500/40 bg-emerald-950/10 opacity-80"

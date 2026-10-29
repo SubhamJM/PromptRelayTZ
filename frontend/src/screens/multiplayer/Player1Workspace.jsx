@@ -78,19 +78,6 @@ export function Player1Workspace() {
             </div>
           </div>
 
-          {/* Quick Strategy Reminders from Handout */}
-          <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-500/20 text-xs text-slate-300 space-y-1.5 font-sans leading-relaxed">
-            <span className="font-bold text-blue-300 font-mono text-[11px] block">
-              💡 Key Objectives for Player 1:
-            </span>
-            <ul className="list-disc list-inside space-y-1 text-slate-300 text-[11px]">
-              <li>Define clear role: <em>Forensic Evidence Extractor</em></li>
-              <li>Extract exact timestamps, passenger/staff names, locations, and physical luggage items</li>
-              <li>Filter out peripheral news / banquet chatter</li>
-              <li><strong>Do NOT</strong> make accusations or operational dispatch decisions</li>
-            </ul>
-          </div>
-
           {/* Prompt Form */}
           <form onSubmit={handleLockIn} className="space-y-3">
             <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
@@ -105,11 +92,11 @@ export function Player1Workspace() {
             </div>
 
             <textarea
-              rows={8}
+              rows={9}
               disabled={isLockedIn}
               value={myPrompt}
               onChange={handleTextChange}
-              placeholder="e.g. Role: Forensic Evidence Extractor. Extract all factual clues from CCTV feeds, scale readings, and baggage tags: people, locations, luggage weights, and reprint codes. Separate confirmed facts from rumors. Filter out marathon news. Do not accuse anyone."
+              placeholder="Write your prompt to guide Agent 1 in extracting key facts, IDs, timestamps, and evidence from the dossier..."
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn
                   ? "border-emerald-500/40 bg-emerald-950/10 opacity-80"
