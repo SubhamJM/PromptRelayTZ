@@ -68,12 +68,26 @@ def run_agent_llm(
         if content and not content.strip().startswith("Error"):
             return content
     except Exception as e:
-        logger.warning(f"Primary LLM invocation failed ({e.__class__.__name__}: {e}). Attempting backup...")
+        logger.warning(f"Primary LLM invocation failed ({e.__class__.__name__}: {e}). Attempting fallback to gemini-3.5-flash-lite...")
 
     settings = get_settings()
-    # Tier 2a: Try fast Groq Qwen backup models if GROQ_API_KEY exists
+
+    # Tier 1 Fallback: gemini-3.5-flash-lite if GEMINI_API_KEY exists
+    if settings.gemini_key:
+        try:
+            logger.info("Primary model failed/unavailable; falling back immediately to gemini-3.5-flash-lite...")
+            fallback_llm = _get_cached_llm("gemini", "gemini-3.5-flash-lite", 0.2, 15, settings.gemini_key)
+            res = fallback_llm.invoke(messages)
+            content = extract_text_from_response(res)
+            if content and not content.strip().startswith("Error"):
+                logger.info("Fallback to gemini-3.5-flash-lite succeeded!")
+                return content
+        except Exception as gemini_err:
+            logger.warning(f"Fallback to gemini-3.5-flash-lite failed ({gemini_err.__class__.__name__}: {gemini_err}). Trying alternative backups...")
+
+    # Tier 2 Fallback: Alternative Groq models if GROQ_API_KEY exists
     if settings.groq_key:
-        for backup_model in ["qwen-2.5-32b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]:
+        for backup_model in ["qwen-2.5-32b", "llama-3.3-70b-versatile"]:
             try:
                 logger.info(f"Attempting backup Groq model: {backup_model}...")
                 backup_llm = _get_cached_llm("groq", backup_model, 0.2, 10, settings.groq_key)
@@ -84,20 +98,6 @@ def run_agent_llm(
                     return content
             except Exception as backup_err:
                 logger.warning(f"Backup Groq model {backup_model} failed: {backup_err}")
-
-    # Tier 2b: Try fast backup Gemini models if GEMINI_API_KEY exists
-    if settings.gemini_key:
-        for backup_model in ["gemini-3.5-flash", "gemini-3-flash-preview", "gemini-3.1-flash-lite"]:
-            try:
-                logger.info(f"Attempting backup Gemini model: {backup_model}...")
-                backup_llm = _get_cached_llm("gemini", backup_model, 0.2, 10, settings.gemini_key)
-                res = backup_llm.invoke(messages)
-                content = extract_text_from_response(res)
-                if content and not content.strip().startswith("Error"):
-                    logger.info(f"Backup Gemini model {backup_model} succeeded!")
-                    return content
-            except Exception as backup_err:
-                logger.warning(f"Backup Gemini model {backup_model} failed: {backup_err}")
 
     # Tier 3: High-fidelity Offline Simulator
     if get_runtime_config().fallback_to_offline:

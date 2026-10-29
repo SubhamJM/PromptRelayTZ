@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # LLM Settings
     GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
-    DEFAULT_MODEL_NAME: str = "qwen-2.5-32b"
+    DEFAULT_MODEL_NAME: str = "qwen/qwen3.8-27b"
     DEFAULT_LLM_PROVIDER: str = "groq"
     MODEL_TEMPERATURE: float = 0.2
     MODEL_TIMEOUT_SECONDS: int = 15

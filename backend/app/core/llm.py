@@ -382,7 +382,7 @@ class RuntimeLLMConfig:
     def __init__(self):
         settings = get_settings()
         self.provider: str = getattr(settings, "DEFAULT_LLM_PROVIDER", "groq")
-        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "qwen-2.5-32b")
+        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "qwen/qwen3.8-27b")
         self.temperature: float = getattr(settings, "MODEL_TEMPERATURE", 0.2)
         self.timeout_seconds: int = getattr(settings, "MODEL_TIMEOUT_SECONDS", 15)
         self.fallback_to_offline: bool = getattr(settings, "FALLBACK_TO_OFFLINE", True)
@@ -435,7 +435,7 @@ def _get_cached_llm(
     if chosen_provider in ("groq",):
         from langchain_groq import ChatGroq
         return ChatGroq(
-            model=chosen_model or "qwen-2.5-32b",
+            model=chosen_model or "qwen/qwen3.8-27b",
             groq_api_key=api_key,
             temperature=temp,
             timeout=effective_timeout,
