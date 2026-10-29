@@ -121,6 +121,14 @@ class Scenario(BaseModel):
         if not self.objective:
             self.objective = self.synopsis
 
+    @property
+    def case_id(self) -> str:
+        return self.id
+
+    @property
+    def description(self) -> str:
+        return self.synopsis
+
 
 class ScenarioSummary(BaseModel):
     id: str

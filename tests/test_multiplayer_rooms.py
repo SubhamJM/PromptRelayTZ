@@ -102,7 +102,10 @@ def test_websocket_room_lifecycle():
         assert pong["type"] == "PONG"
 
 
-def test_full_multiplayer_relay_execution():
+@pytest.mark.asyncio
+async def test_full_multiplayer_relay_execution():
+    from backend.app.services.relay_runner import execute_multiplayer_relay
+
     room_mgr = get_room_manager()
     room = room_mgr.create_room(
         team_name="SimultaneousSquad",
@@ -121,12 +124,28 @@ def test_full_multiplayer_relay_execution():
     p2 = "Role: Incident Reconstructor. Chronologically sequence events first, next, and last. Trace the unattended bag."
     p3 = "Role: Logic Decision Solver. Evaluate rules Rule SEC-101 and Rule OPS-204 to hold Flight SW 472. Output JSON."
 
-    client.post(f"/api/rooms/{code}/lock-in", json={"room_code": code, "role": "player_1", "prompt": p1})
-    client.post(f"/api/rooms/{code}/lock-in", json={"room_code": code, "role": "player_2", "prompt": p2})
-    client.post(f"/api/rooms/{code}/lock-in", json={"room_code": code, "role": "player_3", "prompt": p3})
+    room_mgr.lock_in_prompt(code, "player_1", p1)
+    room_mgr.lock_in_prompt(code, "player_2", p2)
+    room_mgr.lock_in_prompt(code, "player_3", p3)
 
     # Verify all ready was reached
     assert room_mgr.all_ready(code) is True
+
+    broadcast_events = []
+
+    async def mock_broadcast(r_code, event):
+        broadcast_events.append(event)
+
+    await execute_multiplayer_relay(code, mock_broadcast)
+
+    assert room.status == "completed"
+    assert room.a1_output != ""
+    assert room.a2_output != ""
+    assert room.a3_output != ""
+    assert room.evaluation is not None
+    event_types = [e["type"] for e in broadcast_events]
+    assert "EXECUTION_STARTED" in event_types
+    assert "MATCH_COMPLETED" in event_types
 
 
 def test_invalid_room_and_unlock_flow():

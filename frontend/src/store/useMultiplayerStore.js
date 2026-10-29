@@ -307,6 +307,11 @@ export const useMultiplayerStore = create((set, get) => ({
             finalVerdict: final_verdict,
             evaluation,
           });
+        } else if (type === "EXECUTION_ERROR") {
+          set((state) => ({
+            error: msg.error || "Agent execution failed.",
+            room: state.room ? { ...state.room, status: "prompting" } : null,
+          }));
         }
       } catch (e) {
         console.error("Error parsing WebSocket message:", e);
