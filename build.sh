@@ -4,6 +4,7 @@ set -o errexit
 
 echo "=== Installing Python dependencies ==="
 pip install --upgrade pip
+pip install -r requirements.txt
 pip install -e .
 
 echo "=== Building React Frontend ==="

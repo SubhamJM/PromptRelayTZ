@@ -26,15 +26,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python project dependencies
-COPY pyproject.toml ./
+# Install Python project dependencies using cached layer
+COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir .
+    pip install --no-cache-dir -r requirements.txt
 
-# Copy Backend codebase
+# Copy Backend codebase, metadata, and assets
+COPY pyproject.toml README.md ./
 COPY backend/ ./backend/
 COPY image_data/ ./image_data/
 COPY images_for_museum/ ./images_for_museum/
+
+# Install local package metadata
+RUN pip install --no-cache-dir --no-deps -e .
 
 # Copy built frontend distribution from builder stage
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
