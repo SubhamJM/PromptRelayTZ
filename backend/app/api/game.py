@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import random
 from typing import Any, Dict, List, Optional
@@ -275,7 +276,8 @@ async def submit_step_1(
         "user_1_prompt": prompt_text,
     }
 
-    result = agent_1_extractor(state)
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(None, lambda: agent_1_extractor(state))
     a1_output = result.get("a1_output") or result.get("agent_1_output") or ""
 
     session.p1_prompt = prompt_text
@@ -333,7 +335,8 @@ async def submit_step_2(
         "leak_keywords": leak_kw,
     }
 
-    result = agent_2_reconstructor(state)
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(None, lambda: agent_2_reconstructor(state))
     a2_output = result.get("a2_output") or result.get("agent_2_output") or ""
     leak_detected = result.get("leak_detected", False)
     leak_keywords_found = result.get("leak_keywords_found", [])
@@ -394,7 +397,9 @@ async def submit_step_3(
         "user_3_prompt": prompt_text,
     }
 
-    solver_res = agent_3_detective(solver_state)
+    # 1. Run Solver Node
+    loop = asyncio.get_running_loop()
+    solver_res = await loop.run_in_executor(None, lambda: agent_3_detective(solver_state))
     final_verdict = solver_res.get("final_verdict", {})
     a3_raw_output = (
         solver_res.get("a3_raw_output")
@@ -416,7 +421,7 @@ async def submit_step_3(
         "raw_agent_3_output": a3_raw_output,
         "_was_clean_json": was_clean_json,
     }
-    eval_res = node_evaluator(eval_state)
+    eval_res = await loop.run_in_executor(None, lambda: node_evaluator(eval_state))
     report = eval_res["evaluation"]
 
     session.evaluation = report

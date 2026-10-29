@@ -3,7 +3,13 @@ import logging
 from typing import Any, Dict, Optional
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from backend.app.core.llm import MockOfflineChatModel, get_llm, get_runtime_config
+from backend.app.core.config import get_settings
+from backend.app.core.llm import (
+    MockOfflineChatModel,
+    _get_cached_llm,
+    get_llm,
+    get_runtime_config,
+)
 from backend.app.graph.evaluator import evaluate_relay_match, evaluate_verdict, parse_json_verdict
 from backend.app.graph.guardrails import (
     sanitize_extractor_output,
@@ -40,6 +46,52 @@ def extract_text_from_response(response: Any) -> str:
 
 
 extract_text_content = extract_text_from_response
+
+
+def run_agent_llm(
+    system_prompt: str,
+    user_message: str,
+    active_llm: Optional[BaseChatModel] = None,
+) -> str:
+    """
+    Execute LLM call with strict fail-fast timeout and multi-tier fallbacks:
+    1. Primary active_llm (max_retries=1, timeout <= 20s)
+    2. Fast backup Gemini models (gemini-3-flash-preview, gemini-3.1-flash-lite)
+    3. High-fidelity MockOfflineChatModel simulation
+    """
+    messages = [("system", system_prompt), ("user", user_message)]
+    chosen_llm = active_llm or get_llm()
+
+    try:
+        res = chosen_llm.invoke(messages)
+        content = extract_text_from_response(res)
+        if content and not content.strip().startswith("Error"):
+            return content
+    except Exception as e:
+        logger.warning(f"Primary LLM invocation failed ({e.__class__.__name__}: {e}). Attempting backup...")
+
+    # Tier 2: Try fast backup Gemini models if API key exists
+    settings = get_settings()
+    if settings.gemini_key:
+        for backup_model in ["gemini-3-flash-preview", "gemini-3.1-flash-lite"]:
+            try:
+                logger.info(f"Attempting backup Gemini model: {backup_model}...")
+                backup_llm = _get_cached_llm("gemini", backup_model, 0.2, 10, settings.gemini_key)
+                res = backup_llm.invoke(messages)
+                content = extract_text_from_response(res)
+                if content and not content.strip().startswith("Error"):
+                    logger.info(f"Backup model {backup_model} succeeded!")
+                    return content
+            except Exception as backup_err:
+                logger.warning(f"Backup model {backup_model} failed: {backup_err}")
+
+    # Tier 3: High-fidelity Offline Simulator
+    if get_runtime_config().fallback_to_offline:
+        logger.info("Engaging MockOfflineChatModel fallback...")
+        res = MockOfflineChatModel().invoke(messages)
+        return extract_text_from_response(res)
+
+    return "Error: LLM service temporarily unavailable. Please retry in a moment."
 
 
 SYSTEM_PROMPT_EXTRACTOR = """You are Agent 1: The Evidence Extractor Agent for an investigative multi-agent pipeline.
@@ -117,23 +169,7 @@ def node_extractor(state: RelayState, llm: Optional[BaseChatModel] = None) -> Di
     prompt_str = user_prompt if user_prompt else "[No specific user prompt provided]"
     user_message = f"USER PROMPT:\n{prompt_str}\n\n{dossier}"
 
-    try:
-        res = active_llm.invoke([
-            ("system", SYSTEM_PROMPT_EXTRACTOR),
-            ("user", user_message),
-        ])
-        content = extract_text_from_response(res)
-    except Exception as e:
-        logger.warning(f"Error in node_extractor: {e}. Checking fallback...")
-        if get_runtime_config().fallback_to_offline:
-            res = MockOfflineChatModel().invoke([
-                ("system", SYSTEM_PROMPT_EXTRACTOR),
-                ("user", user_message),
-            ])
-            content = extract_text_from_response(res)
-        else:
-            content = f"Error generating extraction: {str(e)}"
-
+    content = run_agent_llm(SYSTEM_PROMPT_EXTRACTOR, user_message, active_llm=active_llm)
     sanitized = sanitize_extractor_output(content)
     return {
         "a1_output": sanitized,
@@ -171,22 +207,7 @@ def node_reconstructor(state: RelayState, llm: Optional[BaseChatModel] = None) -
         f"EXTRACTED EVIDENCE FROM AGENT 1:\n{evidence_text}"
     )
 
-    try:
-        res = active_llm.invoke([
-            ("system", SYSTEM_PROMPT_RECONSTRUCTOR),
-            ("user", user_message),
-        ])
-        content = extract_text_from_response(res)
-    except Exception as e:
-        logger.warning(f"Error in node_reconstructor: {e}. Checking fallback...")
-        if get_runtime_config().fallback_to_offline:
-            res = MockOfflineChatModel().invoke([
-                ("system", SYSTEM_PROMPT_RECONSTRUCTOR),
-                ("user", user_message),
-            ])
-            content = extract_text_from_response(res)
-        else:
-            content = f"Error reconstructing timeline: {str(e)}"
+    content = run_agent_llm(SYSTEM_PROMPT_RECONSTRUCTOR, user_message, active_llm=active_llm)
 
     # Determine leak keywords to guardrail
     scenario = state.get("scenario")
@@ -270,23 +291,7 @@ def node_solver(state: RelayState, llm: Optional[BaseChatModel] = None) -> Dict[
         f"RECONSTRUCTED INCIDENT TIMELINE (From Step 2):\n{timeline}"
     )
 
-    try:
-        res = active_llm.invoke([
-            ("system", SYSTEM_PROMPT_SOLVER),
-            ("user", user_message),
-        ])
-        content = extract_text_from_response(res)
-    except Exception as e:
-        logger.warning(f"Error in node_solver: {e}. Checking fallback...")
-        if get_runtime_config().fallback_to_offline:
-            res = MockOfflineChatModel().invoke([
-                ("system", SYSTEM_PROMPT_SOLVER),
-                ("user", user_message),
-            ])
-            content = extract_text_from_response(res)
-        else:
-            content = json.dumps({"culprit": f"Error: {str(e)}", "method": "", "clue": ""})
-
+    content = run_agent_llm(SYSTEM_PROMPT_SOLVER, user_message, active_llm=active_llm)
     parsed_verdict, was_clean = parse_json_verdict(content)
     return {
         "a3_raw_output": content,

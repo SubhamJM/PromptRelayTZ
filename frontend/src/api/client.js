@@ -7,24 +7,37 @@ async function request(endpoint, options = {}) {
     ...options.headers,
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 40000);
 
-  if (!response.ok) {
-    let errorMsg = `Server error (${response.status})`;
-    try {
-      const errJson = await response.json();
-      errorMsg = errJson.detail || errorMsg;
-    } catch {
-      const text = await response.text();
-      if (text) errorMsg = text;
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      signal: options.signal || controller.signal,
+    });
+
+    if (!response.ok) {
+      let errorMsg = `Server error (${response.status})`;
+      try {
+        const errJson = await response.json();
+        errorMsg = errJson.detail || errorMsg;
+      } catch {
+        const text = await response.text();
+        if (text) errorMsg = text;
+      }
+      throw new Error(errorMsg);
     }
-    throw new Error(errorMsg);
-  }
 
-  return response.json();
+    return response.json();
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("Request timed out. The server took longer than 40s to respond. Please try again.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export const api = {

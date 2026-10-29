@@ -13,10 +13,10 @@ class Settings(BaseSettings):
 
     # LLM Settings
     GEMINI_API_KEY: str = ""
-    DEFAULT_MODEL_NAME: str = "gemini-3.8-flash"
+    DEFAULT_MODEL_NAME: str = "gemini-3.5-flash"
     DEFAULT_LLM_PROVIDER: str = "gemini"
     MODEL_TEMPERATURE: float = 0.2
-    MODEL_TIMEOUT_SECONDS: int = 30
+    MODEL_TIMEOUT_SECONDS: int = 15
     FALLBACK_TO_OFFLINE: bool = True
 
     # Database and Directories

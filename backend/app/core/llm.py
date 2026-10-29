@@ -382,9 +382,9 @@ class RuntimeLLMConfig:
     def __init__(self):
         settings = get_settings()
         self.provider: str = getattr(settings, "DEFAULT_LLM_PROVIDER", "gemini")
-        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "gemini-3.8-flash")
+        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "gemini-3.5-flash")
         self.temperature: float = getattr(settings, "MODEL_TEMPERATURE", 0.2)
-        self.timeout_seconds: int = getattr(settings, "MODEL_TIMEOUT_SECONDS", 30)
+        self.timeout_seconds: int = getattr(settings, "MODEL_TIMEOUT_SECONDS", 15)
         self.fallback_to_offline: bool = getattr(settings, "FALLBACK_TO_OFFLINE", True)
 
     def update(
@@ -431,13 +431,15 @@ def _get_cached_llm(
     timeout: int,
     api_key: str,
 ) -> BaseChatModel:
+    effective_timeout = min(timeout, 20) if timeout else 15
     if chosen_provider in ("gemini", "google"):
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
-            model=chosen_model or "gemini-3.5-flash-lite",
+            model=chosen_model or "gemini-3.5-flash",
             google_api_key=api_key,
             temperature=temp,
-            timeout=timeout,
+            timeout=effective_timeout,
+            max_retries=1,
             max_output_tokens=700,
         )
     elif chosen_provider == "openai":
