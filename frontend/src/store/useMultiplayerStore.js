@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { api } from "../api/client";
 import { useGameStore } from "./useGameStore";
 
+let wsPingTimer = null;
+let wsReconnectTimer = null;
+
 export const useMultiplayerStore = create((set, get) => ({
   // Server discovery
   serverInfo: null,
@@ -50,17 +53,21 @@ export const useMultiplayerStore = create((set, get) => ({
   closePartyCreatedModal: () => set({ showPartyCreatedModal: false }),
 
   getJoinUrl: () => {
-    const { roomCode, serverInfo, joinUrl } = get();
+    const { roomCode, serverInfo } = get();
     if (!roomCode) return "";
-    if (joinUrl) return joinUrl;
+
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+
+    // When deployed to Render or any public host, always use the active web origin
+    if (!isLocalhost) {
+      return `${window.location.origin}?room=${roomCode}`;
+    }
 
     const hostIp = serverInfo?.local_ip;
     const currentPort = window.location.port ? `:${window.location.port}` : "";
-    if (
-      hostIp &&
-      (window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1")
-    ) {
+    if (hostIp) {
       return `${window.location.protocol}//${hostIp}${currentPort}?room=${roomCode}`;
     }
     return `${window.location.origin}?room=${roomCode}`;
@@ -92,16 +99,17 @@ export const useMultiplayerStore = create((set, get) => ({
       const room = data.room;
       const hostIp = data.local_ip || get().serverInfo?.local_ip;
       const currentPort = window.location.port ? `:${window.location.port}` : "";
-      let computedJoinUrl = "";
+      const isLocalhost =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
 
-      if (
-        hostIp &&
-        (window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1")
-      ) {
-        computedJoinUrl = `${window.location.protocol}//${hostIp}${currentPort}?room=${room.room_code}`;
-      } else if (data.join_url) {
+      let computedJoinUrl = "";
+      if (!isLocalhost) {
+        computedJoinUrl = `${window.location.origin}?room=${room.room_code}`;
+      } else if (data.join_url && !data.join_url.includes("127.0.0.1") && !data.join_url.includes("localhost")) {
         computedJoinUrl = data.join_url;
+      } else if (hostIp) {
+        computedJoinUrl = `${window.location.protocol}//${hostIp}${currentPort}?room=${room.room_code}`;
       } else {
         computedJoinUrl = `${window.location.origin}?room=${room.room_code}`;
       }
@@ -172,6 +180,15 @@ export const useMultiplayerStore = create((set, get) => ({
 
   // 4. WebSocket Manager
   connectWebSocket: (roomCode, role) => {
+    if (wsPingTimer) {
+      clearInterval(wsPingTimer);
+      wsPingTimer = null;
+    }
+    if (wsReconnectTimer) {
+      clearTimeout(wsReconnectTimer);
+      wsReconnectTimer = null;
+    }
+
     const existingSocket = get().socket;
     if (existingSocket) {
       existingSocket.close();
@@ -185,12 +202,27 @@ export const useMultiplayerStore = create((set, get) => ({
 
     ws.onopen = () => {
       set({ wsConnected: true, socket: ws });
+      // Start ping heartbeat every 20s to prevent Render 55s proxy timeout
+      wsPingTimer = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            ws.send(JSON.stringify({ type: "PING" }));
+          } catch {
+            // Socket closing
+          }
+        }
+      }, 20000);
     };
 
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
         const { type } = msg;
+
+        if (type === "PONG") {
+          // Heartbeat acknowledged by server
+          return;
+        }
 
         if (type === "ROOM_UPDATED") {
           const room = msg.room;
@@ -282,11 +314,30 @@ export const useMultiplayerStore = create((set, get) => ({
     };
 
     ws.onclose = () => {
+      if (wsPingTimer) {
+        clearInterval(wsPingTimer);
+        wsPingTimer = null;
+      }
       set({ wsConnected: false, socket: null });
+
+      // Auto-reconnect if dropped while in an active room
+      const state = get();
+      if (state.roomCode && state.myRole && state.room?.status !== "completed") {
+        wsReconnectTimer = setTimeout(() => {
+          const currentState = get();
+          if (currentState.roomCode && currentState.myRole && !currentState.wsConnected) {
+            currentState.connectWebSocket(currentState.roomCode, currentState.myRole);
+          }
+        }, 2000);
+      }
     };
 
     ws.onerror = (err) => {
       console.warn("WebSocket error:", err);
+      if (wsPingTimer) {
+        clearInterval(wsPingTimer);
+        wsPingTimer = null;
+      }
       set({ wsConnected: false });
     };
   },
@@ -323,6 +374,14 @@ export const useMultiplayerStore = create((set, get) => ({
   },
 
   disconnect: () => {
+    if (wsPingTimer) {
+      clearInterval(wsPingTimer);
+      wsPingTimer = null;
+    }
+    if (wsReconnectTimer) {
+      clearTimeout(wsReconnectTimer);
+      wsReconnectTimer = null;
+    }
     const { socket } = get();
     if (socket) {
       socket.close();
@@ -330,6 +389,8 @@ export const useMultiplayerStore = create((set, get) => ({
     set({
       roomCode: "",
       teamName: "",
+      myRole: "",
+      myPlayerName: "",
       room: null,
       socket: null,
       wsConnected: false,

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: prompt-relay
+    runtime: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FALLBACK_TO_OFFLINE
+        value: "false"
+      - key: PROJECT_NAME
+        value: "Prompt Relay: Multi-Agent Tournament"

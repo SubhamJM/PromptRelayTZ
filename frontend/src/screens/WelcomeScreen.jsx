@@ -110,7 +110,7 @@ export function WelcomeScreen() {
       await joinRoom({
         roomCode: joinRoomCode.trim(),
         role: joinRole,
-        playerName: joinPlayerName.trim() || `Player ${joinRole[-1]}`,
+        playerName: joinPlayerName.trim() || `Player ${joinRole.slice(-1)}`,
       });
     } catch (err) {
       alert(err.message);

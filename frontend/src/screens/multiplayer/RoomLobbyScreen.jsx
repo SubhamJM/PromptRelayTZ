@@ -56,7 +56,7 @@ export function RoomLobbyScreen() {
       await joinRoom({
         roomCode,
         role: targetRole,
-        playerName: myPlayerName || `Player ${targetRole[-1]}`,
+        playerName: myPlayerName || `Player ${targetRole.slice(-1)}`,
       });
     } catch (err) {
       alert(err.message);
@@ -85,7 +85,9 @@ export function RoomLobbyScreen() {
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs font-mono text-slate-300">
-            Wi-Fi Local Network Lobby Active
+            {window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+              ? "Online Relay Room Active"
+              : "Wi-Fi Local Network Lobby Active"}
           </span>
         </div>
       </div>
@@ -124,7 +126,11 @@ export function RoomLobbyScreen() {
           <div className="flex items-center justify-between text-slate-300">
             <div className="flex items-center gap-2">
               <Wifi className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-slate-400">Same Wi-Fi Join Link:</span>
+              <span className="text-slate-400">
+                {window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+                  ? "Direct Party Share Link:"
+                  : "Same Wi-Fi Join Link:"}
+              </span>
             </div>
             <button
               onClick={openPartyCreatedModal}

@@ -58,7 +58,9 @@ export function PartyCreatedModal() {
             {teamName}
           </h2>
           <p className="text-xs text-slate-400 font-mono">
-            Your Wi-Fi multiplayer room is live and ready for teammates.
+            {window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+              ? "Your online multiplayer room is live and ready for teammates."
+              : "Your Wi-Fi multiplayer room is live and ready for teammates."}
           </p>
         </div>
 
@@ -72,12 +74,16 @@ export function PartyCreatedModal() {
           </div>
         </div>
 
-        {/* Same Wi-Fi Share Link Box */}
+        {/* Share Link Box */}
         <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 text-left space-y-3">
           <div className="flex items-center justify-between text-xs font-mono text-slate-300">
             <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
               <Wifi className="w-4 h-4" />
-              <span>Same Wi-Fi Share Link</span>
+              <span>
+                {window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+                  ? "Direct Party Share Link"
+                  : "Same Wi-Fi Share Link"}
+              </span>
             </span>
             <span className="text-[10px] text-slate-500">Auto-joins this party</span>
           </div>
@@ -113,7 +119,11 @@ export function PartyCreatedModal() {
         <div className="text-left text-xs text-slate-400 font-mono space-y-1.5 bg-blue-950/20 border border-blue-500/20 rounded-xl p-3">
           <div className="flex items-start gap-2">
             <span className="text-blue-400 font-bold shrink-0">1.</span>
-            <span>Send this link to Player 2 & 3 on laptops connected to the same Wi-Fi.</span>
+            <span>
+              {window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+                ? "Send this link to Player 2 & 3 on their respective laptops."
+                : "Send this link to Player 2 & 3 on laptops connected to the same Wi-Fi."}
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-blue-400 font-bold shrink-0">2.</span>
@@ -121,7 +131,7 @@ export function PartyCreatedModal() {
           </div>
           <div className="flex items-start gap-2">
             <span className="text-blue-400 font-bold shrink-0">3.</span>
-            <span>Once all 3 seats are filled, click "Begin Synchronized Mission" in the lobby!</span>
+            <span>Once all 3 seats are filled, click "Launch Simultaneous Prompting Phase" in the lobby!</span>
           </div>
         </div>
 

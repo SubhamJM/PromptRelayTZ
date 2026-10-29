@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from backend.app.api.websocket import manager
 from backend.app.models.room import (
@@ -16,26 +16,34 @@ router = APIRouter(prefix="/rooms", tags=["Multiplayer Rooms"])
 
 
 @router.get("/network/server-info")
-async def get_network_server_info():
-    """Returns Laptop 1's local LAN IP address and join URL template
-
-    for sharing across 3 laptops on the same Wi-Fi.
+async def get_network_server_info(request: Request):
+    """Returns server connection information and join URL template
+    for sharing across 3 laptops on local Wi-Fi or public cloud (Render).
     """
+    forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    forwarded_host = request.headers.get("x-forwarded-host", request.headers.get("host"))
     ip = get_local_ip()
     port = 8000
+
+    is_cloud = forwarded_host and not forwarded_host.startswith("localhost") and not forwarded_host.startswith("127.0.0.1")
+    if is_cloud:
+        base_url = f"{forwarded_proto}://{forwarded_host}"
+        instructions = f"Teammates can open {base_url} on their laptops and enter the 4-letter Room Code."
+    else:
+        base_url = f"http://{ip}:{port}"
+        instructions = f"Teammates on the same Wi-Fi can open: http://{ip}:{port} and enter the 4-letter Room Code."
+
     return {
         "local_ip": ip,
         "port": port,
-        "base_url": f"http://{ip}:{port}",
-        "instructions": (
-            f"Teammates on the same Wi-Fi can open: http://{ip}:{port} "
-            "and enter the 4-letter Room Code."
-        ),
+        "base_url": base_url,
+        "is_cloud": bool(is_cloud),
+        "instructions": instructions,
     }
 
 
 @router.post("/create")
-async def create_room(req: CreateRoomRequest):
+async def create_room(req: CreateRoomRequest, request: Request):
     room_mgr = get_room_manager()
     scenario_loader = get_scenario_loader()
     scenario = scenario_loader.get(req.scenario_id)
@@ -50,11 +58,21 @@ async def create_room(req: CreateRoomRequest):
         round_duration_seconds=req.round_duration_seconds,
     )
     ip = get_local_ip()
+
+    # Determine public join URL dynamically (supports Render, custom domains, and local Wi-Fi)
+    forwarded_proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    forwarded_host = request.headers.get("x-forwarded-host", request.headers.get("host"))
+
+    if forwarded_host and not forwarded_host.startswith("localhost") and not forwarded_host.startswith("127.0.0.1"):
+        join_url = f"{forwarded_proto}://{forwarded_host}?room={room.room_code}"
+    else:
+        join_url = f"http://{ip}:8000?room={room.room_code}"
+
     return {
         "room": room.model_dump(),
         "room_code": room.room_code,
         "local_ip": ip,
-        "join_url": f"http://{ip}:8000?room={room.room_code}",
+        "join_url": join_url,
         "scenario": {
             "id": scenario.id,
             "title": scenario.title,
