@@ -282,18 +282,18 @@ def test_prompt_length_limits_enforced():
     assert start_resp.status_code == 200
     session_id = start_resp.json()["session_id"]
     limits = start_resp.json().get("prompt_limits", {})
-    assert limits.get("p1", {}).get("max_words") == 80
-    assert limits.get("p2", {}).get("max_words") == 80
-    assert limits.get("p3", {}).get("max_words") == 120
+    assert limits.get("p1", {}).get("max_words") == 40
+    assert limits.get("p2", {}).get("max_words") == 40
+    assert limits.get("p3", {}).get("max_words") == 60
 
-    # 1. Step 1: Prompt exceeding 80 words
-    overlong_p1 = "word " * 85
+    # 1. Step 1: Prompt exceeding 40 words
+    overlong_p1 = "word " * 45
     p1_fail_resp = client.post(
         "/api/game/step1",
         json={"session_id": session_id, "prompt": overlong_p1},
     )
     assert p1_fail_resp.status_code == 400
-    assert "exceeds the limit of 80 words" in p1_fail_resp.json()["detail"]
+    assert "exceeds the limit of 40 words" in p1_fail_resp.json()["detail"]
 
     # Valid P1 prompt succeeds
     p1_ok_resp = client.post(
@@ -302,14 +302,14 @@ def test_prompt_length_limits_enforced():
     )
     assert p1_ok_resp.status_code == 200
 
-    # 2. Step 2: Prompt exceeding 80 words
-    overlong_p2 = "sequence " * 85
+    # 2. Step 2: Prompt exceeding 40 words
+    overlong_p2 = "sequence " * 45
     p2_fail_resp = client.post(
         "/api/game/step2",
         json={"session_id": session_id, "prompt": overlong_p2},
     )
     assert p2_fail_resp.status_code == 400
-    assert "exceeds the limit of 80 words" in p2_fail_resp.json()["detail"]
+    assert "exceeds the limit of 40 words" in p2_fail_resp.json()["detail"]
 
     # Valid P2 prompt succeeds
     p2_ok_resp = client.post(
@@ -318,12 +318,54 @@ def test_prompt_length_limits_enforced():
     )
     assert p2_ok_resp.status_code == 200
 
-    # 3. Step 3: Prompt exceeding 120 words
-    overlong_p3 = "verdict " * 125
+    # 3. Step 3: Prompt exceeding 60 words
+    overlong_p3 = "verdict " * 65
     p3_fail_resp = client.post(
         "/api/game/step3",
         json={"session_id": session_id, "prompt": overlong_p3},
     )
     assert p3_fail_resp.status_code == 400
-    assert "exceeds the limit of 120 words" in p3_fail_resp.json()["detail"]
+    assert "exceeds the limit of 60 words" in p3_fail_resp.json()["detail"]
+
+
+def test_step1_after_server_restart_cache_clear():
+    """Verify that sessions recovered from SQLite persistence after cache flush / restart don't crash on Step 1."""
+    manager = get_session_manager()
+    start_resp = client.post(
+        "/api/game/start",
+        json={"team_name": "CrashRecoveryTeam", "case_id": "case_04_airport_crisis"},
+    )
+    assert start_resp.status_code == 200
+    session_id = start_resp.json()["session_id"]
+
+    # Simulate server restart / memory cache flush so session is fetched from SQLite
+    manager._cache.clear()
+
+    # Step 1 submission must not raise AttributeError: 'dict' object has no attribute 'dossier_text'
+    p1_resp = client.post(
+        "/api/game/step1",
+        json={"session_id": session_id, "prompt": "Extract all evidence from Gate B07 and check-in island."},
+    )
+    assert p1_resp.status_code == 200
+    assert "a1_output" in p1_resp.json()
+
+    # Flush again before step 2
+    manager._cache.clear()
+    p2_resp = client.post(
+        "/api/game/step2",
+        json={"session_id": session_id, "prompt": "Reconstruct timestamps from check-in to gate discovery."},
+    )
+    assert p2_resp.status_code == 200
+    assert "a2_output" in p2_resp.json()
+
+    # Flush again before step 3
+    manager._cache.clear()
+    p3_resp = client.post(
+        "/api/game/step3",
+        json={"session_id": session_id, "prompt": "Determine culprit and operational action for SW 472."},
+    )
+    assert p3_resp.status_code == 200
+    assert "final_verdict" in p3_resp.json()
+    assert "evaluation" in p3_resp.json()
+
 

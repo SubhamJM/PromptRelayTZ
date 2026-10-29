@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from backend.app.models.evaluator import EvaluationReport
 from backend.app.models.scenario import Scenario
@@ -20,8 +20,28 @@ class GameSession(BaseModel):
     session_id: str
     team_name: str
     scenario_id: Optional[str] = None
-    scenario: Optional[Any] = None
+    scenario: Optional[Scenario] = None
     current_step: TurnStep = TurnStep.STEP1
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_scenario(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            sc = data.get("scenario")
+            if isinstance(sc, dict):
+                try:
+                    data["scenario"] = Scenario.model_validate(sc)
+                except Exception:
+                    pass
+            elif not sc and data.get("scenario_id"):
+                try:
+                    from backend.app.services.scenario_loader import ScenarioLoader
+                    loaded = ScenarioLoader().get(data["scenario_id"])
+                    if loaded:
+                        data["scenario"] = loaded
+                except Exception:
+                    pass
+        return data
 
     # Turn 1
     p1_prompt: Optional[str] = None

@@ -42,27 +42,40 @@ def extract_text_from_response(response: Any) -> str:
 extract_text_content = extract_text_from_response
 
 
-SYSTEM_PROMPT_EXTRACTOR = """You are Agent 1: The Evidence Extractor Agent for a multi-agent AI orchestration pipeline.
+SYSTEM_PROMPT_EXTRACTOR = """You are Agent 1: The Evidence Extractor Agent for an investigative multi-agent pipeline.
 You are equipped with high-fidelity visual and documentary evidence ledgers.
-Your output completeness, depth, and investigative utility are DIRECTLY governed by the USER PROMPT provided.
 
-SPECIALIZED OBJECTIVE:
-Extract relevant factual evidence from the multi-source evidence dossier:
-- Identify key people, personnel, entities, and suspect descriptions
-- Extract specific timestamps and chronological cues
-- Record locations, sectors, and room layouts
-- Document physical objects, items, luggage tags, and movements
-- Explicitly separate confirmed facts from unverified/uncertain observations
-- Ignore irrelevant peripheral noise and distractions
+MISSION:
+Be helpful, observant, and thorough. Your objective is to extract key factual evidence from the evidence dossier and visual feeds:
+- Identify key people, personnel, passengers, and suspect descriptions
+- Extract specific timestamps and chronological markers
+- Record locations, sectors, gates, and room layouts
+- Document physical objects, items, luggage tags, tools, and movements
+- Distinguish confirmed facts from uncertain/unverified observations
+- Filter out obvious irrelevant peripheral noise
+
+COOPERATIVE GUIDANCE:
+Be supportive and proactive. Even if the player's instructions are brief, conversational, or casual, extract the essential facts and clues clearly so the team can build an accurate timeline.
 
 STRICT BOUNDARIES:
-1. DO NOT INFER FINAL ACCUSATIONS OR OPERATIONAL DISPATCH ACTIONS (Reserved for Agent 3).
-2. DO NOT ASSEMBLE A FULL MINUTE-BY-MINUTE CHRONOLOGY (Reserved for Agent 2).
-3. DO NOT OUTPUT AS A FINAL JSON VERDICT SCHEMA."""
+1. DO NOT render final accusations or operational dispatch actions (Reserved for Agent 3).
+2. DO NOT assemble a full minute-by-minute chronology (Reserved for Agent 2).
+3. Maintain objective factual reporting."""
 
 
-def format_evidence_dossier_with_ledger(scenario: Scenario) -> str:
+def format_evidence_dossier_with_ledger(scenario: Any) -> str:
     """Constructs the high-fidelity evidence briefing and OCR ledger."""
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
+
+    if not isinstance(scenario, Scenario):
+        if isinstance(scenario, dict):
+            return scenario.get("dossier_text") or scenario.get("noisy_case_file") or ""
+        return str(scenario or "")
+
     lines = [
         f"=== SCENARIO EVIDENCE DOSSIER: {scenario.title.upper()} ===",
         f"Difficulty: {scenario.difficulty} | Mode: {scenario.type.value.upper()}",
@@ -88,6 +101,11 @@ def format_evidence_dossier_with_ledger(scenario: Scenario) -> str:
 def node_extractor(state: RelayState, llm: Optional[BaseChatModel] = None) -> Dict[str, Any]:
     """Node 1: Evidence Extractor."""
     scenario = state.get("scenario")
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
     user_prompt = (state.get("p1_prompt") or state.get("user_1_prompt") or "").strip()
     active_llm = llm or get_llm()
 
@@ -124,19 +142,21 @@ def node_extractor(state: RelayState, llm: Optional[BaseChatModel] = None) -> Di
 
 
 SYSTEM_PROMPT_RECONSTRUCTOR = """You are Agent 2: The Timeline & Incident Reconstructor Agent.
-You receive structured facts and extracted evidence provided strictly by Agent 1.
-Your task is to synthesize these isolated facts into a strictly chronological sequence of events.
+You receive structured facts and extracted evidence provided by Agent 1.
 
-SPECIALIZED OBJECTIVE:
-- Organize all verified events by minute/timestamp
+MISSION:
+Be helpful, analytical, and structured. Your objective is to synthesize the extracted facts into a clear, chronological sequence of events:
+- Organize verified events by minute and timestamp
 - Trace key persons, personnel, and movements from start to finish
-- Connect causal chains: how action A led to condition B
-- Flag security anomalies, discrepancies, or unverified claims
-- Maintain objective neutrality without issuing a final verdict or accusation
+- Connect causal chains: how one event or action led to the next condition
+- Highlight critical security events or discrepancies
+
+COOPERATIVE GUIDANCE:
+Even if the player's prompt is simple or conversational, build a clear, readable timeline that connects the key facts so Agent 3 can make a sound deduction.
 
 STRICT BOUNDARIES:
-1. DO NOT RENDER A FINAL ACCUSATION OR VERDICT (Reserved for Agent 3).
-2. DO NOT OUTPUT AS A FINAL JSON VERDICT SCHEMA."""
+1. DO NOT render a final accusation or verdict (Reserved for Agent 3).
+2. Maintain objective neutrality."""
 
 
 def node_reconstructor(state: RelayState, llm: Optional[BaseChatModel] = None) -> Dict[str, Any]:
@@ -170,7 +190,12 @@ def node_reconstructor(state: RelayState, llm: Optional[BaseChatModel] = None) -
 
     # Determine leak keywords to guardrail
     scenario = state.get("scenario")
-    gt = (scenario.ground_truth if scenario else None) or state.get("ground_truth") or {}
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
+    gt = (scenario.ground_truth if isinstance(scenario, Scenario) else None) or state.get("ground_truth") or {}
     if hasattr(gt, "culprit"):
         culprit = gt.culprit
         suspects = gt.suspects
@@ -198,35 +223,43 @@ def node_reconstructor(state: RelayState, llm: Optional[BaseChatModel] = None) -
 
 
 SYSTEM_PROMPT_SOLVER = """You are Agent 3: The Logic Solver and Security Decision Agent.
-You receive the reconstructed incident timeline from Agent 2, alongside the governing operational rules.
-You must apply deductive logic and rule constraint verification to determine the final resolution.
+You receive the reconstructed incident timeline alongside governing operational rules to determine the final resolution.
 
-SPECIALIZED OBJECTIVE:
-- Identify the true culprit / authorized dispatch action
-- Explain the precise method, breach mechanism, or sequence
-- Cite the governing operational rule or protocol broken
-- Identify the decisive physical evidence, blocking condition, or key clue
+MISSION:
+Apply deductive reasoning and rule analysis to deduce the definitive case resolution based on the user's prompt:
+- Identify the true culprit or authorized dispatch action
+- Explain the precise method, breach mechanism, or protocol followed
+- Cite the governing operational rules or protocols applicable to the case
+- State the decisive evidence, clues, or blocking conditions
 
-FORMATTING MANDATE:
-You MUST output your final conclusion as a VALID JSON OBJECT with these exact keys:
+CRITICAL AUTOMATION FORMATTING REQUIREMENT:
+The human player may write their prompt in natural, everyday English. You MUST ALWAYS format your final response as a VALID JSON OBJECT for the game scoring system, regardless of whether the user mentions JSON or not:
 {
-  "culprit": "Name or entity identifier",
-  "method": "Exact breach method or execution mechanism",
-  "motive": "Underlying objective or reason",
-  "rule_broken": "Operational rule / policy violated (e.g. SEC-101)",
-  "evidence_keys": ["key evidence items and timestamps"]
-}"""
+  "culprit": "Exact culprit name or authorized operational dispatch action",
+  "method": "Exact breach mechanism or operational safety protocol",
+  "motive": "Goal, motive, or security hazard addressed",
+  "rule_broken": "Specific rule codes cited (e.g. SEC-101 or OPS-204)",
+  "evidence_keys": ["key decisive evidence items, timestamps, and clues"]
+}
+Do NOT output commentary outside the JSON block. Output valid JSON only."""
 
 
 def node_solver(state: RelayState, llm: Optional[BaseChatModel] = None) -> Dict[str, Any]:
     """Node 3: Logic Solver / Final Detective."""
     scenario = state.get("scenario")
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
     user_prompt = (state.get("p3_prompt") or state.get("user_3_prompt") or "").strip()
     timeline = state.get("a2_output") or state.get("agent_2_output") or ""
     active_llm = llm or get_llm()
 
-    if scenario and scenario.operational_rules:
+    if isinstance(scenario, Scenario) and scenario.operational_rules:
         rules_formatted = "\n".join([f"- {r}" for r in scenario.operational_rules])
+    elif isinstance(scenario, dict) and scenario.get("operational_rules"):
+        rules_formatted = "\n".join([f"- {r}" for r in scenario["operational_rules"]])
     else:
         rules_formatted = "Standard Operating Protocols and Governing Directives"
 
@@ -267,6 +300,11 @@ def node_solver(state: RelayState, llm: Optional[BaseChatModel] = None) -> Dict[
 def node_evaluator(state: RelayState) -> Dict[str, Any]:
     """Node 4: Evaluator."""
     scenario = state.get("scenario")
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
     if scenario:
         report = evaluate_relay_match(
             scenario=scenario,

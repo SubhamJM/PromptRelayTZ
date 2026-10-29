@@ -3,149 +3,168 @@
   "type": "image",
   "title": "Airport Crisis: Flight 472 Emergency",
   "difficulty": "Hard",
-  "synopsis": "An emergency security incident occurs at Gate B07 during the boarding of Flight SW 472 to New York. The team must orchestrate 3 specialized AI agents to extract visual evidence from surveillance feeds and documents, reconstruct the timeline, and determine the valid operational safety action before departure clearance.",
-  "dossier_text": "INCIDENT DOSSIER - SKYWAYS INTERNATIONAL AIRPORT\nDate: 12 Nov 2024 | Location: Terminal 1, Gate B07 | Incident Ref: #OPS-SEC-472\nInvestigating Desk: Airport Operations Security Center\n\nOVERVIEW:\nVisual evidence and surveillance feeds have been collected regarding a pre-departure security emergency affecting Flight SW 472 bound for New York.\n\nCOLLECTION OF MULTI-SOURCE VISUAL EVIDENCE:\n1. CCTV Feed [CAM 03 - Check-in Area A] (Timestamp: 2024-11-12 08:14:23)\n2. Flight Information Display System [Terminal 1 Display Screen] (Timestamp: 12 Nov 2024 08:30)\n3. Passenger WhatsApp Chat Screenshot [Passenger Aarav Mehta] (Timestamps: 08:35 - 08:47)\n4. CCTV Feed [CAM 12 - Gate B07 Corridor] (Timestamp: 2024-11-12 08:47:10)\n5. Security Observation Report [SkyWays Security Desk Photo] (Timestamp: 12 Nov 2024 08:49)\n6. CCTV Feed [CAM 21 - Baggage Bay Area] (Timestamp: 2024-11-12 09:02:55)\n7. Physical Evidence Recovered at Gate B07 (Handwritten note & Baggage Tag)\n8. Decoy / Irrelevant Peripheral Material (Daily Chronicle Marathon article)",
+  "synopsis": "During the pre-departure rush for Flight SW 472 to New York at SkyWays International Terminal 1, a $3.5M high-value consignment of industrial diamonds is stolen via an insider luggage swap. An identical blue hard-shell suitcase with a duplicated tag (#SKW-78921-472) was abandoned at Gate B07 as an unattended decoy to trigger a sterile zone security hold, while the authentic diamond-laden suitcase was covertly intercepted on Apron Bay 3 and diverted into an airport maintenance cart. A 3-agent relay team must extract visual forensic evidence from CCTV cameras, baggage scanner telemetry, staff access logs, incident reports, torn drop notes, and baggage tag reprint audits to unmask the insider culprit, prove the luggage swap method, and intercept the stolen diamonds before departure clearance.",
+  "dossier_text": "INCIDENT DOSSIER - SKYWAYS INTERNATIONAL AIRPORT\nDate: 12 Nov 2024 | Location: Terminal 1, Gate B07 & Apron Bay 3 | Incident Ref: #OPS-SEC-472\nInvestigating Desk: Airport Security Intelligence & Anti-Contraband Taskforce\n\nOVERVIEW:\nVisual evidence, digital telemetry, physical crime scene artifacts, and administrative logs have been assembled concerning the pre-departure theft and baggage swap affecting Flight SW 472 bound for New York.\n\nCOLLECTION OF MULTI-SOURCE VISUAL EVIDENCE:\n1. CCTV Feed [CAM 03 - Check-in Area A] (Timestamp: 2024-11-12 08:14:23)\n2. CCTV Feed [CAM 12 - Gate B07 Corridor] (Timestamp: 2024-11-12 08:47:10)\n3. CCTV Feed [CAM 21 - Baggage Bay Area / Apron Stand B07] (Timestamp: 2024-11-12 09:02:55)\n4. Flight Information Display System & Consignment Telemetry (Timestamp: 12 Nov 2024 08:30)\n5. Passenger WhatsApp Chat Screenshot [Passenger Aarav Mehta] (Timestamps: 08:35 - 08:47)\n6. Security Observation & Portable X-Ray Report #SEC-0849 (Timestamp: 12 Nov 2024 08:49)\n7. Concourse Blueprint Drawing & Electronic Door Log [Door B-Staff-03] (Timestamp: 08:47:45)\n8. Physical Evidence Recovered at Gate B07 (Torn Drop Note & Ramp Dispatch Comparison)\n9. Baggage Tag Forensic Audit [Decoy Bag Barcode Tag #SKW-78921-472]\n10. Decoy / Irrelevant Peripheral Material (Daily Chronicle Marathon article)",
   "evidence_items": [
     {
       "id": "img_01",
-      "title": "CCTV: Check-in Area A",
+      "title": "CCTV: Check-in Area A (Counter 04)",
       "category": "CCTV Surveillance",
       "badge": "CAM 03 • Check-in A",
       "timestamp": "08:14:23",
       "src": "/image_data/1.png",
-      "prompt_hint": "Inspect the airline counter transaction. Direct Agent 1 to read the visible camera timestamp, identify the passenger checking in, describe the luggage item and color, and extract counter details.",
-      "description": "Passenger Daniel Kim checks in luggage at airline counter; blue suitcase tagged and dispatched onto conveyor system.",
-      "ocr_ledger": "FEED METADATA: Camera CAM 03 | Location: Terminal 1 Main Concourse, Check-in Island A, Counter 04 | Video Stream Sync: 2024-11-12 08:14:23 UTC+05:30.\nVISUAL SUBJECTS: Ticket Agent (ID badge: SkyWays Staff 412) and Passenger Daniel Kim (wearing grey overcoat, passport in hand).\nOBJECTS & ACTIONS: Passenger Daniel Kim places a medium blue hard-shell polycarbonate suitcase onto baggage belt scale. Scale display reads: 18.4 kg. SkyWays automated luggage tag generated and affixed. Passenger receives boarding boarding pass for Flight SW 472, Seat 14A. Suitcase clears check-in scanner and is dispatched onto primary conveyor bay."
+      "prompt_hint": "Inspect the airline check-in transaction. Direct Agent 1 to read the visible camera timestamp (08:14:23), identify passenger Daniel Kim, extract the checked blue suitcase weight on the digital scale (18.4 kg), and note counter agent Priya Sharma (Badge SKY-412).",
+      "description": "Passenger Daniel Kim checks in a blue polycarbonate suitcase at Counter A04 for Flight SW 472; digital scale confirms weight 18.4 kg; bag dispatched onto primary conveyor.",
+      "ocr_ledger": "FEED METADATA: Camera CAM 03 | Location: Terminal 1 Main Concourse, Check-in Island A, Counter 04 | Video Stream Sync: 2024-11-12 08:14:23 UTC+05:30.\nVISUAL SUBJECTS: Ticket Agent Priya Sharma (ID badge: SKY-412) and Passenger Daniel Kim (wearing grey overcoat, passport in hand).\nOBJECTS & ACTIONS: Passenger Daniel Kim places a medium blue hard-shell polycarbonate suitcase onto baggage belt scale. Scale display reads: 18.4 kg. SkyWays automated luggage tag generated and affixed. Passenger receives boarding pass for Flight SW 472, Seat 14A. Suitcase clears check-in scanner and is dispatched onto primary conveyor bay.\nTELEMETRY NOTE: Adjacent supervisor terminal accessed by badge #RAMP-882 (Tariq Malik) at 08:16:05."
     },
     {
       "id": "img_02",
-      "title": "CCTV: Gate B07 Corridor",
+      "title": "CCTV: Gate B07 Concourse Corridor",
       "category": "CCTV Surveillance",
       "badge": "CAM 12 • Gate B07 Corridor",
       "timestamp": "08:47:10",
       "src": "/image_data/2.png",
-      "prompt_hint": "Observe the person moving rapidly through the concourse. Direct Agent 1 to record the camera timestamp, describe the subject's clothing and appearance, identify gate signage, and note their direction of movement.",
-      "description": "Unidentified person in dark hooded jacket and gloves captured walking rapidly away from Gate B07 corridor.",
-      "ocr_ledger": "FEED METADATA: Camera CAM 12 | Location: Concourse B Passenger Corridor adjacent to Gate B07 | Timestamp: 2024-11-12 08:47:10.\nVISUAL SUBJECTS: Unidentified individual of medium build, wearing a dark navy hooded windbreaker with hood pulled low, black face covering, dark trousers, and dark leather gloves.\nMOVEMENT DYNAMICS: Subject is walking at elevated pace (approx. 2.1 m/s) heading east along Corridor B, moving away from Gate B07 passenger waiting area toward Terminal 1 central atrium. Subject glances back over shoulder toward Gate B07 at 08:47:12. Carries no luggage or personal carry-on item."
+      "prompt_hint": "Track the fleeing suspect. Direct Agent 1 to record the camera timestamp (08:47:10), describe the subject's dark hooded windbreaker, and crucially note their distinctive tarmac safety boots with orange high-visibility soles (Spec RAMP-882 footwear).",
+      "description": "Suspect in dark hooded windbreaker walking briskly away from Gate B07 immediately after the blue bag was abandoned; footwear shows orange high-vis ramp safety soles.",
+      "ocr_ledger": "FEED METADATA: Camera CAM 12 | Location: Concourse B Passenger Corridor adjacent to Gate B07 | Timestamp: 2024-11-12 08:47:10.\nVISUAL SUBJECTS: Individual of broad build wearing dark navy hooded windbreaker with hood drawn low, dark trousers, black work gloves, and distinct tarmac safety boots featuring bright orange high-visibility soles and steel toes (Spec RAMP-882 standard issue to Ramp Supervisors).\nMOVEMENT DYNAMICS: Subject walks at rapid pace heading away from Gate B07 seating bay toward staff egress door B-Staff-03. Leaves Gate B07 seating area with empty hands after abandoning the blue suitcase at 08:46."
     },
     {
       "id": "img_03",
-      "title": "CCTV: Baggage Handling Area",
+      "title": "CCTV: Sub-Terminal Apron Bay 3 & Maintenance Cart",
       "category": "CCTV Surveillance",
-      "badge": "CAM 21 • Apron Bay",
+      "badge": "CAM 21 • Apron Bay 3",
       "timestamp": "09:02:55",
       "src": "/image_data/3.png",
-      "prompt_hint": "Review ground operations on the apron. Direct Agent 1 to record the timestamp, observe ramp crew loading actions, and evaluate whether this shows routine operations or an emergency anomaly.",
-      "description": "Ramp crew loading checked cargo containers onto apron; routine ground operations.",
-      "ocr_ledger": "FEED METADATA: Camera CAM 21 | Location: Sub-terminal Apron Bay 3, Aircraft Stand B07 Ground Level | Timestamp: 2024-11-12 09:02:55.\nOPERATIONAL OBSERVATIONS: Ramp baggage handlers wearing high-visibility orange vests and hearing protection operate motorized baggage tug and belt loader under fuselage of Boeing 777-300ER (Flight SW 472). Standard cargo containers (ULD type AKE) being loaded into aft cargo hold. Normal ramp operating conditions without security anomalies or unauthorized personnel present."
+      "prompt_hint": "Examine ground apron operations. Direct Agent 1 to observe Ramp Supervisor Tariq Malik directing cargo loading, spot yellow maintenance utility cart #MC-08 parked beside the conveyor, and detect the genuine blue 18.4 kg suitcase being diverted into Cart #MC-08.",
+      "description": "Ramp crew active at Aircraft Stand B07; yellow maintenance cart #MC-08 parked near conveyor belt with an authentic blue hard-shell suitcase diverted away from the aircraft cargo hold.",
+      "ocr_ledger": "FEED METADATA: Camera CAM 21 | Location: Sub-terminal Apron Bay 3, Aircraft Stand B07 Ground Level | Timestamp: 2024-11-12 09:02:55.\nOPERATIONAL OBSERVATIONS: Ramp crew loading containerized cargo onto Flight SW 472. Parked adjacent to the belt conveyor is yellow airport maintenance utility cart #MC-08. Surveillance captures Ramp Supervisor Tariq Malik (RAMP-882) covertly lifting the authentic blue hard-shell suitcase (18.4 kg diamond shipment) from the apron belt and stowing it under a tarpaulin inside Maintenance Cart #MC-08, instead of the aircraft cargo container."
     },
     {
       "id": "img_04",
-      "title": "Flight Information Display",
+      "title": "Terminal 1 Flight Information Display & Consignment Telemetry",
       "category": "Flight Monitor",
-      "badge": "Terminal 1 FIDS",
+      "badge": "Terminal 1 FIDS • Ops Console",
       "timestamp": "08:30:00",
       "src": "/image_data/4.png",
-      "prompt_hint": "Perform OCR on the digital flight monitor screen. Direct Agent 1 to extract system date/time, flight numbers, destinations, assigned gates, and operational status for Flight SW 472 and adjacent flights.",
-      "description": "Flight SW 472 to New York listed as 'Boarding' at Gate B07. Other flights on time or delayed.",
-      "ocr_ledger": "DISPLAY OCR TRANSCRIPTION: Terminal 1 Departures Board | System Clock: 12-Nov-2024 08:30:00.\n- Flight SW 472 | Destination: NEW YORK (JFK) | Sched: 09:15 | Gate: B07 | Status: BOARDING (Priority Call Group 1)\n- Flight SW 318 | Destination: LONDON (LHR) | Sched: 09:30 | Gate: B04 | Status: ON TIME\n- Flight SW 561 | Destination: DUBAI (DXB) | Sched: 09:45 | Gate: B09 | Status: DELAYED (Tech Inspection)\n- Flight SW 209 | Destination: SINGAPORE (SIN) | Sched: 10:10 | Gate: B12 | Status: ON TIME"
+      "prompt_hint": "Perform OCR on the digital flight monitor and freight manifest. Direct Agent 1 to extract the system date/time, flight status (Flight SW 472 to New York 'Boarding' at Gate B07), and note the high-value customs manifest #DIA-904 ($3.5M industrial diamonds) assigned to Flight SW 472.",
+      "description": "Digital flight display listing Flight SW 472 to New York boarding at Gate B07, alongside cargo telemetry manifest #DIA-904 flagged for valuable cargo.",
+      "ocr_ledger": "DISPLAY OCR TRANSCRIPTION: Terminal 1 Departures Board | System Clock: 12-Nov-2024 08:30:00.\n- Flight SW 472 | Destination: NEW YORK (JFK) | Sched: 09:15 | Gate: B07 | Status: BOARDING (Priority Call Group 1)\n- Flight SW 318 | Destination: LONDON (LHR) | Sched: 09:30 | Gate: B04 | Status: ON TIME\n- Flight SW 561 | Destination: DUBAI (DXB) | Sched: 09:45 | Gate: B09 | Status: DELAYED\n- Flight SW 209 | Destination: SINGAPORE (SIN) | Sched: 10:10 | Gate: B12 | Status: ON TIME\nCARGO TELEMETRY OVERLAY: Declared Customs Consignment #DIA-904 ($3,500,000 Uncut Industrial Diamonds) assigned to Flight SW 472 checked hold cargo (Tag #SKW-78921-472)."
     },
     {
       "id": "img_05",
-      "title": "Passenger Messages (Chat)",
+      "title": "Passenger WhatsApp Chat Screenshot (Aarav Mehta)",
       "category": "Passenger Chat",
-      "badge": "WhatsApp Screenshot",
+      "badge": "WhatsApp Screenshot • Gate B07",
       "timestamp": "08:35 - 08:47",
       "src": "/image_data/5.png",
-      "prompt_hint": "Transcribe the passenger chat thread. Direct Agent 1 to extract sender name, message timestamps, and the specific security observation reported regarding unattended property near the gate.",
-      "description": "Passenger Aarav Mehta messages: 'There\\'s a blue bag near the seats... looks unattended. No passenger in sight.'",
-      "ocr_ledger": "CHAT LOG OCR TRANSCRIPTION: WhatsApp Messenger Mobile Screenshot | User: Aarav Mehta | Contact: Priya M.\n- [08:35] Aarav Mehta: 'Hey, I just reached Gate B07. Boarding queue already forming.'\n- [08:36] Priya M.: 'Safe travels! Running slightly behind in traffic.'\n- [08:46] Aarav Mehta: 'Wait... there is a blue hard-shell bag sitting right under the window seats at Gate B07. Completely unattended for at least 10 minutes. Nobody is near it.'\n- [08:46] Aarav Mehta: 'Should I alert security or airline ground staff?'\n- [08:47] Priya M.: 'Yes immediately! Don\\'t touch it.'"
+      "prompt_hint": "Transcribe the passenger chat thread. Direct Agent 1 to extract sender Aarav Mehta's observation: seeing an unattended blue bag near the window seats, and observing a hooded person in orange-soled ramp boots slip into staff door B-Staff-03.",
+      "description": "Aarav Mehta messages contact: 'There's a blue bag near the seats... looks unattended. Saw a guy in a dark hoodie and bright orange boot soles rush into the staff door.'",
+      "ocr_ledger": "CHAT LOG OCR TRANSCRIPTION: WhatsApp Messenger Mobile Screenshot | User: Aarav Mehta | Contact: Priya M.\n- [08:35] Aarav Mehta: 'Hey, I just reached Gate B07. Boarding queue already forming.'\n- [08:36] Priya M.: 'Safe travels! Running slightly behind in traffic.'\n- [08:46] Aarav Mehta: 'Wait... there is a blue hard-shell bag sitting right under the window seats at Gate B07. Completely unattended for at least 10 minutes. Nobody is near it.'\n- [08:46] Aarav Mehta: 'Also saw a guy in a dark hoodie with heavy boots with bright orange soles drop it and duck into staff door B-Staff-03.'\n- [08:47] Priya M.: 'Alert security right now!'"
     },
     {
       "id": "img_06",
-      "title": "Security Observation Report",
+      "title": "Security Observation & Portable X-Ray Report #SEC-0849",
       "category": "Security Log",
       "badge": "Officer R. Nair Incident Log",
       "timestamp": "08:49:00",
       "src": "/image_data/6.png",
-      "prompt_hint": "Transcribe the official security observation log. Direct Agent 1 to extract report date, logged time, gate location, reporting officer name, physical description of the item, and immediate security action taken.",
-      "description": "Officer R. Nair logs unattended blue suitcase near B07 window seats. Area under observation awaiting K9 explosive sweep.",
-      "ocr_ledger": "INCIDENT REPORT OCR TRANSCRIPTION: SkyWays Aviation Security Patrol Incident Slip #SEC-0849\nDate: 12-Nov-2024 | Time Logged: 08:49:00 | Reporting Officer: R. Nair (Badge #AVSEC-9042)\nIncident Location: Terminal 1, Departure Gate B07, Window Seating Bay (Row 4, Seat 22 Area)\nSubject Description: Unattended blue hard-shell polycarbonate wheeled suitcase with extendable handle.\nObservations: Item abandoned with no owner in immediate 15m radius. No passenger claiming custody.\nImmediate Action Taken: Established 10-meter preliminary observation perimeter. Alerted Terminal Operations Security Control Desk. Formally requested immediate K9 Explosive Detection Sweep. Gate B07 boarding hold requested pending clearance."
+      "prompt_hint": "Transcribe Officer R. Nair's official security log and portable X-ray scan. Direct Agent 1 to extract the logged weight of the gate bag (12.1 kg vs 18.4 kg at check-in), the X-ray contents (dense sand ballast, no clothing/valuables), confirming it is a decoy bag.",
+      "description": "Officer R. Nair logs unattended blue suitcase at Gate B07. Portable security scale logs weight at 12.1 kg (6.3 kg discrepancy from 18.4 kg check-in). X-ray reveals only dense ballast, confirming decoy swap.",
+      "ocr_ledger": "INCIDENT REPORT OCR TRANSCRIPTION: SkyWays Aviation Security Patrol Incident Slip #SEC-0849\nDate: 12-Nov-2024 | Time Logged: 08:49:00 | Reporting Officer: R. Nair (Badge #AVSEC-9042)\nIncident Location: Terminal 1, Departure Gate B07, Window Seating Bay (Row 4)\nPhysical Item: Blue hard-shell wheeled suitcase bearing Tag #SKW-78921-472.\nFORENSIC MEASUREMENTS: Portable security scale reads: 12.1 kg (Check-in ledger shows 18.4 kg; Discrepancy: -6.3 kg).\nPORTABLE BACKSCATTER X-RAY: Interior reveals 6 packets of dense construction sand and gravel ballast. Completely empty of passenger garments, toiletries, or personal effects. Conclusive proof that the gate suitcase is a planted decoy designed to trigger an evacuation/hold."
     },
     {
       "id": "img_07",
-      "title": "Terminal 1 Departure Map",
+      "title": "Terminal 1 Architectural Concourse Map & Card Access Ledger",
       "category": "Terminal Layout",
-      "badge": "Terminal 1 Map",
-      "timestamp": "Concourse Plan",
+      "badge": "Terminal 1 Blueprint • Door B-Staff-03",
+      "timestamp": "08:47:45",
       "src": "/image_data/7.png",
-      "prompt_hint": "Inspect the concourse floor plan. Direct Agent 1 to identify the position of Gate B07, surrounding passenger gates, and security perimeter boundaries required for cordon procedures.",
-      "description": "Concourse map showing Gate B07 location, passenger corridors, and restricted apron access doors.",
-      "ocr_ledger": "DIAGRAM OCR & LAYOUT ANALYSIS: Concourse B Architectural Blueprint.\n- Gate B07 is positioned at the north-east terminus of Concourse B sterile lounge, adjacent to emergency access door E-04 and Gate B09.\n- Window seating row 4 directly borders the glass curtain wall overlooking Aircraft Stand B07.\n- Sterile Departure Zone: Access strictly limited to screened passengers and badged personnel. Any breach or unattended hazard directly compromises the passenger boarding jet bridge to Stand B07."
+      "prompt_hint": "Analyze the concourse blueprint and electronic door access ledger. Direct Agent 1 to locate staff door B-Staff-03 connecting Gate B07 corridor to Apron Bay 3, and note the card-swipe log: Badge #RAMP-882 (Tariq Malik) unlocked B-Staff-03 at 08:47:45.",
+      "description": "Floor plan showing Gate B07, staff egress door B-Staff-03 to apron, and electronic lock record: Badge #RAMP-882 (Tariq Malik) badged through at 08:47:45.",
+      "ocr_ledger": "DIAGRAM OCR & LAYOUT ANALYSIS: Concourse B Architectural Blueprint.\n- Gate B07 corridor terminates at restricted Staff Egress Door B-Staff-03, providing stairway descent directly down to Apron Bay 3 / Stand B07.\nELECTRONIC ACCESS CONTROL LOG (Door B-Staff-03):\n- [08:47:45] Card Swipe SUCCESS: Badge #RAMP-882 | Name: MALIK, TARIQ | Title: Senior Ramp Baggage Supervisor | Direction: Corridor B to Apron Bay 3."
     },
     {
       "id": "img_08",
-      "title": "Handwritten Note near B07",
+      "title": "Physical Evidence: Torn Drop Memo & Ramp Dispatch Slip",
       "category": "Physical Clue",
-      "badge": "Paper Scrap",
-      "timestamp": "Found near B07",
+      "badge": "Evidence Bag #08 • Gate B07",
+      "timestamp": "Found near B07 seats",
       "src": "/image_data/8.png",
-      "prompt_hint": "Perform OCR on the paper scrap recovered at the gate. Direct Agent 1 to extract the exact handwritten message and note the physical location where it was discovered.",
-      "description": "Slip of paper recovered near Gate B07 seating area with handwritten text: 'Meet at B07'.",
-      "ocr_ledger": "PHYSICAL CLUE OCR TRANSCRIPTION: Torn piece of lined yellow notepad paper, approx 6cm x 9cm, found beneath seat cushion at Gate B07 window bay.\nHandwritten in black ballpoint ink: 'Meet at B07 - deliver package before 08:45'. Smudge of graphite on bottom right corner."
+      "prompt_hint": "Perform forensic OCR on the recovered torn paper scrap. Direct Agent 1 to transcribe the handwritten note: 'Meet at B07 - Decoy down - move real box to Cart 08', and note the handwriting comparison matching the Ramp Cargo Dispatch slip signed by Tariq Malik.",
+      "description": "Evidence tray with torn slip recovered near Gate B07 seating reading: 'Meet at B07 - Decoy down - move real box to Cart 08'. Handwriting matches Tariq Malik's official ramp dispatch signature.",
+      "ocr_ledger": "PHYSICAL CLUE OCR TRANSCRIPTION: Torn lined memo scrap found under seat cushion at Gate B07 window bay.\nHandwritten in black ballpoint: 'Meet at B07 - Decoy down - move real box to Cart 08'.\nFORENSIC COMPARISON: Script analysis confirms distinctive 45-degree rightward slant and looped capital 'B' perfectly matches the morning Ramp Cargo Dispatch Slip signed by Tariq Malik (Badge RAMP-882)."
     },
     {
       "id": "img_09",
-      "title": "Baggage Tag: Recovered Luggage",
+      "title": "Baggage Tag Forensic Audit: Barcode Tag #SKW-78921-472",
       "category": "Physical Clue",
-      "badge": "SkyWays Bag Tag",
-      "timestamp": "Attached to Bag",
+      "badge": "SkyWays Bag Tag • Reprint Audit",
+      "timestamp": "Attached to Decoy Bag",
       "src": "/image_data/9.png",
-      "prompt_hint": "Perform detailed OCR on the airline luggage tag attached to the unattended item. Direct Agent 1 to extract airline name, passenger full name, assigned flight number, and destination.",
-      "description": "SkyWays baggage tag on the blue suitcase reading: 'Passenger: Daniel Kim | Flight: SW 472'.",
-      "ocr_ledger": "BAGGAGE TAG OCR TRANSCRIPTION: SkyWays Automated Barcode Tag #SKW-78921-472\n- Airline: SkyWays International Airlines\n- Passenger Name: KIM / DANIEL\n- Flight: SW 472\n- Destination: JFK (New York)\n- Date: 12-NOV-2024\n- Class: Y | Weight: 18.4 KG\n- Routing: DEL -> JFK Direct\nCross-referencing confirms this tag matches the bag checked in by Daniel Kim at Counter A04 at 08:14:23."
+      "prompt_hint": "Perform detailed OCR on the airline luggage tag affixed to the decoy bag. Direct Agent 1 to read passenger name (Daniel Kim), flight (SW 472), and crucially extract the supervisory reprint code at the bottom: 'REPRINT-MGR-02 / AUTH-ID: RAMP-882 / TIME: 08:16:05'.",
+      "description": "SkyWays baggage tag on decoy bag reading 'Passenger: Daniel Kim | Flight: SW 472', with micro-text audit line: 'REPRINT-MGR-02 / AUTH: RAMP-882 (Tariq Malik) / 08:16:05'.",
+      "ocr_ledger": "BAGGAGE TAG OCR TRANSCRIPTION: SkyWays Automated Barcode Tag #SKW-78921-472 (Affixed to Decoy Bag)\n- Airline: SkyWays International Airlines\n- Passenger Name: KIM / DANIEL\n- Flight: SW 472 | Destination: JFK (New York) | Date: 12-NOV-2024\n- Upper Line: Weight 18.4 KG (Printed from original check-in record)\n- MICRO-PRINT SECURITY AUDIT LINE: 'REPRINT-MGR-02 / AUTH-ID: RAMP-882 / TERM: A04-SUP / TIME: 08:16:05'.\nCONCLUSION: Tag is a fraudulent reprint generated via Tariq Malik's supervisor override key 100 seconds after Kim's check-in."
     },
     {
       "id": "img_10",
-      "title": "Daily Chronicle Newspaper (Decoy)",
+      "title": "Daily Chronicle Newspaper & Catering Delivery Log (Decoy / Noise)",
       "category": "Peripheral Decoy",
-      "badge": "Daily Chronicle",
+      "badge": "Daily Chronicle • Peripheral Noise",
       "timestamp": "Morning Edition",
       "src": "/image_data/10.png",
-      "prompt_hint": "Review the newspaper article clipping found in the seating area. Direct Agent 1 to read the headline and determine whether this material contains incident facts or represents irrelevant peripheral noise to filter out.",
-      "description": "Discarded newspaper article: 'City Marathon Brings Thousands Together'; no relation to flight operations.",
-      "ocr_ledger": "PRINT MEDIA OCR TRANSCRIPTION: The Daily Chronicle | Vol. 48 No. 312 | Morning City Edition\nHeadline: 'City Marathon Brings Thousands Together - Over 25,000 runners participate in annual charity run through central avenues. Roads reopened at 06:00 AM. Mayor commends community turnout.'\nASSESSMENT: Completely irrelevant peripheral chatter and decoy material. No bearing on aviation security."
+      "prompt_hint": "Review the newspaper clipping and lounge coffee log. Direct Agent 1 to recognize the marathon article and 08:20 coffee drop as irrelevant peripheral noise to filter out.",
+      "description": "Discarded Daily Chronicle newspaper ('City Marathon Brings Thousands Together') and 08:20 catering coffee slip; irrelevant decoy material.",
+      "ocr_ledger": "PRINT MEDIA OCR TRANSCRIPTION: The Daily Chronicle | Morning City Edition\nHeadline: 'City Marathon Brings Thousands Together - Over 25,000 runners participate in annual charity run.'\nCATERING LOG: Luxe Lounge coffee delivery completed at 08:20.\nASSESSMENT: Completely irrelevant peripheral noise and decoy material. No bearing on the smuggling conspiracy."
     }
   ],
   "operational_rules": [
     "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol): Any unattended baggage detected in passenger departure/boarding gates must be immediately cordoned off and subjected to certified explosive detection / K9 unit inspection.",
-    "Rule OPS-204 (Pre-Departure Security Hold Protocol): No commercial flight assigned to a gate under an unresolved security investigation or unattended baggage incident may push back, board passengers, or be cleared for departure.",
-    "Rule CLR-305 (Operational Resumption Protocol): Normal flight operations and passenger boarding may only resume once the item is verified non-hazardous by the K9 explosive unit, baggage ownership is verified, and written clearance is signed by the Airport Security Controller."
+    "Rule BAGG-204 (Baggage Chain-of-Custody & Tag Duplicate Protocol): Manual reprinting or duplication of automated baggage tags requires multi-factor supervisor authorization; any weight discrepancy exceeding 1.0 kg between check-in scale telemetry and gate intercept flags an immediate chain-of-custody fraud alarm.",
+    "Rule OPS-204 (Pre-Departure Security Hold Protocol): No commercial flight assigned to a gate under an unresolved security investigation, unattended baggage incident, or ramp cargo diversion may push back, board passengers, or be cleared for departure until authorized by the Security Director."
   ],
   "ground_truth": {
-    "target_action_or_culprit": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
-    "target_rules_or_method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
-    "target_proof_or_clue": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim)",
-    "explanation": "At 08:49, Officer R. Nair logged an unattended blue hard-shell suitcase at Gate B07 window seats with no owner present. Flight SW 472 is actively boarding at Gate B07. Under Rule SEC-101, the bag must be cordoned and swept by a K9 explosive unit. Under Rule OPS-204, Flight SW 472 cannot board or push back until security clearance is verified. The baggage tag proves the bag belongs to passenger Daniel Kim, who checked in at 08:14.",
+    "target_action_or_culprit": "Tariq Malik (Hold Flight SW 472 to intercept diamond heist)",
+    "target_rules_or_method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule BAGG-204 (Baggage Chain-of-Custody & Tag Duplicate Protocol)",
+    "target_proof_or_clue": "Baggage tag reprint authorization REPRINT-MGR-02 matching Tariq Malik (RAMP-882), orange-soled tarmac boots on CAM 12, door B-Staff-03 badge swipe log at 08:47:45, and 6.3 kg weight discrepancy between check-in scale (18.4 kg) and gate decoy (12.1 kg)",
+    "explanation": "Senior Ramp Baggage Supervisor Tariq Malik used his supervisory override card REPRINT-MGR-02 to print a duplicate bag tag for Daniel Kim's checked luggage containing $3.5M in industrial diamonds (Manifest #DIA-904). Malik placed an identical 12.1 kg sandbag decoy at Gate B07 at 08:46 to trigger a sterile zone security hold under Rule SEC-101 and Rule OPS-204, while covertly diverting the real 18.4 kg diamond suitcase on Apron Bay 3 into Maintenance Cart #MC-08 under Rule BAGG-204.",
     "suspects_or_entities": [
+      "Tariq Malik",
+      "Tariq Malik (Hold Flight SW 472 to intercept diamond heist)",
       "Daniel Kim",
-      "Aarav Mehta",
+      "Priya Sharma",
       "Officer R. Nair",
-      "Flight SW 472",
-      "Unidentified person in dark hooded windbreaker"
+      "Aarav Mehta",
+      "Elena Rostova",
+      "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage"
     ],
-    "motive_or_hazard": "Potential improvised explosive device (IED) or sterile zone contraband breach before aircraft pushback"
+    "motive_or_hazard": "Illicit $3.5M industrial diamond smuggling and theft by diverting cargo manifest #DIA-904 into an apron maintenance cart before flight departure",
+    "culprit": "Tariq Malik (Hold Flight SW 472 to intercept diamond heist)",
+    "weapon_or_method": "Baggage swap using duplicate tag #SKW-78921-472 printed via supervisor override card REPRINT-MGR-02, leaving a 12.1 kg decoy bag at Gate B07 to trigger a sterile zone security hold while diverting the authentic 18.4 kg diamond consignment on Apron Bay 3 into Cart #MC-08 under Rule SEC-101 and Rule BAGG-204",
+    "key_clue": "Baggage tag reprint authorization REPRINT-MGR-02 matching Tariq Malik (RAMP-882), orange-soled tarmac boots on CAM 12, door B-Staff-03 badge swipe log at 08:47:45, and 6.3 kg weight discrepancy between check-in scale (18.4 kg) and gate decoy (12.1 kg)",
+    "valid_action": "Hold Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, dispatch the K9 explosive detection unit, and detain Tariq Malik to intercept Maintenance Cart #MC-08.",
+    "supporting_rules": [
+      "Rule SEC-101: Sterile Zone Unattended Baggage Protocol",
+      "Rule BAGG-204: Baggage Chain-of-Custody & Tag Duplicate Protocol",
+      "Rule OPS-204: Pre-Departure Security Hold Protocol"
+    ],
+    "blocking_condition": "Unattended blue decoy suitcase at Gate B07 window seats awaiting K9 explosive clearance and fraudulent duplicate tag audit (tag: Daniel Kim #SKW-78921-472 reprinted by RAMP-882).",
+    "resume_condition": "K9 unit sweep certifies decoy suitcase clear of explosives, suspect Tariq Malik detained, authentic 18.4 kg diamond luggage recovered from Cart #MC-08, and written clearance signed by Airport Security Director."
   },
   "spoiler_keywords": [
+    "Tariq Malik",
+    "RAMP-882",
+    "REPRINT-MGR-02",
+    "Cart #MC-08",
     "Hold Flight SW 472",
     "Hold Flight 472",
     "Rule SEC-101",
-    "Rule OPS-204",
-    "dispatch K9 explosive"
+    "Rule BAGG-204",
+    "Rule OPS-204"
   ],
   "decoy_items": [
     "Daily Chronicle City Marathon article",
     "Flight SW 561 to Dubai delayed at Gate B09",
-    "Catering coffee delivery log"
+    "Catering coffee delivery log",
+    "Daniel Kim legitimate boarding pass"
   ]
 }

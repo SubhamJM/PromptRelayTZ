@@ -12,7 +12,7 @@ export function Player2Workspace() {
   const [charCount, setCharCount] = useState(myPrompt.length);
   const words = myPrompt.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const MAX_WORDS = 80;
+  const MAX_WORDS = 40;
 
   const handleTextChange = (e) => {
     const val = e.target.value;
@@ -142,16 +142,16 @@ export function Player2Workspace() {
                 <p className="text-slate-300 text-[11px]">
                   {isMuseum
                     ? "23:40:42 Breaker B-04 trip ➔ 90s blackout ➔ canvas tube moved down Stairwell C1."
-                    : "08:46 WhatsApp chatter ➔ 08:47 hooded subject walking away from B07 corridor."}
+                    : "08:16:05 Supervisor duplicate tag reprint ➔ 08:46 decoy bag drop at B07 ➔ 08:47:45 Door B-Staff-03 badge swipe."}
                 </p>
               </div>
 
               <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
-                <span className="text-purple-300 font-bold block text-[10px]">3. LAST (Drop Point)</span>
+                <span className="text-purple-300 font-bold block text-[10px]">3. LAST (Drop Point & Diversion)</span>
                 <p className="text-slate-300 text-[11px]">
                   {isMuseum
                     ? "23:48 Basement Locker 14 search yields card CONSV-408 and token C-408."
-                    : "08:49 Officer R. Nair logs unattended blue suitcase near B07 window seats."}
+                    : "08:49 Officer R. Nair logs 12.1 kg ballast decoy at B07; 09:02 genuine 18.4 kg diamond bag diverted to Cart #MC-08."}
                 </p>
               </div>
             </div>
@@ -220,8 +220,8 @@ export function Player2Workspace() {
               onChange={handleTextChange}
               placeholder={
                 isMuseum
-                  ? "e.g. Role: Timeline & Incident Reconstructor. Organize events in chronological sequence of what happened first, next, and last (21:15 gala reception to 23:48 locker search). Trace suspect movements and connect the 23:40:42 Breaker B-04 blackout to the canvas tube transit to Locker 14. Keep unverified sightings separate. Maintain neutrality without naming culprits."
-                  : "e.g. Role: Timeline & Incident Reconstructor. Reconstruct events into an exact chronological sequence of what happened first, next, and last from 08:14 check-in to 09:02 apron loading. Trace the blue bag movement to Gate B07 window seats. Connect causal links to pre-departure flight clearance. Keep uncertain sightings separate. Maintain neutrality."
+                  ? "e.g. Role: Timeline & Incident Reconstructor. Order all facts chronologically from 21:15 to 23:48. Trace suspect movements, connect Breaker B-04 blackout to Locker 14, and highlight alibi gaps. Maintain neutrality without naming culprits."
+                  : "e.g. Role: Timeline & Incident Reconstructor. Reconstruct events chronologically from 08:14 to 09:02. Trace Daniel Kim's 18.4 kg checked bag, the duplicate tag reprint, Gate B07 decoy, and Cart #MC-08 diversion. Maintain neutrality."
               }
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn

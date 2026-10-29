@@ -54,11 +54,12 @@ class Z3ConstraintSolverTool:
             supporting_rules = []
 
             if has_bag_breach or has_perimeter_breach:
-                action_parts.append("HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off Gate B07, and dispatch K9 explosive detection unit")
+                action_parts.append("HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off Gate B07, dispatch K9 unit to secure decoy luggage, and detain Tariq Malik to recover diamond consignment")
                 if rules:
                     supporting_rules.extend(rules[:2])
                 else:
                     supporting_rules.append("Rule SEC-101: Sterile Zone Unattended Baggage Protocol")
+                    supporting_rules.append("Rule BAGG-204: Baggage Chain-of-Custody & Tag Duplicate Protocol")
                     supporting_rules.append("Rule OPS-204: Pre-Departure Security Hold Protocol")
 
             if not action_parts:
@@ -66,8 +67,8 @@ class Z3ConstraintSolverTool:
                 blocking_condition = "None (All operational safety constraints satisfied)"
                 resume_condition = "Standard pre-flight checklist completion"
             else:
-                blocking_condition = "Unattended blue hard-shell suitcase at Gate B07 window seats awaiting K9 explosive clearance and passenger identity verification"
-                resume_condition = "K9 sweep certifies suitcase clear of explosives, passenger identity verified, and written operational clearance issued"
+                blocking_condition = "Unattended blue decoy suitcase at Gate B07 window seats awaiting K9 explosive clearance and fraudulent tag audit"
+                resume_condition = "K9 sweep certifies decoy suitcase clear of explosives, suspect Tariq Malik detained, stolen diamond cargo recovered from Maintenance Cart #MC-08, and written clearance signed by Airport Security Director"
 
             valid_action = " AND ".join(action_parts)
         else:

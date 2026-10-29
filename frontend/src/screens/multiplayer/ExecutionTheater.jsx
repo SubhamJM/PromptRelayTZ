@@ -134,7 +134,7 @@ export function ExecutionTheater() {
             <span>Agent 3: Logic Solver</span>
           </div>
           <span className="text-[11px] text-slate-400 block mt-1">
-            Verifying rules & JSON schema
+            Verifying rules & final verdict
           </span>
         </div>
 
@@ -280,10 +280,10 @@ export function ExecutionTheater() {
             <div className="flex items-center justify-between border-b border-slate-800 pb-2">
               <span className="font-bold text-emerald-400 font-mono text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Agent 3 Final Operational Verdict (Strict JSON):</span>
+                <span>Agent 3 Final Operational Verdict:</span>
               </span>
               <span className="text-[10px] font-mono text-slate-500">
-                Machine-Readable Output
+                Case Resolution Output
               </span>
             </div>
             <pre className="text-xs font-mono text-emerald-300 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto p-3 bg-slate-950 rounded-xl border border-slate-800">

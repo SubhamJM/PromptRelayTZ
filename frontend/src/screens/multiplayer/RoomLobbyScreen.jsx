@@ -303,7 +303,7 @@ export function RoomLobbyScreen() {
                 <span>Player 3: Logic Solver</span>
               </h4>
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Directs Agent 3 to evaluate governing rules and output the definitive operational resolution in valid JSON.
+                Directs Agent 3 to evaluate governing rules and deduce the definitive operational resolution.
               </p>
             </div>
             <div className="text-[11px] font-mono text-slate-500 pt-2 border-t border-slate-800/80">

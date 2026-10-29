@@ -10,7 +10,7 @@ export function Player1Workspace() {
   const [charCount, setCharCount] = useState(myPrompt.length);
   const words = myPrompt.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const MAX_WORDS = 80;
+  const MAX_WORDS = 40;
 
   const handleTextChange = (e) => {
     const val = e.target.value;
@@ -109,7 +109,7 @@ export function Player1Workspace() {
               disabled={isLockedIn}
               value={myPrompt}
               onChange={handleTextChange}
-              placeholder="e.g. Role: Forensic Evidence Extractor. Extract all factual observations from the CCTV feeds, flight displays, and baggage logs. Identify Daniel Kim, Gate B07, timestamps (08:14, 08:49), and the blue hard-shell suitcase tag. Separate confirmed records from unverified rumors. Ignore marathon news. Do not infer causes or decisions."
+              placeholder="e.g. Role: Forensic Evidence Extractor. Extract all factual clues from CCTV feeds, scale readings, and baggage tags: people, locations, luggage weights, and reprint codes. Separate confirmed facts from rumors. Filter out marathon news. Do not accuse anyone."
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn
                   ? "border-emerald-500/40 bg-emerald-950/10 opacity-80"

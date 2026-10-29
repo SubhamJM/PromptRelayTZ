@@ -176,30 +176,44 @@ export function ResultsScreen() {
   const expectedCulprit =
     solutionCard?.ground_truth?.culprit ||
     scenario?.ground_truth?.culprit ||
+    scenario?.ground_truth?.target_action_or_culprit ||
     scenario?.ground_truth?.action ||
     evaluation?.expected_verdict?.culprit ||
     evaluation?.breakdown?.culprit?.expected ||
     "N/A";
   const expectedMethod =
+    solutionCard?.ground_truth?.weapon_or_method ||
     solutionCard?.ground_truth?.method ||
+    solutionCard?.ground_truth?.target_rules_or_method ||
+    scenario?.ground_truth?.weapon_or_method ||
     scenario?.ground_truth?.method ||
-    scenario?.ground_truth?.rules ||
+    scenario?.ground_truth?.target_rules_or_method ||
     evaluation?.expected_verdict?.method ||
     evaluation?.breakdown?.method?.expected ||
     "N/A";
   const expectedMotive =
     solutionCard?.ground_truth?.motive ||
+    solutionCard?.ground_truth?.motive_or_hazard ||
     scenario?.ground_truth?.motive ||
-    (Array.isArray(scenario?.operational_rules) ? scenario.operational_rules[0] : null) ||
+    scenario?.ground_truth?.motive_or_hazard ||
     "N/A";
-  const expectedRule =
-    solutionCard?.ground_truth?.rule_broken ||
+  const expectedClue =
+    solutionCard?.ground_truth?.key_clue ||
     solutionCard?.ground_truth?.clue ||
+    solutionCard?.ground_truth?.target_proof_or_clue ||
+    scenario?.ground_truth?.key_clue ||
+    scenario?.ground_truth?.target_proof_or_clue ||
     scenario?.ground_truth?.proof ||
-    scenario?.ground_truth?.clue ||
-    evaluation?.expected_verdict?.rule_broken ||
+    evaluation?.expected_verdict?.key_clue ||
     evaluation?.breakdown?.clue?.expected ||
     "N/A";
+  const expectedRules =
+    (Array.isArray(solutionCard?.ground_truth?.supporting_rules) && solutionCard.ground_truth.supporting_rules.join("; ")) ||
+    (Array.isArray(scenario?.ground_truth?.supporting_rules) && scenario.ground_truth.supporting_rules.join("; ")) ||
+    (Array.isArray(scenario?.operational_rules) && scenario.operational_rules.join("; ")) ||
+    solutionCard?.ground_truth?.supporting_rules ||
+    scenario?.ground_truth?.supporting_rules ||
+    "";
 
   const teamParsed =
     solutionCard?.parsed_verdict ||
@@ -214,19 +228,27 @@ export function ResultsScreen() {
     "N/A";
   const teamMethod =
     teamParsed?.method ||
-    teamParsed?.rules ||
+    teamParsed?.weapon_or_method ||
     evaluation?.breakdown?.method?.actual ||
     "N/A";
   const teamMotive =
     teamParsed?.motive ||
+    teamParsed?.objective ||
     teamParsed?.reason ||
+    "N/A";
+  const teamClue =
+    teamParsed?.clue ||
+    teamParsed?.key_clue ||
+    teamParsed?.proof ||
+    teamParsed?.evidence ||
+    evaluation?.breakdown?.clue?.actual ||
     "N/A";
   const teamRule =
     teamParsed?.rule_broken ||
-    teamParsed?.clue ||
-    teamParsed?.proof ||
-    evaluation?.breakdown?.clue?.actual ||
-    "N/A";
+    teamParsed?.rules_broken ||
+    teamParsed?.rules ||
+    teamParsed?.supporting_rules ||
+    "";
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
@@ -466,7 +488,7 @@ export function ResultsScreen() {
                   {evaluation?.breakdown?.format?.status === "failed" ? "INVALID" : "COMPLIANT"}
                 </span>
                 <span className="text-[10px] text-slate-500 block mt-0.5">
-                  Structured JSON
+                  Structured Verdict
                 </span>
               </div>
             </div>
@@ -557,11 +579,11 @@ export function ResultsScreen() {
               </span>
               <div className="space-y-2 text-slate-300">
                 <div>
-                  <span className="text-slate-500">Culprit / Action:</span>{" "}
-                  <strong>{expectedCulprit}</strong>
+                  <span className="text-slate-500">Culprit / Perpetrator:</span>{" "}
+                  <strong className="text-emerald-300">{expectedCulprit}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500">Method / Rules:</span>{" "}
+                  <span className="text-slate-500">Method & Mechanism:</span>{" "}
                   <span>{expectedMethod}</span>
                 </div>
                 <div>
@@ -569,9 +591,15 @@ export function ResultsScreen() {
                   <span>{expectedMotive}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500">Rule Violated / Proof Clue:</span>{" "}
-                  <span>{expectedRule}</span>
+                  <span className="text-slate-500">Key Evidence / Clue:</span>{" "}
+                  <span>{expectedClue}</span>
                 </div>
+                {expectedRules && (
+                  <div>
+                    <span className="text-slate-500">Governing Rules:</span>{" "}
+                    <span className="text-slate-400">{expectedRules}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -581,11 +609,11 @@ export function ResultsScreen() {
               </span>
               <div className="space-y-2 text-slate-300">
                 <div>
-                  <span className="text-slate-500">Culprit / Action:</span>{" "}
-                  <strong>{teamCulprit}</strong>
+                  <span className="text-slate-500">Culprit / Perpetrator:</span>{" "}
+                  <strong className="text-blue-300">{teamCulprit}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500">Method / Rules:</span>{" "}
+                  <span className="text-slate-500">Method & Mechanism:</span>{" "}
                   <span>{teamMethod}</span>
                 </div>
                 <div>
@@ -593,9 +621,15 @@ export function ResultsScreen() {
                   <span>{teamMotive}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500">Rule Violated / Proof Clue:</span>{" "}
-                  <span>{teamRule}</span>
+                  <span className="text-slate-500">Key Evidence / Clue:</span>{" "}
+                  <span>{teamClue}</span>
                 </div>
+                {teamRule && (
+                  <div>
+                    <span className="text-slate-500">Rules Cited / Broken:</span>{" "}
+                    <span className="text-slate-400">{teamRule}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

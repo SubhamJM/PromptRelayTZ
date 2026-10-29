@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from functools import lru_cache
 from typing import Any, Dict, List, Optional
 from langchain_core.language_models.chat_models import BaseChatModel, SimpleChatModel
 from langchain_core.messages import BaseMessage
@@ -41,11 +42,11 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
 
     # 1. Role Directive (0-3)
     role_pts = 0
-    if any(k in clean for k in ["you are", "role", "act as", "specialist", "agent", "expert", "analyst"]):
+    if any(k in clean for k in ["you are", "role", "act as", "specialist", "agent", "expert", "analyst", "solver", "detective"]):
         role_pts = 3
     elif any(k in clean for k in ["extract", "identify", "analyze", "order", "deduce", "solve", "reconstruct", "construct", "synthesize"]):
         role_pts = 2
-    elif word_count >= 8 and any(k in clean for k in ["find", "look", "check", "review"]):
+    elif word_count >= 8 and any(k in clean for k in ["find", "look", "check", "review", "organize"]):
         role_pts = 1
 
     # 2. Scope & Taxonomy (0-3)
@@ -54,7 +55,7 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
         keywords = [
             "person", "people", "time", "timestamp", "location", "object", "movement",
             "tag", "badge", "flight", "cctv", "clue", "forensic", "chemical", "residue",
-            "alibi", "suspect", "evidence", "log"
+            "alibi", "suspect", "evidence", "log", "luggage", "bag"
         ]
         matches = sum(1 for k in keywords if k in clean)
         tax_pts = 3 if matches >= 3 else (2 if matches >= 2 else 1)
@@ -85,7 +86,7 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
         elif any(k in clean for k in ["why", "because", "condition"]):
             disc_pts = 1
 
-    # 4. Negative Constraints & Formatting (0-3)
+    # 4. Constraints & Resolution Clarity (0-3) - NO MANDATORY JSON FORMATTING
     con_pts = 0
     has_constraint = any(k in clean for k in ["do not", "never", "refrain", "don't", "avoid", "without", "no "])
     if agent_role in ("extractor", "reconstructor"):
@@ -97,10 +98,11 @@ def classify_prompt_quality(prompt_text: str, agent_role: str) -> Dict[str, Any]
         elif word_count >= 15:
             con_pts = 1
     else:
-        has_json = any(k in clean for k in ["json", "format", "schema", "keys", "valid json"])
-        if has_constraint and has_json:
+        has_format = any(k in clean for k in ["json", "format", "schema", "keys", "valid json"])
+        has_decision_focus = any(k in clean for k in ["culprit", "method", "motive", "rule", "clue", "evidence", "verdict", "decision", "action"])
+        if (has_constraint and (has_format or has_decision_focus)) or (has_format and has_decision_focus):
             con_pts = 3
-        elif has_constraint or has_json:
+        elif has_constraint or has_format or has_decision_focus:
             con_pts = 2
         elif word_count >= 15:
             con_pts = 1
@@ -142,7 +144,7 @@ class MockOfflineChatModel(SimpleChatModel):
 
         is_museum = any(k in text_joined.lower() for k in [
             "celestial madonna", "gallery 4", "riverton", "julian vance", "marcus thorne",
-            "breaker b-04", "locker 14", "c-408", "consv-408", "sec-401", "art-302", "rm-1887-04"
+            "breaker b-04", "locker 14", "c-408", "consv-408", "rm-1887-04"
         ])
         is_airport = not is_museum
         sys_message = str(messages[0].content) if messages else ""
@@ -196,13 +198,15 @@ class MockOfflineChatModel(SimpleChatModel):
                 else:
                     return (
                         "Reconstructed Chronological Sequence of Events:\n"
-                        "• 08:14:23: Daniel Kim completes check-in at Counter A04 for SW 472; blue suitcase tagged.\n"
+                        "• 08:14:23: Daniel Kim completes check-in at Counter A04 for SW 472; genuine 18.4 kg diamond suitcase tagged.\n"
+                        "• 08:16:05: Supervisor Tariq Malik (RAMP-882) prints duplicate bag tag via override REPRINT-MGR-02.\n"
                         "• 08:30:00: Terminal 1 FIDS calls priority boarding for Flight SW 472 at Gate B07.\n"
                         "• 08:35:00: Aarav Mehta arrives at Gate B07 waiting bay.\n"
-                        "• 08:46:00: Unattended blue suitcase identified under Gate B07 window seats with no custodian.\n"
-                        "• 08:47:10: Unidentified person in dark hooded windbreaker flees Gate B07 corridor.\n"
-                        "• 08:49:00: Officer R. Nair establishes observation perimeter and initiates K9 explosive sweep request.\n"
-                        "• Causal Dependency: Presence of an uninspected unattended suitcase directly impacts departure safety clearance for Flight SW 472."
+                        "• 08:46:00: Unattended 12.1 kg sandbag decoy suitcase abandoned under Gate B07 window seats.\n"
+                        "• 08:47:10: Suspect in dark hooded windbreaker with orange-soled ramp boots flees through staff door B-Staff-03 (logged to Tariq Malik at 08:47:45).\n"
+                        "• 08:49:00: Officer R. Nair establishes observation perimeter, logs 6.3 kg weight discrepancy, and requests K9 sweep.\n"
+                        "• 09:02:55: On Apron Bay 3, Tariq Malik diverts genuine 18.4 kg diamond suitcase off the belt into Maintenance Cart #MC-08.\n"
+                        "• Causal Dependency: Abandoning the decoy bag at Gate B07 triggered a sterile zone security distraction under Rule SEC-101, directly enabling the insider luggage swap on Apron Bay 3 into Cart #MC-08."
                     )
 
         # Agent 3 (Solver / Detective)
@@ -218,10 +222,10 @@ class MockOfflineChatModel(SimpleChatModel):
                         "supporting_rules": "Unspecified (Incomplete prompt)",
                         "blocking_condition": "Unspecified (Incomplete prompt)"
                     }, indent=2)
-                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["ops-204", "sec-101"]):
+                elif tier == "moderate" or score < 8 or not any(r in user_p_lower for r in ["ops-204", "sec-101", "bagg-204"]):
                     return json.dumps({
                         "action": "HOLD Flight SW 472 at Gate B07",
-                        "culprit": "HOLD Flight SW 472 at Gate B07",
+                        "culprit": "Tariq Malik (suspected on Flight SW 472)",
                         "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol)",
                         "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol)",
                         "rule_broken": "SEC-101",
@@ -229,16 +233,16 @@ class MockOfflineChatModel(SimpleChatModel):
                         "clue": "Unattended blue bag awaiting K9 unit sweep at Gate B07",
                         "evidence_keys": ["Unattended blue bag awaiting K9 unit sweep at Gate B07"]
                     }, indent=2)
-                elif not any(k in user_p_lower for k in ["evidence_keys", "skw-", "daniel kim", "barcode", "tag"]):
+                elif not any(k in user_p_lower for k in ["evidence_keys", "skw-", "daniel kim", "barcode", "tag", "malik", "tariq", "reprint", "cart"]):
                     return json.dumps({
                         "action": "HOLD Flight SW 472 at Gate B07 and suspend passenger boarding",
-                        "culprit": "HOLD Flight SW 472 at Gate B07 and suspend passenger boarding",
+                        "culprit": "Tariq Malik (Flight SW 472 Ramp Supervisor)",
                         "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
                         "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
                         "rule_broken": "Rule SEC-101 and Rule OPS-204",
                         "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
                         "clue": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance",
-                        "motive": "Potential improvised explosive device (IED) or sterile zone contraband breach",
+                        "motive": "Illicit diamond smuggling and theft via baggage swap",
                         "evidence_keys": [
                             "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49",
                             "Awaiting K9 explosive sweep clearance before departure authorization"
@@ -247,17 +251,19 @@ class MockOfflineChatModel(SimpleChatModel):
                 else:
                     return json.dumps({
                         "action": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
-                        "culprit": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
+                        "culprit": "Tariq Malik (Flight SW 472 Ramp Supervisor)",
                         "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
-                        "method": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
-                        "rule_broken": "Rule SEC-101 and Rule OPS-204",
-                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472)",
-                        "clue": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472)",
-                        "motive": "Potential improvised explosive device (IED) or sterile zone contraband breach",
+                        "method": "Baggage swap using duplicate tag #SKW-78921-472 printed via supervisor override card REPRINT-MGR-02, leaving a 12.1 kg decoy bag at Gate B07 to trigger a sterile zone security hold while diverting the authentic 18.4 kg diamond consignment on Apron Bay 3 into Cart #MC-08 under Rule SEC-101 and Rule BAGG-204",
+                        "rule_broken": "Rule SEC-101, Rule OPS-204, and Rule BAGG-204",
+                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472 reprinted by RAMP-882)",
+                        "clue": "Baggage tag reprint authorization REPRINT-MGR-02 matching Tariq Malik (RAMP-882), orange-soled tarmac boots on CAM 12, door B-Staff-03 badge swipe log at 08:47:45, and 6.3 kg weight discrepancy between check-in scale (18.4 kg) and gate decoy (12.1 kg)",
+                        "motive": "Illicit $3.5M industrial diamond smuggling and theft by diverting cargo manifest #DIA-904 into an apron maintenance cart before flight departure",
                         "evidence_keys": [
                             "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49",
                             "Bag tag #SKW-78921-472 belongs to Daniel Kim (Counter A04)",
-                            "CCTV CAM 12 captures unidentified hooded individual fleeing Gate B07 corridor at 08:47:10",
+                            "CCTV CAM 12 captures unidentified hooded individual fleeing Gate B07 corridor at 08:47:10 with orange-soled tarmac boots",
+                            "Door B-Staff-03 electronic card swipe at 08:47:45 logged to Badge #RAMP-882 (Tariq Malik)",
+                            "Reprint authorization REPRINT-MGR-02 on decoy bag tag matches supervisor Tariq Malik",
                             "Awaiting K9 explosive sweep clearance before departure authorization"
                         ]
                     }, indent=2)
@@ -358,12 +364,14 @@ class MockOfflineChatModel(SimpleChatModel):
                 else:  # strong
                     return (
                         "Verified Clues & Factual Evidence Extracted:\n"
-                        "- 08:14:23: Passenger Daniel Kim checked in blue polycarbonate suitcase at Counter A04 (Flight SW 472).\n"
-                        "- 08:30:00: Flight SW 472 to New York commences boarding at Gate B07.\n"
-                        "- 08:35 - 08:47: Passenger Aarav Mehta spots unattended blue bag under Gate B07 window seats with no owner present.\n"
-                        "- 08:47:10: CCTV CAM 12 captures unidentified person in hooded windbreaker moving rapidly away from Gate B07.\n"
-                        "- 08:49:00: Security Officer R. Nair logs unattended blue suitcase, cordons area, requests urgent K9 explosive sweep.\n"
-                        "- Baggage Tag Barcode: Tag on unattended blue suitcase belongs to Daniel Kim (Flight SW 472).\n"
+                        "- 08:14:23: Passenger Daniel Kim checked in 18.4 kg blue polycarbonate suitcase at Counter A04 for Flight SW 472 (Consignment #DIA-904 diamonds).\n"
+                        "- 08:16:05: Supervisor terminal accessed with keycard REPRINT-MGR-02 (Tariq Malik, Badge RAMP-882).\n"
+                        "- 08:30:00: Flight SW 472 to New York commences priority boarding at Gate B07.\n"
+                        "- 08:35 - 08:47: Passenger Aarav Mehta spots unattended blue bag under Gate B07 window seats with no owner present; sees hooded person with orange-soled ramp boots slip into staff door.\n"
+                        "- 08:47:10: CCTV CAM 12 captures suspect in hooded windbreaker and orange-soled tarmac boots (Spec RAMP-882) unlocking Door B-Staff-03 at 08:47:45.\n"
+                        "- 08:49:00: Officer R. Nair logs decoy blue suitcase; portable scale reads 12.1 kg (6.3 kg discrepancy); X-ray shows sand ballast.\n"
+                        "- 09:02:55: CAM 21 shows genuine 18.4 kg diamond suitcase diverted into Maintenance Cart #MC-08 on Apron Bay 3 by Tariq Malik.\n"
+                        "- Baggage Tag Barcode: Decoy bag tag #SKW-78921-472 has bottom watermark: REPRINT-MGR-02 / AUTH: RAMP-882.\n"
                         "- Filtered Distractions: Daily Chronicle marathon news and catering coffee deliveries disregarded as peripheral noise."
                     )
 
@@ -415,12 +423,50 @@ def get_runtime_config() -> RuntimeLLMConfig:
     return _runtime_config
 
 
+@lru_cache(maxsize=16)
+def _get_cached_llm(
+    chosen_provider: str,
+    chosen_model: str,
+    temp: float,
+    timeout: int,
+    api_key: str,
+) -> BaseChatModel:
+    if chosen_provider in ("gemini", "google"):
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(
+            model=chosen_model or "gemini-3.5-flash-lite",
+            google_api_key=api_key,
+            temperature=temp,
+            timeout=timeout,
+            max_output_tokens=700,
+        )
+    elif chosen_provider == "openai":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model=chosen_model or "gpt-4o-mini",
+            api_key=api_key,
+            temperature=temp,
+            timeout=timeout,
+            max_tokens=700,
+        )
+    elif chosen_provider == "anthropic":
+        from langchain_anthropic import ChatAnthropic
+        return ChatAnthropic(
+            model=chosen_model or "claude-3-5-haiku-20241022",
+            api_key=api_key,
+            temperature=temp,
+            timeout=timeout,
+            max_tokens=700,
+        )
+    return MockOfflineChatModel(model_name=chosen_model or "offline-relay-simulator")
+
+
 def get_llm(
     provider: Optional[str] = None,
     model_name: Optional[str] = None,
     temperature: Optional[float] = None,
 ) -> BaseChatModel:
-    """Initialize and return the configured ChatModel."""
+    """Initialize and return the configured ChatModel (with keep-alive pooling)."""
     settings = get_settings()
     config = get_runtime_config()
 
@@ -437,32 +483,13 @@ def get_llm(
         if not api_key:
             logger.warning("No GEMINI_API_KEY found; falling back to MockOfflineChatModel")
             return MockOfflineChatModel()
-
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(
-            model=chosen_model or "gemini-3.8-flash",
-            google_api_key=api_key,
-            temperature=temp,
-            timeout=timeout,
-        )
+        return _get_cached_llm(chosen_provider, chosen_model, temp, timeout, api_key)
 
     elif chosen_provider == "openai":
-        from langchain_openai import ChatOpenAI
-        return ChatOpenAI(
-            model=chosen_model or "gpt-4o-mini",
-            api_key=settings.OPENAI_API_KEY,
-            temperature=temp,
-            timeout=timeout,
-        )
+        return _get_cached_llm(chosen_provider, chosen_model, temp, timeout, settings.OPENAI_API_KEY or "")
 
     elif chosen_provider == "anthropic":
-        from langchain_anthropic import ChatAnthropic
-        return ChatAnthropic(
-            model=chosen_model or "claude-3-5-haiku-20241022",
-            api_key=settings.ANTHROPIC_API_KEY,
-            temperature=temp,
-            timeout=timeout,
-        )
+        return _get_cached_llm(chosen_provider, chosen_model, temp, timeout, settings.ANTHROPIC_API_KEY or "")
 
     elif chosen_provider == "ollama":
         from langchain_openai import ChatOpenAI
@@ -472,6 +499,7 @@ def get_llm(
             model=chosen_model or "qwen3:4b",
             temperature=temp,
             timeout=timeout,
+            max_tokens=700,
         )
 
     return MockOfflineChatModel()

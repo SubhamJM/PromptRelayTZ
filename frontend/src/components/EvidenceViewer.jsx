@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, ZoomIn, Lightbulb } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
 import { useMultiplayerStore } from "../store/useMultiplayerStore";
 
@@ -159,24 +159,6 @@ export function EvidenceViewer({ isStep1 = false, isStep2 = false, isStep3 = fal
           <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-mono text-slate-300 border border-slate-700/60 opacity-80 group-hover:opacity-100 transition flex items-center gap-1">
             <ZoomIn className="w-3 h-3" /> Click to zoom
           </div>
-        </div>
-
-        {/* Prompting Hint Box */}
-        <div className={`p-4 bg-gradient-to-br ${theme.hintBox} border-t space-y-2`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4 text-amber-400" />
-              <span className={`text-xs font-mono font-bold uppercase tracking-wider ${theme.hintLabel}`}>
-                Investigative Prompting Hint (Extract from Image)
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-slate-500">
-              {activeItem.id}.png
-            </span>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
-            {activeItem.prompt_hint}
-          </p>
         </div>
       </div>
 

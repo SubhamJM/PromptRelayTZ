@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import {
   FileSearch,
-  Sparkles,
   AlertCircle,
   HelpCircle,
   CheckCircle2,
   Send,
   RotateCcw,
-  BookOpen,
 } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
 import { EvidenceViewer } from "../components/EvidenceViewer";
@@ -16,20 +14,11 @@ export function Step1Screen() {
   const { scenario, submitStep1, isLoading } = useGameStore();
 
   const [prompt, setPrompt] = useState("");
-  const [showTips, setShowTips] = useState(true);
 
   if (!scenario) return null;
 
-  const MAX_WORDS = 80;
-  const MAX_CHARS = 600;
-
-  const defaultTemplate = `Role: Forensic Evidence Extractor.
-Extract all verified facts from the dossier and visual feeds:
-- People: suspect identities, descriptions, and badge numbers
-- Timestamps: chronological markers and times
-- Locations: gates, corridors, and room layouts
-- Objects: luggage tags, flight numbers, and physical items
-Distinguish confirmed facts from uncertain observations. Ignore irrelevant noise and red herrings. Do not accuse anyone.`;
+  const MAX_WORDS = 40;
+  const MAX_CHARS = 300;
 
   const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
   const charCount = prompt.length;
@@ -64,14 +53,6 @@ Distinguish confirmed facts from uncertain observations. Ignore irrelevant noise
             Carefully inspect the case evidence on the left. Prompt Agent 1 to filter out noise and extract critical facts for Player 2.
           </p>
         </div>
-
-        <button
-          onClick={() => setShowTips(!showTips)}
-          className="self-start md:self-center px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-semibold transition border border-slate-700 flex items-center gap-2 cursor-pointer shrink-0"
-        >
-          <BookOpen className="w-4 h-4 text-blue-400" />
-          {showTips ? "Hide Rubric & Tips" : "Show Rubric & Tips"}
-        </button>
       </div>
 
       {/* Main Two-Column Workspace */}
@@ -81,27 +62,8 @@ Distinguish confirmed facts from uncertain observations. Ignore irrelevant noise
           <EvidenceViewer isStep1={true} />
         </div>
 
-        {/* Right Column: Prompt Drafting & Tips (5 cols) */}
+        {/* Right Column: Prompt Drafting (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          {/* Rubric / Strategy Card */}
-          {showTips && (
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-blue-400 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" /> SCORING RUBRIC (20 PTS)
-                </span>
-                <span className="text-[11px] font-mono text-slate-400">P1 Weight: 20%</span>
-              </div>
-              <ul className="text-xs font-mono text-slate-300 space-y-1.5 list-disc list-inside">
-                <li><strong className="text-slate-100">Specific Role & Objective:</strong> Clearly define Agent 1's role as a forensic data extractor.</li>
-                <li><strong className="text-slate-100">Filtering Noise:</strong> Instruct the agent to ignore distractions/red herrings.</li>
-                <li><strong className="text-slate-100">Structured Output:</strong> Request bulleted facts, timestamps, and suspect attributes.</li>
-                <li><strong className="text-slate-100">No Premature Logic:</strong> Leave chronological timeline synthesis for Player 2 and final verdicts for Player 3!</li>
-                <li><strong className="text-amber-400">Hard Length Cap:</strong> Max {MAX_WORDS} words / {MAX_CHARS} characters. Keep instructions concise and high-signal.</li>
-              </ul>
-            </div>
-          )}
-
           {/* Prompt Form */}
           <form
             onSubmit={handleSubmit}
@@ -113,13 +75,6 @@ Distinguish confirmed facts from uncertain observations. Ignore irrelevant noise
               </label>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPrompt(defaultTemplate)}
-                  className="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-mono transition cursor-pointer flex items-center gap-1"
-                >
-                  <Sparkles className="w-3 h-3" /> Template
-                </button>
                 {prompt && (
                   <button
                     type="button"

@@ -93,14 +93,14 @@ def parse_json_verdict(raw_text: str) -> Tuple[Dict[str, Any], bool]:
         except Exception:
             pass
 
-    # 4. Fallback regex extraction for keys
+    # 4. Fallback line-by-line / regex extraction for keys (supports plain text, markdown lists, bullet points)
     extracted: Dict[str, Any] = {
         "action": "", "culprit": "", "method": "", "clue": "",
-        "rules": "", "proof": "",
+        "rules": "", "proof": "", "rule_broken": "",
     }
     key_aliases = {
-        "culprit": ["culprit", "perpetrator", "suspect", "action", "valid_action", "target_action_or_culprit"],
-        "method": ["method", "weapon", "mechanism", "rules", "supporting_rules", "rule_broken", "target_rules_or_method"],
+        "culprit": ["culprit", "perpetrator", "suspect", "action", "valid_action", "target_action_or_culprit", "who"],
+        "method": ["method", "weapon", "mechanism", "rules", "supporting_rules", "rule_broken", "target_rules_or_method", "how"],
         "clue": [
             "clue", "key_clue", "proof", "blocking_condition", "evidence",
             "evidence_keys", "clues", "key_evidence", "target_proof_or_clue",
@@ -109,12 +109,16 @@ def parse_json_verdict(raw_text: str) -> Tuple[Dict[str, Any], bool]:
     }
     for standard_key, aliases in key_aliases.items():
         for alias in aliases:
-            m = re.search(rf"['\"]?{alias}['\"]?\s*:\s*['\"]([^'\"]+)['\"]", cleaned, re.IGNORECASE)
+            # Check with quotes or plain line format (e.g. "Culprit: Dr. Vance" or '- Action: HOLD Flight')
+            m = re.search(rf"(?:^|\n|,\s*)['\"]?(?:[-*]\s*)?{alias}['\"]?\s*[:=]\s*['\"]?([^,\n\r\"}}]+)", cleaned, re.IGNORECASE)
             if m:
-                extracted[standard_key] = m.group(1).strip()
-                break
+                val = m.group(1).strip().strip("'\"")
+                if val:
+                    extracted[standard_key] = val
+                    break
 
-    return enrich_verdict_dict(extracted), False
+    enriched = enrich_verdict_dict(extracted)
+    return enriched, False
 
 
 def enrich_verdict_dict(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -346,8 +350,9 @@ def evaluate_player_2_prompt(prompt: str, agent_output: str) -> Dict[str, Any]:
 def evaluate_player_3_prompt(prompt: str, agent_output: str, was_clean_json: bool = True) -> Dict[str, Any]:
     """
     Evaluates Player 3's Turn (Max 20 pts):
-    - Prompt Engineering Quality: 12 pts
+    - Prompt Engineering Quality: 12 pts (Decision, Rules, Operational Directives, Clarity)
     - Agent 3 Output Performance: 8 pts
+    Note: Natural language prompts are fully supported with zero penalty for omitting JSON formatting!
     """
     p = (prompt or "").lower().strip()
     words = p.split()
@@ -367,7 +372,8 @@ def evaluate_player_3_prompt(prompt: str, agent_output: str, was_clean_json: boo
     # 2. Rule & Deductive Directives (0-3)
     rule_pts = 0
     if any(k in p for k in [
-        "sec-101", "ops-204", "clr-305", "operational rules", "protocols", "governing rules",
+        "sec-101", "ops-204", "clr-305", "sec-401", "art-302", "clr-505",
+        "operational rules", "protocols", "governing rules",
         "standard §", "trace standard", "forensic standard", "discrepancy principle", "biological trace", "cyber-physical"
     ]):
         rule_pts = 3
@@ -388,16 +394,19 @@ def evaluate_player_3_prompt(prompt: str, agent_output: str, was_clean_json: boo
     elif word_count >= 10:
         act_pts = 1
 
-    # 4. JSON Schema Constraints (0-3)
-    schema_pts = 0
-    if "json" in p and any(k in p for k in ["key", "schema", "format", "strict", "{"]):
-        schema_pts = 3
-    elif "json" in p or "format" in p:
-        schema_pts = 2
-    else:
-        schema_pts = 0
+    # 4. Decision & Verdict Clarity (0-3) (Replaces mandatory JSON schema requirement)
+    decision_pts = 0
+    if any(k in p for k in ["culprit", "method", "motive", "rule", "clue", "evidence", "verdict", "decision"]):
+        if any(k in p for k in ["json", "format", "schema", "keys", "detail", "clear", "why", "how"]) or word_count >= 8:
+            decision_pts = 3
+        else:
+            decision_pts = 2
+    elif any(k in p for k in ["json", "format", "schema", "keys"]):
+        decision_pts = 2
+    elif word_count >= 8:
+        decision_pts = 1
 
-    prompt_score = min(12, role_pts + rule_pts + act_pts + schema_pts)
+    prompt_score = min(12, role_pts + rule_pts + act_pts + decision_pts)
 
     # Agent 3 Output Performance (0-8)
     out_lower = (agent_output or "").lower()
@@ -524,7 +533,26 @@ def evaluate_verdict(
 
         is_unconfirmed = any(u in act_lower for u in ["suspect", "unconfirmed", "pending", "possible", "preliminary"])
 
-        if not is_operational_action and (exp_lower in act_lower or act_lower in exp_lower):
+        is_tariq_case = "tariq" in exp_lower or "malik" in exp_lower
+        is_operational_hold = any(k in act_lower for k in ["hold", "ground", "suspend", "dispatch", "sw 472", "flight 472"])
+
+        if is_tariq_case and ("tariq" in act_lower or "malik" in act_lower):
+            if has_prompts and is_unconfirmed:
+                culprit_pts = int(culprit_pts_max * 0.55)  # 8 pts partial
+                culprit_status = "partial"
+                culprit_feedback = f"Identified primary suspect ({actual_culprit}), but conviction was unconfirmed/pending verification."
+            else:
+                culprit_pts = culprit_pts_max
+                culprit_status = "correct"
+                culprit_feedback = f"Accurately identified culprit: {expected_culprit}."
+        elif is_tariq_case and is_operational_hold:
+            has_action_verb = any(v in act_lower for v in ["hold", "ground", "suspend", "stop", "halt"])
+            has_flight_id = any(fid in act_lower for fid in ["472", "sw 472", "sw-472", "flight"])
+            if has_action_verb and has_flight_id:
+                culprit_pts = culprit_pts_max
+                culprit_status = "correct"
+                culprit_feedback = f"Accurately deduced operational safety hold for Flight SW 472 to intercept culprit {expected_culprit}."
+        elif not is_operational_action and (exp_lower in act_lower or act_lower in exp_lower):
             if has_prompts and is_unconfirmed:
                 culprit_pts = int(culprit_pts_max * 0.55)  # 8 pts partial
                 culprit_status = "partial"
@@ -607,16 +635,16 @@ def evaluate_verdict(
     else:
         exp_m_lower = expected_method.lower()
         act_m_lower = actual_method.lower()
-        is_operational_rules = any(r in exp_m_lower for r in ["sec-101", "ops-204", "clr-305", "sterile zone", "pre-departure"])
+        is_operational_rules = any(r in exp_m_lower for r in ["sec-101", "ops-204", "clr-305", "bagg-204", "sterile zone", "pre-departure", "baggage swap"])
 
         if is_operational_rules:
             has_sec101 = any(r in act_m_lower for r in ["sec-101", "sec 101", "sterile zone unattended baggage", "unattended baggage protocol", "unattended baggage"])
-            has_ops204 = any(r in act_m_lower for r in ["ops-204", "ops 204", "pre-departure security hold", "security hold protocol", "pre-departure hold"])
+            has_ops204 = any(r in act_m_lower for r in ["ops-204", "ops 204", "bagg-204", "bagg 204", "pre-departure security hold", "security hold protocol", "pre-departure hold", "baggage chain-of-custody", "baggage swap", "duplicate tag", "reprint", "maintenance cart"])
 
             if has_sec101 and has_ops204:
                 method_pts = method_pts_max
                 method_status = "correct"
-                method_feedback = "Correctly deduced both governing operational rules (SEC-101 and OPS-204)."
+                method_feedback = "Correctly deduced governing operational rules and baggage swap method."
             elif has_sec101 or has_ops204:
                 method_pts = int(method_pts_max * 0.55)  # 8 pts
                 method_status = "partial"
@@ -684,11 +712,11 @@ def evaluate_verdict(
     else:
         exp_c_lower = expected_clue.lower()
         act_c_lower = actual_clue.lower()
-        is_operational_clue = any(k in exp_c_lower for k in ["daniel kim", "skw-", "unattended blue", "k9 explosive", "gate b07"])
+        is_operational_clue = any(k in exp_c_lower for k in ["daniel kim", "skw-", "unattended blue", "k9 explosive", "gate b07", "tariq malik", "reprint-mgr-02", "ramp-882"])
 
         if is_operational_clue:
-            has_bag_gate = any(b in act_c_lower for b in ["unattended", "blue suitcase", "blue hard-shell", "blue bag", "suitcase at gate", "bag at gate", "gate b07"])
-            has_tag_or_owner = any(o in act_c_lower for o in ["daniel kim", "kim", "skw-78921-472", "skw-", "78921", "bag tag", "tag #"])
+            has_bag_gate = any(b in act_c_lower for b in ["unattended", "blue suitcase", "blue hard-shell", "blue bag", "suitcase at gate", "bag at gate", "gate b07", "cam 12", "boots", "ballast", "decoy"])
+            has_tag_or_owner = any(o in act_c_lower for o in ["daniel kim", "kim", "skw-78921-472", "skw-", "78921", "bag tag", "tag #", "tariq", "malik", "ramp-882", "reprint-mgr-02", "reprint", "discrepancy", "12.1", "weight", "mc-08", "cart"])
             has_k9_sweep = any(k in act_c_lower for k in ["k9 sweep", "k-9 sweep", "k9 explosive", "explosive clearance", "k9 clearance", "sweep clearance"])
 
             # Full marks: Must cite the unattended blue bag/gate AND tag/Daniel Kim ownership link
@@ -942,7 +970,7 @@ def evaluate_verdict(
 
 
 def evaluate_relay_match(
-    scenario: Scenario,
+    scenario: Any,
     p1_prompt: str,
     a1_output: str,
     p2_prompt: str,
@@ -954,7 +982,18 @@ def evaluate_relay_match(
     """
     Evaluates complete 3-player match returning typed EvaluationReport for webapp and API.
     """
-    gt = scenario.ground_truth.model_dump()
+    if isinstance(scenario, dict):
+        try:
+            scenario = Scenario.model_validate(scenario)
+        except Exception:
+            pass
+
+    if hasattr(scenario, "ground_truth") and hasattr(scenario.ground_truth, "model_dump"):
+        gt = scenario.ground_truth.model_dump()
+    elif isinstance(scenario, dict):
+        gt = scenario.get("ground_truth", {})
+    else:
+        gt = getattr(scenario, "ground_truth", {}) or {}
     parsed_verdict, was_clean = parse_json_verdict(a3_raw_output or json.dumps(final_verdict))
     if final_verdict and isinstance(final_verdict, dict):
         for k, v in final_verdict.items():

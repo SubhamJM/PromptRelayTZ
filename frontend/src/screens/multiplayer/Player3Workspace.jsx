@@ -12,7 +12,7 @@ export function Player3Workspace() {
   const [charCount, setCharCount] = useState(myPrompt.length);
   const words = myPrompt.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const MAX_WORDS = 120;
+  const MAX_WORDS = 60;
 
   const handleTextChange = (e) => {
     const val = e.target.value;
@@ -50,7 +50,7 @@ export function Player3Workspace() {
             <h2 className="font-bold text-slate-100 text-base font-serif">
               {activeTab === "evidence"
                 ? "Visual Evidence & Surveillance Console"
-                : "Governing Operational Protocols & Schema Assistant"}
+                : "Governing Operational Protocols & Resolution Assistant"}
             </h2>
           </div>
           <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
@@ -92,7 +92,7 @@ export function Player3Workspace() {
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Operational Rules & Schema</span>
+            <span>Operational Rules & Resolution Checklist</span>
           </button>
         </div>
 
@@ -152,19 +152,19 @@ export function Player3Workspace() {
 
                     <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1">
                       <span className="font-bold text-emerald-300">
-                        Rule OPS-204 (Pre-Departure Security Hold Protocol)
+                        Rule BAGG-204 (Baggage Chain-of-Custody & Tag Duplicate Protocol)
                       </span>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        No commercial flight at a gate under an unresolved security investigation may push back, board passengers, or be cleared for departure.
+                        Manual tag reprinting requires multi-factor supervisor authorization; any weight discrepancy over 1.0 kg between check-in and gate intercepts flags immediate chain-of-custody fraud.
                       </p>
                     </div>
 
                     <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1">
                       <span className="font-bold text-emerald-300">
-                        Rule CLR-305 (Operational Resumption Protocol)
+                        Rule OPS-204 (Pre-Departure Security Hold Protocol)
                       </span>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        Boarding may only resume once the item is verified non-hazardous by K9, ownership is verified, and written clearance is signed by the Airport Security Controller.
+                        No flight at a gate under an active security investigation, unattended baggage incident, or ramp cargo diversion may depart or board passengers.
                       </p>
                     </div>
                   </>
@@ -172,29 +172,49 @@ export function Player3Workspace() {
               </div>
             </div>
 
-            {/* JSON Output Schema Reference Box */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-2">
+            {/* Case Resolution Checklist */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-emerald-400" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   <span className="text-xs font-mono font-bold text-slate-200">
-                    Mandatory Machine-Readable JSON Schema Required
+                    Final Case Resolution Checklist
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">
-                  Output Must Be JSON
+                  Plain English Supported
                 </span>
               </div>
 
-              <pre className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-300 overflow-x-auto leading-relaxed">
-{`{
-  "culprit": "${isMuseum ? "Dr. Julian Vance & Marcus Thorne" : "HOLD Flight SW 472 at Gate B07"}",
-  "method": "${isMuseum ? "Breaker B-04 blackout synthetic acrylic forgery swap" : "Rule SEC-101 and Rule OPS-204"}",
-  "motive": "${isMuseum ? "Illicit high-value art theft" : "Sterile zone breach prevention"}",
-  "rule_broken": "${isMuseum ? "Rule SEC-401, Rule ART-302, Rule CLR-505" : "Rule SEC-101 and Rule OPS-204"}",
-  "evidence_keys": ["...key evidence items and timestamps..."]
-}`}
-              </pre>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                  <span className="text-emerald-400 font-bold">1. Culprit / Action:</span>
+                  <p className="text-slate-400 text-[10px]">
+                    {isMuseum ? "Identify Dr. Julian Vance & Marcus Thorne" : "Identify Tariq Malik (Senior Ramp Supervisor)"}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                  <span className="text-emerald-400 font-bold">2. Method & Mechanism:</span>
+                  <p className="text-slate-400 text-[10px]">
+                    {isMuseum ? "Breaker B-04 blackout synthetic forgery swap" : "Duplicate tag reprint, ballast decoy drop & Cart #MC-08 diversion"}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                  <span className="text-emerald-400 font-bold">3. Violated Rule:</span>
+                  <p className="text-slate-400 text-[10px]">
+                    {isMuseum ? "Rule SEC-401, Rule ART-302, Rule CLR-505" : "Rule SEC-101, Rule BAGG-204, Rule OPS-204"}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                  <span className="text-emerald-400 font-bold">4. Key Evidence:</span>
+                  <p className="text-slate-400 text-[10px]">
+                    {isMuseum ? "Locker 14 token C-408, CONSV-408 badge, lab spectrometry" : "REPRINT-MGR-02 watermark, 6.3kg discrepancy, CAM 12 boots"}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-500 font-mono">
+                💡 Tip: Agent 3 handles all structured formatting automatically—just instruct in clear, natural English!
+              </p>
             </div>
           </div>
         )}
@@ -237,7 +257,7 @@ export function Player3Workspace() {
               <li>Define role: <em>Logic Decision Solver and Operational Authority</em></li>
               <li>Evaluate timeline against governing rules ({isMuseum ? "SEC-401, ART-302, CLR-505" : "SEC-101, OPS-204"})</li>
               <li>Deduce authorized dispatch action / conspirators and decisive evidence keys</li>
-              <li><strong>Mandate strict JSON output</strong> with exact required keys</li>
+              <li><strong>Plain English:</strong> Write naturally without technical data formatting requirements</li>
             </ul>
           </div>
 
@@ -261,8 +281,8 @@ export function Player3Workspace() {
               onChange={handleTextChange}
               placeholder={
                 isMuseum
-                  ? "e.g. Role: Logic Decision Solver. Evaluate the reconstructed timeline against Rule SEC-401, Rule ART-302, and Rule CLR-505. Deduce the conspirators Dr. Julian Vance and Marcus Thorne. Explain the Breaker B-04 90-second blackout forgery swap method. Cite evidence keys (card CONSV-408, token C-408, acrylic spectrometry). Output strictly valid JSON with keys: culprit, method, motive, rule_broken, evidence_keys"
-                  : "e.g. Role: Logic Decision Solver. Evaluate the reconstructed incident timeline against Airport Operational Rules (Rule SEC-101, Rule OPS-204). Determine the operational dispatch action to HOLD Flight SW 472 at Gate B07 immediately, suspend boarding, cordon the seating area, and dispatch the K9 explosive unit. Output strictly valid JSON with keys: culprit, method, motive, rule_broken, evidence_keys"
+                  ? "e.g. Role: Logic Decision Solver. Evaluate the reconstructed timeline against Rule SEC-401, Rule ART-302, and Rule CLR-505. Deduce the conspirators Dr. Julian Vance and Marcus Thorne. Explain the Breaker B-04 90-second blackout forgery swap method. Cite key evidence (card CONSV-408, token C-408, acrylic spectrometry)."
+                  : "e.g. Role: Logic Decision Solver. Evaluate the reconstructed timeline against Rule SEC-101, Rule BAGG-204, and Rule OPS-204. Deduce the culprit Tariq Malik, the luggage swap method using the duplicate tag and Maintenance Cart #MC-08, and cite the decisive clues (REPRINT-MGR-02 watermark, 6.3kg discrepancy, Door B-Staff-03 log)."
               }
               className={`w-full p-3.5 rounded-xl bg-slate-950 border font-mono text-xs text-slate-100 placeholder-slate-600 focus:outline-none transition leading-relaxed ${
                 isLockedIn

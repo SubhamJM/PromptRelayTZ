@@ -314,10 +314,10 @@ export function WelcomeScreen() {
                       <Plane className="w-4 h-4 text-blue-400" />
                     </div>
                     <h4 className="font-bold text-slate-100 text-sm">
-                      Flight SW 472: Baggage Contraband
+                      Flight SW 472: The Diamond Baggage Swap
                     </h4>
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      Terminal CCTV feeds, flight displays, passenger chats, and physical baggage tags.
+                      Terminal CCTV feeds, baggage scales, apron cargo diversion, and duplicate tag audits.
                     </p>
                   </div>
 
@@ -491,7 +491,7 @@ export function WelcomeScreen() {
                   <Plane className="w-4 h-4 text-blue-400" />
                 </div>
                 <h4 className="font-bold text-slate-100 text-sm">
-                  Flight SW 472: Baggage Contraband
+                  Flight SW 472: The Diamond Baggage Swap
                 </h4>
               </div>
 

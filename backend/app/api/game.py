@@ -21,8 +21,8 @@ from backend.app.models.api_dtos import (
     Step3Request,
     Step3Response,
 )
-from backend.app.models.scenario import ScenarioSummary
-from backend.app.models.session import TurnStep
+from backend.app.models.scenario import Scenario, ScenarioSummary
+from backend.app.models.session import GameSession, TurnStep
 from backend.app.core.config import get_settings
 from backend.app.services.case_loader import CaseLoader, get_case_loader
 from backend.app.services.database import MatchDatabase, get_database
@@ -36,6 +36,26 @@ router = APIRouter(prefix="/game", tags=["Game"])
 agent_1_extractor = node_extractor
 agent_2_reconstructor = node_reconstructor
 agent_3_detective = node_solver
+
+
+def _resolve_session_scenario(session: GameSession) -> Optional[Scenario]:
+    """Ensures session.scenario is always a validated Scenario model instance."""
+    if isinstance(session.scenario, Scenario):
+        return session.scenario
+    if isinstance(session.scenario, dict):
+        try:
+            sc = Scenario.model_validate(session.scenario)
+            session.scenario = sc
+            return sc
+        except Exception:
+            pass
+    if session.scenario_id:
+        loader = get_scenario_loader()
+        sc = loader.get(session.scenario_id)
+        if sc:
+            session.scenario = sc
+            return sc
+    return None
 
 
 def validate_prompt_length(prompt_text: str, max_words: int, max_chars: int, player_num: int) -> None:
@@ -239,11 +259,18 @@ async def submit_step_1(
     settings = get_settings()
     validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P1, settings.MAX_PROMPT_CHARS_P1, 1)
 
+    scenario = _resolve_session_scenario(session)
+    dossier = ""
+    if scenario:
+        dossier = scenario.dossier_text
+    elif isinstance(session.scenario, dict):
+        dossier = session.scenario.get("dossier_text", "")
+
     state: RelayState = {
         "session_id": session.session_id,
         "team_name": session.team_name,
-        "scenario": session.scenario,
-        "case_file": session.scenario.dossier_text if session.scenario else "",
+        "scenario": scenario or session.scenario,
+        "case_file": dossier,
         "p1_prompt": prompt_text,
         "user_1_prompt": prompt_text,
     }
@@ -287,16 +314,23 @@ async def submit_step_2(
     settings = get_settings()
     validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P2, settings.MAX_PROMPT_CHARS_P2, 2)
 
+    scenario = _resolve_session_scenario(session)
+    leak_kw = []
+    if scenario:
+        leak_kw = scenario.spoiler_keywords or scenario.leak_keywords
+    elif isinstance(session.scenario, dict):
+        leak_kw = session.scenario.get("spoiler_keywords") or session.scenario.get("leak_keywords") or []
+
     state: RelayState = {
         "session_id": session.session_id,
         "team_name": session.team_name,
-        "scenario": session.scenario,
+        "scenario": scenario or session.scenario,
         "p1_prompt": session.p1_prompt or "",
         "a1_output": session.a1_output or "",
         "agent_1_output": session.a1_output or "",
         "p2_prompt": prompt_text,
         "user_2_prompt": prompt_text,
-        "leak_keywords": session.scenario.leak_keywords if session.scenario else [],
+        "leak_keywords": leak_kw,
     }
 
     result = agent_2_reconstructor(state)
@@ -343,11 +377,13 @@ async def submit_step_3(
     settings = get_settings()
     validate_prompt_length(prompt_text, settings.MAX_PROMPT_WORDS_P3, settings.MAX_PROMPT_CHARS_P3, 3)
 
+    scenario = _resolve_session_scenario(session)
+
     # 1. Run Solver Node
     solver_state: RelayState = {
         "session_id": session.session_id,
         "team_name": session.team_name,
-        "scenario": session.scenario,
+        "scenario": scenario or session.scenario,
         "p1_prompt": session.p1_prompt or "",
         "a1_output": session.a1_output or "",
         "agent_1_output": session.a1_output or "",

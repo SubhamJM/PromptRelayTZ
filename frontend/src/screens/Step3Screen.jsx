@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import {
   Brain,
-  Sparkles,
   AlertCircle,
   FileText,
   ShieldCheck,
   Code,
   Send,
   RotateCcw,
-  BookOpen,
   Scale,
 } from "lucide-react";
 import { useGameStore } from "../store/useGameStore";
@@ -18,27 +16,11 @@ export function Step3Screen() {
 
   const [prompt, setPrompt] = useState("");
   const [activeTab, setActiveTab] = useState("timeline"); // timeline, rules, schema
-  const [showTips, setShowTips] = useState(true);
 
   if (!scenario) return null;
 
-  const MAX_WORDS = 120;
-  const MAX_CHARS = 900;
-
-  const defaultTemplate = `Role: Logic Decision Solver.
-Analyze the reconstructed timeline and operational rules to determine the final operational action:
-- Identify the true culprit or entity responsible
-- Deduce the exact breach method and mechanism
-- Cite the governing operational rule broken
-- Identify the decisive physical clue or blocking condition
-Output strictly valid JSON with keys:
-{
-  "culprit": "<name or action>",
-  "method": "<method or rules>",
-  "motive": "<objective>",
-  "rule_broken": "<rule code>",
-  "evidence_keys": ["<key clues>"]
-}`;
+  const MAX_WORDS = 60;
+  const MAX_CHARS = 450;
 
   const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
   const charCount = prompt.length;
@@ -71,17 +53,9 @@ Output strictly valid JSON with keys:
             Player 3: Logic Deduction & Final Verdict
           </h1>
           <p className="text-sm text-slate-400">
-            Apply deductive reasoning across Agent 2's timeline and the operational rules. Prompt Agent 3 to output the definitive JSON verdict.
+            Apply deductive reasoning across Agent 2's timeline and the operational rules. Prompt Agent 3 in plain English to deduce the final resolution.
           </p>
         </div>
-
-        <button
-          onClick={() => setShowTips(!showTips)}
-          className="self-start md:self-center px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-semibold transition border border-slate-700 flex items-center gap-2 cursor-pointer shrink-0"
-        >
-          <BookOpen className="w-4 h-4 text-emerald-400" />
-          {showTips ? "Hide Rubric & Tips" : "Show Rubric & Tips"}
-        </button>
       </div>
 
       {/* Main Two-Column Workspace */}
@@ -121,8 +95,8 @@ Output strictly valid JSON with keys:
                     : "bg-slate-900 text-slate-400 hover:text-slate-200"
                 }`}
               >
-                <Code className="w-3.5 h-3.5" />
-                <span>Verdict JSON Schema</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Resolution Checklist</span>
               </button>
             </div>
 
@@ -161,20 +135,34 @@ Output strictly valid JSON with keys:
 
               {activeTab === "schema" && (
                 <div className="space-y-3 whitespace-normal">
-                  <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono space-y-2">
-                    <p className="text-emerald-400 font-bold">Required Verdict JSON Format:</p>
-                    <pre className="text-slate-300 overflow-x-auto p-2 bg-slate-900 rounded">
-{`{
-  "culprit": "Exact name or entity",
-  "method": "Step-by-step mechanism of breach/crime",
-  "motive": "Goal / motive behind the action",
-  "rule_broken": "Specific rule ID (e.g. SEC-101)",
-  "evidence_keys": ["item_1", "item_2", "timestamp_x"]
-}`}
-                    </pre>
-                    <p className="text-slate-400 text-[11px]">
-                      Tip: Instruct Agent 3 to output pure JSON so that our automated calibrated scoring pipeline can parse the fields accurately!
+                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono space-y-3">
+                    <p className="text-emerald-400 font-bold flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4" /> Final Case Resolution Checklist:
                     </p>
+                    <p className="text-slate-300 leading-relaxed">
+                      Instruct Agent 3 to resolve the case by addressing these 4 core questions:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-slate-300">
+                      <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-emerald-400 font-bold block">1. Culprit / Operational Action</span>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">Who is the perpetrator, or what emergency action must be executed immediately?</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-emerald-400 font-bold block">2. Method & Mechanism</span>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">How was the breach carried out, or what security protocol explains the situation?</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-emerald-400 font-bold block">3. Violated Rule</span>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">Which specific operational rule or safety protocol applies (e.g. SEC-101, BAGG-204, ART-302)?</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-1">
+                        <span className="text-emerald-400 font-bold block">4. Decisive Evidence & Clues</span>
+                        <p className="text-slate-400 text-[11px] leading-relaxed">What decisive physical clues, barcodes, or sensor logs prove the case?</p>
+                      </div>
+                    </div>
+                    <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-[11px] leading-relaxed">
+                      💡 Tip: Write naturally in plain English! Agent 3 handles the technical data formatting automatically behind the scenes.
+                    </div>
                   </div>
                 </div>
               )}
@@ -190,27 +178,8 @@ Output strictly valid JSON with keys:
           </div>
         </div>
 
-        {/* Right Column: Prompt Drafting & Tips (5 cols) */}
+        {/* Right Column: Prompt Drafting (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          {/* Rubric / Strategy Card */}
-          {showTips && (
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" /> SCORING RUBRIC (20 + 40 PTS)
-                </span>
-                <span className="text-[11px] font-mono text-slate-400">Total 60% on line</span>
-              </div>
-              <ul className="text-xs font-mono text-slate-300 space-y-1.5 list-disc list-inside">
-                <li><strong className="text-slate-100">Deductive Logic:</strong> Instruct the agent to connect timeline evidence with specific operational rules.</li>
-                <li><strong className="text-slate-100">Pinpoint Accuracy:</strong> Name the exact culprit, method, and motive.</li>
-                <li><strong className="text-slate-100">Strict JSON Output:</strong> Enforce the JSON schema keys to avoid parsing penalties.</li>
-                <li><strong className="text-slate-100">Final Verdict:</strong> This turn completes the relay match and scores your entire team!</li>
-                <li><strong className="text-amber-400">Hard Length Cap:</strong> Max {MAX_WORDS} words / {MAX_CHARS} characters. Concise JSON schema & rule directives.</li>
-              </ul>
-            </div>
-          )}
-
           {/* Prompt Form */}
           <form
             onSubmit={handleSubmit}
@@ -222,13 +191,6 @@ Output strictly valid JSON with keys:
               </label>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPrompt(defaultTemplate)}
-                  className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-mono transition cursor-pointer flex items-center gap-1"
-                >
-                  <Sparkles className="w-3 h-3" /> Template
-                </button>
                 {prompt && (
                   <button
                     type="button"
@@ -247,7 +209,7 @@ Output strictly valid JSON with keys:
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={12}
                 disabled={isLoading}
-                placeholder="Write your prompt to instruct Agent 3 to deduce the culprit, method, motive, and violated rule, and format the verdict in JSON..."
+                placeholder="Write your prompt in plain English to instruct Agent 3 to deduce the culprit or action, method, motive, and violated rule..."
                 className={`w-full bg-slate-950 border rounded-xl p-3.5 text-sm font-mono text-slate-200 placeholder-slate-600 focus:outline-none transition resize-y leading-relaxed disabled:opacity-50 ${
                   isOverLimit ? "border-rose-500 focus:border-rose-500" : "border-slate-800 focus:border-emerald-500"
                 }`}
