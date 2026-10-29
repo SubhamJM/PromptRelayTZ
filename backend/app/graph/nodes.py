@@ -73,7 +73,7 @@ def run_agent_llm(
     # Tier 2: Try fast backup Gemini models if API key exists
     settings = get_settings()
     if settings.gemini_key:
-        for backup_model in ["gemini-3-flash-preview", "gemini-3.1-flash-lite"]:
+        for backup_model in ["gemini-3.5-flash", "gemini-3-flash-preview", "gemini-3.1-flash-lite"]:
             try:
                 logger.info(f"Attempting backup Gemini model: {backup_model}...")
                 backup_llm = _get_cached_llm("gemini", backup_model, 0.2, 10, settings.gemini_key)
