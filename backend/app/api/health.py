@@ -15,6 +15,7 @@ async def health_check():
         "llm": {
             "default_provider": settings.DEFAULT_LLM_PROVIDER,
             "default_model": settings.DEFAULT_MODEL_NAME,
+            "has_groq_key": bool(settings.GROQ_API_KEY),
             "has_gemini_key": bool(settings.GEMINI_API_KEY),
         },
     }

@@ -19,6 +19,6 @@ def test_health_endpoint():
     assert data["status"] == "ok"
     assert data["service"] == "Prompt Relay"
     assert "llm" in data
-    assert data["llm"]["default_provider"] in ("gemini", "ollama")
+    assert data["llm"]["default_provider"] in ("groq", "gemini", "ollama")
     assert "default_model" in data["llm"]
     assert "has_gemini_key" in data["llm"]

@@ -381,8 +381,8 @@ class MockOfflineChatModel(SimpleChatModel):
 class RuntimeLLMConfig:
     def __init__(self):
         settings = get_settings()
-        self.provider: str = getattr(settings, "DEFAULT_LLM_PROVIDER", "gemini")
-        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "gemini-3.5-flash-lite")
+        self.provider: str = getattr(settings, "DEFAULT_LLM_PROVIDER", "groq")
+        self.model_name: str = getattr(settings, "DEFAULT_MODEL_NAME", "qwen-2.5-32b")
         self.temperature: float = getattr(settings, "MODEL_TEMPERATURE", 0.2)
         self.timeout_seconds: int = getattr(settings, "MODEL_TIMEOUT_SECONDS", 15)
         self.fallback_to_offline: bool = getattr(settings, "FALLBACK_TO_OFFLINE", True)
@@ -432,7 +432,17 @@ def _get_cached_llm(
     api_key: str,
 ) -> BaseChatModel:
     effective_timeout = min(timeout, 20) if timeout else 15
-    if chosen_provider in ("gemini", "google"):
+    if chosen_provider in ("groq",):
+        from langchain_groq import ChatGroq
+        return ChatGroq(
+            model=chosen_model or "qwen-2.5-32b",
+            groq_api_key=api_key,
+            temperature=temp,
+            timeout=effective_timeout,
+            max_retries=1,
+            max_tokens=2048,
+        )
+    elif chosen_provider in ("gemini", "google"):
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model=chosen_model or "gemini-3.5-flash-lite",
@@ -440,7 +450,8 @@ def _get_cached_llm(
             temperature=temp,
             timeout=effective_timeout,
             max_retries=1,
-            max_output_tokens=700,
+            thinking_budget=0,
+            max_output_tokens=2048,
         )
     elif chosen_provider == "openai":
         from langchain_openai import ChatOpenAI
@@ -480,7 +491,16 @@ def get_llm(
     if chosen_provider in ("offline", "mock"):
         return MockOfflineChatModel(model_name=chosen_model or "offline-relay-simulator")
 
-    if chosen_provider in ("gemini", "google"):
+    if chosen_provider == "groq":
+        api_key = settings.groq_key
+        if not api_key:
+            logger.warning("No GROQ_API_KEY found; checking GEMINI_API_KEY or falling back to MockOfflineChatModel")
+            if settings.gemini_key:
+                return _get_cached_llm("gemini", "gemini-3.5-flash", temp, timeout, settings.gemini_key)
+            return MockOfflineChatModel()
+        return _get_cached_llm(chosen_provider, chosen_model, temp, timeout, api_key)
+
+    elif chosen_provider in ("gemini", "google"):
         api_key = settings.gemini_key
         if not api_key:
             logger.warning("No GEMINI_API_KEY found; falling back to MockOfflineChatModel")

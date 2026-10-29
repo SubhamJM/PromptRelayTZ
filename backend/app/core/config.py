@@ -12,9 +12,10 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "Sequential 3-Player Hotseat Prompt Engineering Competition"
 
     # LLM Settings
+    GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
-    DEFAULT_MODEL_NAME: str = "gemini-3.5-flash-lite"
-    DEFAULT_LLM_PROVIDER: str = "gemini"
+    DEFAULT_MODEL_NAME: str = "qwen-2.5-32b"
+    DEFAULT_LLM_PROVIDER: str = "groq"
     MODEL_TEMPERATURE: float = 0.2
     MODEL_TIMEOUT_SECONDS: int = 15
     FALLBACK_TO_OFFLINE: bool = True
@@ -45,6 +46,10 @@ class Settings(BaseSettings):
     @property
     def gemini_key(self) -> str:
         return self.GEMINI_API_KEY
+
+    @property
+    def groq_key(self) -> str:
+        return self.GROQ_API_KEY
 
 
 @lru_cache
