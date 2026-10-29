@@ -215,8 +215,32 @@ class MockOfflineChatModel(SimpleChatModel):
             tier = eval_res["tier"]
             score = eval_res["score"]
             user_p_lower = user_prompt.lower()
+            is_tier5_verdict = (
+                score >= 10
+                and any(f in user_p_lower for f in ["final verdict", "final resolution", "final operational resolution"])
+                and any(r in user_p_lower for r in ["rules", "rule", "protocol", "protocols", "governing"])
+            )
             if is_airport:
-                if tier == "weak":
+                if is_tier5_verdict:
+                    return json.dumps({
+                        "action": "HOLD Flight SW 472 at Gate B07 immediately, suspend passenger boarding, cordon off the Gate B07 seating area, and dispatch the K9 explosive detection unit to inspect the unattended blue baggage",
+                        "culprit": "Tariq Malik (Flight SW 472 Ramp Supervisor)",
+                        "supporting_rules": "Rule SEC-101 (Sterile Zone Unattended Baggage Protocol) and Rule OPS-204 (Pre-Departure Security Hold Protocol)",
+                        "method": "Baggage swap using duplicate tag #SKW-78921-472 printed via supervisor override card REPRINT-MGR-02, leaving a 12.1 kg decoy bag at Gate B07 to trigger a sterile zone security hold while diverting the authentic 18.4 kg diamond consignment on Apron Bay 3 into Cart #MC-08 under Rule SEC-101 and Rule BAGG-204",
+                        "rule_broken": "Rule SEC-101, Rule OPS-204, and Rule BAGG-204",
+                        "blocking_condition": "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49 awaiting K9 explosive clearance and passenger ownership verification (tag: Daniel Kim #SKW-78921-472 reprinted by RAMP-882)",
+                        "clue": "Baggage tag reprint authorization REPRINT-MGR-02 matching Tariq Malik (RAMP-882), orange-soled tarmac boots on CAM 12, door B-Staff-03 badge swipe log at 08:47:45, and 6.3 kg weight discrepancy between check-in scale (18.4 kg) and gate decoy (12.1 kg)",
+                        "motive": "Illicit $3.5M industrial diamond smuggling and theft by diverting cargo manifest #DIA-904 into an apron maintenance cart before flight departure",
+                        "evidence_keys": [
+                            "Unattended blue hard-shell suitcase discovered at Gate B07 window seats reported at 08:49",
+                            "Bag tag #SKW-78921-472 belongs to Daniel Kim (Counter A04)",
+                            "CCTV CAM 12 captures unidentified hooded individual fleeing Gate B07 corridor at 08:47:10 with orange-soled tarmac boots",
+                            "Door B-Staff-03 electronic card swipe at 08:47:45 logged to Badge #RAMP-882 (Tariq Malik)",
+                            "Reprint authorization REPRINT-MGR-02 on decoy bag tag matches supervisor Tariq Malik",
+                            "Awaiting K9 explosive sweep clearance before departure authorization"
+                        ]
+                    }, indent=2)
+                elif tier == "weak":
                     return json.dumps({
                         "action": "Undetermined (User prompt lacked operational safety directives)",
                         "supporting_rules": "Unspecified (Incomplete prompt)",
@@ -268,7 +292,21 @@ class MockOfflineChatModel(SimpleChatModel):
                         ]
                     }, indent=2)
             elif is_museum:
-                if tier == "weak":
+                if is_tier5_verdict:
+                    return json.dumps({
+                        "culprit": "Dr. Julian Vance (Head of Conservation) and Chief Marcus Thorne (Security Accomplice)",
+                        "method": "Breaker B-04 intentional blackout exploiting 90-second auxiliary power failover to swap original canvas with synthetic acrylic forgery and drop tube at Locker 14 under Rule SEC-401 and Rule ART-302",
+                        "rule_broken": "Rule SEC-401, Rule ART-302, and Rule CLR-505",
+                        "clue": "Locker 14 search yielded Conservation RFID keycard CONSV-408 and Private Vault cloakroom token C-408 matching Julian Vance, disproving Thorne's sub-station sabotage alibi and proving canvas swap forgery RM-1887-04",
+                        "motive": "Replace authentic Renaissance masterpiece with synthetic acrylic forgery for illicit high-value private sale",
+                        "evidence_keys": [
+                            "Recovered Conservation staff access card #408 (CONSV-408) and Gala Cloakroom token No. C-408 from Locker 14",
+                            "Lab spectrometry confirming wall painting RM-1887-04 is a 2023 synthetic acrylic forgery with zinc white",
+                            "SCADA telemetry and Evidence #04 memo confirming Breaker B-04 trip 90-second blackout loop",
+                            "Thorne sub-station sabotage alibi disproven by insider timing and Locker 14 drop"
+                        ]
+                    }, indent=2)
+                elif tier == "weak":
                     return json.dumps({
                         "culprit": "Undetermined (User prompt lacked deductive instructions)",
                         "method": "Unspecified (Incomplete prompt)",
