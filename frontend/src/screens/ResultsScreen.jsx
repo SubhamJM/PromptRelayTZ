@@ -237,7 +237,12 @@ export function ResultsScreen() {
     teamParsed?.reason ||
     "N/A";
   const teamClue =
-    teamParsed?.clue ||
+    (Array.isArray(teamParsed?.evidence_keys) && teamParsed.evidence_keys.length > 0
+      ? teamParsed.evidence_keys.join("; ")
+      : null) ||
+    (Array.isArray(teamParsed?.clue)
+      ? teamParsed.clue.join("; ")
+      : teamParsed?.clue) ||
     teamParsed?.key_clue ||
     teamParsed?.proof ||
     teamParsed?.evidence ||

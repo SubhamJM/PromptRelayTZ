@@ -55,6 +55,32 @@ def test_parse_json_verdict_broken():
     assert parsed["culprit"] == ""
 
 
+def test_parse_json_verdict_fenced_with_unescaped_newline():
+    raw = """Agent 3 Final Verdict:
+
+```json
+{
+  "culprit": "Tariq Malik (Senior Ramp Baggage Supervisor, Badge #RAMP-882)",
+  "method": "Unauthorized duplication of automated baggage tag to create a diversion, deploying a pre-weighted ballast decoy bag at Gate B07, and intercepting authentic high-value cargo at Apron Bay 3",
+  "motive": "Theft and illegal diversion of Customs Consignment #DIA-904 ($3.5M in uncut diamonds)",
+  "rule_broken": "SEC-101, BAGG-204, OPS-204",
+  "evidence_keys": [
+    "08:16:05 - Fraudulent duplicate tag #\nSKW-78921-472 generated using override REPRINT-MGR-02 under Badge #RAMP-882",
+    "08:47:45 - Keycard swipe by Badge #RAMP-882 at door B-Staff-03 following decoy drop",
+    "08:49:00 - Weight discrepancy of 6.3 kg (18.4 kg check-in vs. 12.1 kg decoy bag containing sand/gravel)",
+    "09:02:55 - CAM 21 video capture of Malik stashing real diamond consignment in Maintenance Cart #MC-08",
+    "Handwritten drop memo recovered at Gate B07 matching Tariq Malik's official signature referencing Cart 08"
+  ]
+}
+```
+"""
+    parsed, was_clean = parse_json_verdict(raw)
+    assert "Tariq Malik" in parsed["culprit"]
+    assert "Unauthorized duplication" in parsed["method"]
+    assert "SEC-101" in parsed["rule_broken"]
+    assert len(parsed["evidence_keys"]) == 5
+
+
 # -------------------------------------------------------------
 # 2. Analytical Evaluator Tests
 # -------------------------------------------------------------

@@ -52,68 +52,116 @@ def is_placeholder_value(val: Any) -> bool:
     return False
 
 
+def _clean_json_candidate(candidate: str) -> str:
+    """Normalize common LLM JSON formatting quirks."""
+    s = candidate.strip()
+    s = re.sub(r"^```(?:json)?", "", s, flags=re.IGNORECASE).strip()
+    s = re.sub(r"```$", "", s).strip()
+    s = re.sub(r",\s*([\]}])", r"\1", s)
+    return s
+
+
+def _try_load_json(s: str) -> Optional[Dict[str, Any]]:
+    """
+    Attempt JSON decoding with multiple recovery strategies:
+    1. strict=False (allows unescaped control chars/newlines inside strings)
+    2. standard json.loads
+    3. trailing comma normalization
+    4. ast.literal_eval for single-quoted dicts
+    """
+    if not s or not isinstance(s, str):
+        return None
+    cleaned = _clean_json_candidate(s)
+    candidates = [cleaned, s.strip()]
+
+    for cand in candidates:
+        try:
+            data = json.loads(cand, strict=False)
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+
+    for cand in candidates:
+        try:
+            data = json.loads(cand)
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+
+    for cand in candidates:
+        try:
+            import ast
+            data = ast.literal_eval(cand)
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+
+    return None
+
+
 def parse_json_verdict(raw_text: str) -> Tuple[Dict[str, Any], bool]:
     """
     Robustly extract the structured JSON decision / verdict from LLM output.
     Returns (verdict_dict, was_clean_json).
+    Handles markdown triple-backtick fences, unescaped newlines, trailing commas, and text preambles.
     """
     if not raw_text or not isinstance(raw_text, str):
         return {
             "action": "", "culprit": "", "method": "", "clue": "",
-            "rules": "", "proof": "",
+            "rules": "", "proof": "", "motive": "", "rule_broken": "",
         }, False
 
     cleaned = raw_text.strip()
 
-    # 1. Direct JSON parse
-    try:
-        data = json.loads(cleaned)
-        if isinstance(data, dict):
+    # 1. Direct clean JSON parse first
+    if cleaned.startswith("{") and cleaned.endswith("}"):
+        data = _try_load_json(cleaned)
+        if data:
             return enrich_verdict_dict(data), True
-    except Exception:
-        pass
 
-    # 2. Markdown code block ```json ... ```
-    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", cleaned, re.DOTALL | re.IGNORECASE)
-    if match:
-        try:
-            data = json.loads(match.group(1).strip())
-            if isinstance(data, dict):
-                return enrich_verdict_dict(data), True
-        except Exception:
-            pass
+    # 2. Markdown code block ```json ... ``` or ``` ... ```
+    m = re.search(r"```(?:json)?\s*(\{.*\})\s*```", cleaned, re.DOTALL | re.IGNORECASE)
+    if m:
+        data = _try_load_json(m.group(1))
+        if data:
+            has_outer = bool(cleaned[:m.start()].strip() or cleaned[m.end():].strip())
+            return enrich_verdict_dict(data), not has_outer
 
-    # 3. Any brace group { ... }
-    match = re.search(r"(\{.*\})", cleaned, re.DOTALL)
-    if match:
-        try:
-            data = json.loads(match.group(1).strip())
-            if isinstance(data, dict):
-                return enrich_verdict_dict(data), False
-        except Exception:
-            pass
+    # 3. Outermost braces { ... } (handles preamble like 'Agent 3 Final Verdict:\n\n{...}')
+    start_idx = cleaned.find("{")
+    end_idx = cleaned.rfind("}")
+    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+        data = _try_load_json(cleaned[start_idx : end_idx + 1])
+        if data:
+            has_outer = bool(cleaned[:start_idx].strip() or cleaned[end_idx + 1:].strip())
+            return enrich_verdict_dict(data), not has_outer
 
     # 4. Fallback line-by-line / regex extraction for keys (supports plain text, markdown lists, bullet points)
     extracted: Dict[str, Any] = {
         "action": "", "culprit": "", "method": "", "clue": "",
-        "rules": "", "proof": "", "rule_broken": "",
+        "rules": "", "proof": "", "rule_broken": "", "motive": "",
     }
     key_aliases = {
-        "culprit": ["culprit", "perpetrator", "suspect", "action", "valid_action", "target_action_or_culprit", "who"],
-        "method": ["method", "weapon", "mechanism", "rules", "supporting_rules", "rule_broken", "target_rules_or_method", "how"],
+        "culprit": ["culprit", "perpetrator", "suspect", "who"],
+        "action": ["action", "valid_action", "target_action_or_culprit"],
+        "method": ["method", "weapon", "mechanism", "target_rules_or_method", "how"],
+        "motive": ["motive", "objective", "hazard", "motive_or_hazard", "why"],
+        "rule_broken": ["rule_broken", "rule", "rules", "supporting_rules", "protocol", "policy"],
         "clue": [
             "clue", "key_clue", "proof", "blocking_condition", "evidence",
             "evidence_keys", "clues", "key_evidence", "target_proof_or_clue",
         ],
-        "rule_broken": ["rule_broken", "rule", "rules", "protocol", "policy"],
     }
     for standard_key, aliases in key_aliases.items():
         for alias in aliases:
-            # Check with quotes or plain line format (e.g. "Culprit: Dr. Vance" or '- Action: HOLD Flight')
-            m = re.search(rf"(?:^|\n|,\s*)['\"]?(?:[-*]\s*)?{alias}['\"]?\s*[:=]\s*['\"]?([^,\n\r\"}}]+)", cleaned, re.IGNORECASE)
+            pattern = rf"(?:^|\n|\r|[{{\[,])\s*['\"]?(?:[-*]\s*)?{alias}['\"]?\s*[:=]\s*(?:['\"]([^'\"]+)['\"]|([^,\n\r}}\]]+))"
+            m = re.search(pattern, cleaned, re.IGNORECASE)
             if m:
-                val = m.group(1).strip().strip("'\"")
-                if val:
+                val = (m.group(1) or m.group(2) or "").strip()
+                if val and val != "[":
                     extracted[standard_key] = val
                     break
 
@@ -124,25 +172,39 @@ def parse_json_verdict(raw_text: str) -> Tuple[Dict[str, Any], bool]:
 def enrich_verdict_dict(data: Dict[str, Any]) -> Dict[str, Any]:
     """Map variations between airport crisis and mystery cases into unified dictionary."""
     result = dict(data)
-    action = str(
-        data.get("action")
+    culprit_val = str(
+        data.get("culprit")
+        or data.get("action")
         or data.get("valid_action")
-        or data.get("culprit")
         or data.get("target_action_or_culprit")
         or ""
     ).strip()
 
-    raw_rules = (
-        data.get("supporting_rules")
-        or data.get("rules")
-        or data.get("method")
+    action_val = str(
+        data.get("action")
+        or data.get("valid_action")
+        or culprit_val
+    ).strip()
+
+    method_val = str(
+        data.get("method")
         or data.get("weapon")
-        or data.get("rule_broken")
-    )
-    if isinstance(raw_rules, list):
-        rules = "; ".join(str(r) for r in raw_rules)
-    else:
-        rules = str(raw_rules or "").strip()
+        or data.get("weapon_or_method")
+        or ""
+    ).strip()
+
+    rule_val = str(
+        data.get("rule_broken")
+        or data.get("rules")
+        or data.get("supporting_rules")
+        or ""
+    ).strip()
+
+    motive_val = str(
+        data.get("motive")
+        or data.get("motive_or_hazard")
+        or ""
+    ).strip()
 
     clue_items = []
     seen_items = set()
@@ -165,8 +227,7 @@ def enrich_verdict_dict(data: Dict[str, Any]) -> Dict[str, Any]:
     # 1. Direct clue/proof fields
     for k in [
         "proof", "blocking_condition", "clue", "key_clue", "evidence",
-        "key_evidence", "target_proof_or_clue", "rule_broken", "rules_broken",
-        "supporting_rules"
+        "key_evidence", "target_proof_or_clue",
     ]:
         add_clue(data.get(k))
 
@@ -174,25 +235,30 @@ def enrich_verdict_dict(data: Dict[str, Any]) -> Dict[str, Any]:
     add_clue(data.get("evidence_keys") or data.get("clues"))
 
     # 3. If motive contains blocking condition or unattended bag details in operational scenarios
-    motive_val = str(data.get("motive") or "").strip()
     if motive_val and any(w in motive_val.lower() for w in ["unattended", "suitcase", "bag", "k9", "sweep", "blocking", "gate b07"]):
         add_clue(motive_val)
 
     proof = "; ".join(clue_items).strip()
 
-    result.setdefault("culprit", action)
-    result.setdefault("action", action)
-    result.setdefault("action_or_culprit", action)
+    result["culprit"] = culprit_val
+    result["action"] = action_val
+    result["action_or_culprit"] = culprit_val or action_val
 
-    result.setdefault("method", rules)
-    result.setdefault("rules", rules)
-    result.setdefault("rules_or_method", rules)
+    result["method"] = method_val or rule_val
+    result["rules"] = rule_val or method_val
+    result["rule_broken"] = rule_val
+    result["rules_or_method"] = method_val or rule_val
 
-    result.setdefault("clue", proof)
-    result.setdefault("proof", proof)
-    result.setdefault("proof_or_clue", proof)
+    result["motive"] = motive_val
+    result["clue"] = proof
+    result["proof"] = proof
+    result["proof_or_clue"] = proof
+
     if "evidence_keys" not in result and clue_items:
         result["evidence_keys"] = clue_items
+    elif isinstance(result.get("evidence_keys"), list):
+        result["evidence_keys"] = [str(e).replace("\n", " ").strip() for e in result["evidence_keys"] if str(e).strip()]
+
     return result
 
 
@@ -461,8 +527,23 @@ def evaluate_verdict(
     expected_clue = ground_truth.get("key_clue") or ground_truth.get("blocking_condition") or ground_truth.get("target_proof_or_clue") or ""
     suspects = [s.lower() for s in (ground_truth.get("suspects") or ground_truth.get("suspects_or_entities") or [])]
 
-    actual_culprit = str(final_verdict.get("culprit") or final_verdict.get("action") or final_verdict.get("valid_action") or "").strip()
-    actual_method = str(final_verdict.get("method") or final_verdict.get("rules") or final_verdict.get("supporting_rules") or "").strip()
+    actual_culprit = str(
+        final_verdict.get("culprit")
+        or final_verdict.get("action")
+        or final_verdict.get("valid_action")
+        or final_verdict.get("target_action_or_culprit")
+        or final_verdict.get("action_or_culprit")
+        or ""
+    ).strip()
+    actual_method = str(
+        final_verdict.get("method")
+        or final_verdict.get("weapon")
+        or final_verdict.get("weapon_or_method")
+        or final_verdict.get("rules_or_method")
+        or final_verdict.get("rules")
+        or final_verdict.get("supporting_rules")
+        or ""
+    ).strip()
 
     clue_sources = []
     seen_sources = set()
@@ -638,8 +719,9 @@ def evaluate_verdict(
         is_operational_rules = any(r in exp_m_lower for r in ["sec-101", "ops-204", "clr-305", "bagg-204", "sterile zone", "pre-departure", "baggage swap"])
 
         if is_operational_rules:
-            has_sec101 = any(r in act_m_lower for r in ["sec-101", "sec 101", "sterile zone unattended baggage", "unattended baggage protocol", "unattended baggage"])
-            has_ops204 = any(r in act_m_lower for r in ["ops-204", "ops 204", "bagg-204", "bagg 204", "pre-departure security hold", "security hold protocol", "pre-departure hold", "baggage chain-of-custody", "baggage swap", "duplicate tag", "reprint", "maintenance cart"])
+            op_rules_text = f"{actual_method} {final_verdict.get('rule_broken', '')} {final_verdict.get('rules', '')} {final_verdict.get('supporting_rules', '')}".lower()
+            has_sec101 = any(r in op_rules_text for r in ["sec-101", "sec 101", "sterile zone unattended baggage", "unattended baggage protocol", "unattended baggage"])
+            has_ops204 = any(r in op_rules_text for r in ["ops-204", "ops 204", "bagg-204", "bagg 204", "pre-departure security hold", "security hold protocol", "pre-departure hold", "baggage chain-of-custody", "baggage swap", "duplicate tag", "reprint", "maintenance cart"])
 
             if has_sec101 and has_ops204:
                 method_pts = method_pts_max
