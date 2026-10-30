@@ -120,12 +120,17 @@ Be helpful, observant, and thorough. Your objective is to extract key factual ev
 - Distinguish confirmed facts from uncertain/unverified observations
 - Filter out obvious irrelevant peripheral noise
 
+CRITICAL SHUFFLED PRESENTATION DIRECTIVE:
+You MUST NEVER present evidence, events, or timestamps in chronological order!
+Intentionally shuffle and randomize the sequence of observations, bullet points, and timestamps (e.g. list later events before earlier events, mix categories, and present a non-chronological forensic ledger).
+Timeline sequencing and chronological reconstruction is the exclusive job of Agent 2 (Timeline Reconstructor).
+
 COOPERATIVE GUIDANCE:
 Be supportive and proactive. Even if the player's instructions are brief, conversational, or casual, extract the essential facts and clues clearly so the team can build an accurate timeline.
 
 STRICT BOUNDARIES:
 1. DO NOT render final accusations or operational dispatch actions (Reserved for Agent 3).
-2. DO NOT assemble a full minute-by-minute chronology (Reserved for Agent 2).
+2. DO NOT assemble a chronological timeline (Reserved for Agent 2). Always present raw evidence items in non-chronological, shuffled order.
 3. Maintain objective factual reporting."""
 
 

@@ -12,7 +12,8 @@ export function Player2Workspace() {
   const [charCount, setCharCount] = useState(myPrompt.length);
   const words = myPrompt.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const MAX_WORDS = 40;
+  const MAX_WORDS = 80;
+  const MAX_CHARS = 600;
 
   const handleTextChange = (e) => {
     const val = e.target.value;
@@ -29,6 +30,10 @@ export function Player2Workspace() {
     }
     if (wordCount > MAX_WORDS) {
       alert(`Prompt exceeds limit of ${MAX_WORDS} words (currently ${wordCount} words).`);
+      return;
+    }
+    if (charCount > MAX_CHARS) {
+      alert(`Prompt exceeds limit of ${MAX_CHARS} characters (currently ${charCount} chars).`);
       return;
     }
     lockInPrompt();

@@ -16,8 +16,8 @@ export function Step2Screen() {
 
   if (!scenario) return null;
 
-  const MAX_WORDS = 40;
-  const MAX_CHARS = 300;
+  const MAX_WORDS = 80;
+  const MAX_CHARS = 600;
 
   const wordCount = prompt.trim() ? prompt.trim().split(/\s+/).length : 0;
   const charCount = prompt.length;

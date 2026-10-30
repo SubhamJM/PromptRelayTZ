@@ -12,9 +12,9 @@ In compliance with investigative standards and competitive game design:
 - 🚫 **NO Exact Timestamps**: Does **NOT** mention hardcoded times (e.g. *08:14*, *21:15*, *23:40*).
 - 🚫 **NO Hardcoded Rule Codes**: Does **NOT** mention specific rule numbers (e.g. *SEC-101*, *OPS-204*, *SEC-401*, *ART-302*).
 - ✅ **Strict Word & Character Budget**: Guaranteed within all game constraints:
-  - **Player 1**: Max 40 words | Max 300 characters
-  - **Player 2**: Max 40 words | Max 300 characters
-  - **Player 3**: Max 60 words | Max 450 characters
+  - **Player 1**: Max 80 words | Max 600 characters
+  - **Player 2**: Max 80 words | Max 600 characters
+  - **Player 3**: Max 120 words | Max 900 characters
 - 🎯 **Expected Score**: **95–100 / 100 (Tier S - Master Detective)** across all three agents and final case evaluation.
 
 ---
@@ -24,8 +24,8 @@ In compliance with investigative standards and competitive game design:
 If you want a single set of master prompts that your team can paste into **ANY** scenario without knowing the case ahead of time:
 
 ### Player 1 (Universal - Evidence Extractor)
-* **Word Count**: 34 / 40 words
-* **Character Count**: 260 / 300 characters
+* **Word Count**: 34 / 80 words
+* **Character Count**: 260 / 600 characters
 * **Score**: **20 / 20**
 
 ```text
@@ -33,8 +33,8 @@ Role: Forensic Evidence Extractor. Extract verified facts from CCTV feeds, acces
 ```
 
 ### Player 2 (Universal - Timeline Reconstructor)
-* **Word Count**: 36 / 40 words
-* **Character Count**: 271 / 300 characters
+* **Word Count**: 36 / 80 words
+* **Character Count**: 271 / 600 characters
 * **Score**: **20 / 20**
 
 ```text
@@ -42,8 +42,8 @@ Role: Timeline & Incident Reconstructor. Sequence all events chronologically fro
 ```
 
 ### Player 3 (Universal - Logic Decision Solver)
-* **Word Count**: 44 / 60 words
-* **Character Count**: 318 / 450 characters
+* **Word Count**: 44 / 120 words
+* **Character Count**: 318 / 900 characters
 * **Score**: **20 / 20** (+ **40 / 40** Case Accuracy)
 
 ```text
@@ -56,8 +56,8 @@ Role: Logic Decision Solver. Evaluate the timeline against governing rules and s
 
 ### Player 1: Evidence Extractor
 * **Persona**: Forensic Evidence Extractor
-* **Word Count**: 34 words (limit: 40)
-* **Character Count**: 260 chars (limit: 300)
+* **Word Count**: 34 words (limit: 80)
+* **Character Count**: 260 chars (limit: 600)
 * **Score**: **20 / 20**
 
 ```text
@@ -66,8 +66,8 @@ Role: Forensic Evidence Extractor. Extract verified facts from CCTV feeds, acces
 
 ### Player 2: Timeline Reconstructor
 * **Persona**: Timeline & Incident Reconstructor
-* **Word Count**: 36 words (limit: 40)
-* **Character Count**: 271 chars (limit: 300)
+* **Word Count**: 36 words (limit: 80)
+* **Character Count**: 271 chars (limit: 600)
 * **Score**: **20 / 20**
 
 ```text
@@ -76,8 +76,8 @@ Role: Timeline & Incident Reconstructor. Sequence all events chronologically fro
 
 ### Player 3: Logic Decision Solver
 * **Persona**: Logic Decision Solver
-* **Word Count**: 47 words (limit: 60)
-* **Character Count**: 341 chars (limit: 450)
+* **Word Count**: 47 words (limit: 120)
+* **Character Count**: 341 chars (limit: 900)
 * **Score**: **20 / 20** (+ **40 / 40** Case Solution)
 
 ```text
@@ -99,8 +99,8 @@ Role: Logic Decision Solver. Evaluate the timeline against governing rules and s
 
 ### Player 1: Evidence Extractor
 * **Persona**: Forensic Evidence Extractor
-* **Word Count**: 34 words (limit: 40)
-* **Character Count**: 260 chars (limit: 300)
+* **Word Count**: 34 words (limit: 80)
+* **Character Count**: 260 chars (limit: 600)
 * **Score**: **20 / 20**
 
 ```text
@@ -109,8 +109,8 @@ Role: Forensic Evidence Extractor. Extract verified facts from CCTV feeds, acces
 
 ### Player 2: Timeline Reconstructor
 * **Persona**: Timeline & Incident Reconstructor
-* **Word Count**: 36 words (limit: 40)
-* **Character Count**: 271 chars (limit: 300)
+* **Word Count**: 36 words (limit: 80)
+* **Character Count**: 271 chars (limit: 600)
 * **Score**: **20 / 20**
 
 ```text
@@ -119,8 +119,8 @@ Role: Timeline & Incident Reconstructor. Sequence all events chronologically fro
 
 ### Player 3: Logic Decision Solver
 * **Persona**: Logic Decision Solver
-* **Word Count**: 43 words (limit: 60)
-* **Character Count**: 334 chars (limit: 450)
+* **Word Count**: 43 words (limit: 120)
+* **Character Count**: 334 chars (limit: 900)
 * **Score**: **20 / 20** (+ **40 / 40** Case Solution)
 
 ```text

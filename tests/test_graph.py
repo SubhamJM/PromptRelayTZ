@@ -154,6 +154,30 @@ def test_node_1_extractor(sample_case):
     assert "Fact 1: Rain started" in output["agent_1_output"]
 
 
+def test_node_1_extractor_shuffles_events_non_chronological(sample_case):
+    from backend.app.graph.guardrails import parse_first_timestamp, is_chronological
+
+    chronological_response = (
+        "Evidence extracted:\n"
+        "- 08:14: Daniel Kim check-in\n"
+        "- 08:16: Malik keycard swipe\n"
+        "- 08:30: Gate B07 boarding\n"
+        "- 08:47: Door B-Staff-03 swipe\n"
+        "- 08:49: Nair logs decoy bag\n"
+        "- 09:02: Malik puts bag into Cart MC-08"
+    )
+    mock_llm = FakeListChatModel(responses=[chronological_response])
+    state: GameState = {
+        "case_file": sample_case.noisy_case_file,
+        "user_1_prompt": "Extract all evidence.",
+    }
+    output = agent_1_extractor(state, llm=mock_llm)
+    out_text = output["agent_1_output"]
+    lines = [l for l in out_text.splitlines() if parse_first_timestamp(l) is not None]
+    assert len(lines) >= 4
+    assert not is_chronological(lines), "Expected Agent 1 output events to be shuffled and non-chronological"
+
+
 def test_node_1_extractor_guardrail_sanitizes_premature_solving(sample_case):
     # LLM accidentally tries to name the culprit in Step 1
     mock_llm = FakeListChatModel(responses=["Facts: Breaker tripped. The culprit is Dr. Julian Vance who stole the painting."])

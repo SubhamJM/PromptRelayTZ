@@ -363,22 +363,22 @@ class MockOfflineChatModel(SimpleChatModel):
                 elif tier == "moderate":
                     return (
                         "Extracted Evidence (Partial):\n"
-                        "- 21:15: Dr. Julian Vance (Badge CONSV-04) checked into gala.\n"
-                        "- 23:40:42: Breaker B-04 tripped, disrupting Wing C Gallery 4 Beam Grid #7.\n"
                         "- 23:42:10: CCTV CAM-18 caught masked individual with canvas tube in basement passage.\n"
+                        "- 21:15: Dr. Julian Vance (Badge CONSV-04) checked into gala.\n"
                         "- Lab analysis RM-1887-04 showed synthetic acrylic binder in the framed painting.\n"
+                        "- 23:40:42: Breaker B-04 tripped, disrupting Wing C Gallery 4 Beam Grid #7.\n"
                         "- Locker 14 search yielded Gala token C-408 and staff card #408."
                     )
                 else:
                     return (
                         "Verified Clues & Factual Evidence Extracted:\n"
-                        "- 21:15:42: Dr. Julian Vance (Head of Conservation, Badge CONSV-04) checked into gala with access to Gallery 4 and Private Vault.\n"
-                        "- 23:40:42.286: SCADA logged Breaker B-04 trip causing 90-second auxiliary power blackout loop and disrupting Beam Grid #7.\n"
-                        "- 23:40: Chief Marcus Thorne dispatched in person to basement sub-station.\n"
                         "- 23:42:10: CCTV CAM-18 recorded masked suspect fleeing basement corridor carrying canvas travel tube toward Stairwell C1 / Fire Exit.\n"
+                        "- 21:15:42: Dr. Julian Vance (Head of Conservation, Badge CONSV-04) checked into gala with access to Gallery 4 and Private Vault.\n"
                         "- 23:48:00: Officer J. Carter searched Locker 14, recovering Gala Cloakroom token No. C-408 and Conservation staff RFID access card #408 (CONSV-408).\n"
-                        "- Lab Spectrometry: Painting RM-1887-04 left on wall confirmed as modern synthetic acrylic forgery (circa 2023) with zinc white.\n"
                         "- Evidence #04 Memo: 'Breaker B-04 loop: 90 sec gap before aux power - switch canvas - drop tube at Locker 14.'\n"
+                        "- 23:40:42.286: SCADA logged Breaker B-04 trip causing 90-second auxiliary power blackout loop and disrupting Beam Grid #7.\n"
+                        "- Lab Spectrometry: Painting RM-1887-04 left on wall confirmed as modern synthetic acrylic forgery (circa 2023) with zinc white.\n"
+                        "- 23:40: Chief Marcus Thorne dispatched in person to basement sub-station.\n"
                         "- Filtered Distractions: Luxe Catering dropped crate at 21:25 and Elena Rossi logistics disregarded as peripheral noise."
                     )
             else:  # Airport Crisis
@@ -393,8 +393,8 @@ class MockOfflineChatModel(SimpleChatModel):
                 elif tier == "moderate":
                     return (
                         "Extracted Information (Partial):\n"
-                        "- 08:30: Flight SW 472 to New York boarding at Gate B07.\n"
                         "- 08:35: Passenger Aarav Mehta at Gate B07 noticed a blue bag.\n"
+                        "- 08:30: Flight SW 472 to New York boarding at Gate B07.\n"
                         "- Blue hard-shell suitcase reported near window seats.\n"
                         "- Security Officer R. Nair on patrol.\n"
                         "- Checked baggage conveyor active."
@@ -402,14 +402,14 @@ class MockOfflineChatModel(SimpleChatModel):
                 else:  # strong
                     return (
                         "Verified Clues & Factual Evidence Extracted:\n"
-                        "- 08:14:23: Passenger Daniel Kim checked in 18.4 kg blue polycarbonate suitcase at Counter A04 for Flight SW 472 (Consignment #DIA-904 diamonds).\n"
-                        "- 08:16:05: Supervisor terminal accessed with keycard REPRINT-MGR-02 (Tariq Malik, Badge RAMP-882).\n"
-                        "- 08:30:00: Flight SW 472 to New York commences priority boarding at Gate B07.\n"
-                        "- 08:35 - 08:47: Passenger Aarav Mehta spots unattended blue bag under Gate B07 window seats with no owner present; sees hooded person with orange-soled ramp boots slip into staff door.\n"
                         "- 08:47:10: CCTV CAM 12 captures suspect in hooded windbreaker and orange-soled tarmac boots (Spec RAMP-882) unlocking Door B-Staff-03 at 08:47:45.\n"
+                        "- 08:14:23: Passenger Daniel Kim checked in 18.4 kg blue polycarbonate suitcase at Counter A04 for Flight SW 472 (Consignment #DIA-904 diamonds).\n"
                         "- 08:49:00: Officer R. Nair logs decoy blue suitcase; portable scale reads 12.1 kg (6.3 kg discrepancy); X-ray shows sand ballast.\n"
+                        "- 08:16:05: Supervisor terminal accessed with keycard REPRINT-MGR-02 (Tariq Malik, Badge RAMP-882).\n"
                         "- 09:02:55: CAM 21 shows genuine 18.4 kg diamond suitcase diverted into Maintenance Cart #MC-08 on Apron Bay 3 by Tariq Malik.\n"
+                        "- 08:30:00: Flight SW 472 to New York commences priority boarding at Gate B07.\n"
                         "- Baggage Tag Barcode: Decoy bag tag #SKW-78921-472 has bottom watermark: REPRINT-MGR-02 / AUTH: RAMP-882.\n"
+                        "- 08:35 - 08:47: Passenger Aarav Mehta spots unattended blue bag under Gate B07 window seats with no owner present; sees hooded person with orange-soled ramp boots slip into staff door.\n"
                         "- Filtered Distractions: Daily Chronicle marathon news and catering coffee deliveries disregarded as peripheral noise."
                     )
 
